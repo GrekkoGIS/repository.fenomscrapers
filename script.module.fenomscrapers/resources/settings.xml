@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<!-- General-0 -->
+	<category label="General">
+		<setting id="module.provider" label="Choose Module Scraper" type="action" enable="false" visible="false" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ScraperChoice)" default="Fenomscrapers"/>
+		<setting label="Fenomscrapers Default Providers" type="action"  action="RunPlugin(plugin://script.module.fenomscrapers/?action=Defaults&amp;setting=true)" />
+		<setting label="Disable All Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAll&amp;setting=false)" />
+		<setting label="Enable All Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAll&amp;setting=true)" />
+		<setting type="sep" />
+		<setting label="Show Changelog" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowChangelog)" />
+		<setting id="checkAddonUpdates" type="bool" label="Notify Me About Available Updates" default="false" />
+	</category>
+
+	<!-- Debrid Sources-1 -->
+	<category label="Premium Hosters">
+		<setting label="Disable All Hosters" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllHosters&amp;setting=false)" />
+		<setting label="Enable All Hosters" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllHosters&amp;setting=true)" />
+		<setting type="sep"/>
+		<setting id="provider.2ddl" type="bool" label="$NUMBER[2]DDL" default="false" />
+		<setting id="provider.300mbfilms" type="bool" label="$NUMBER[300]MBFILMS" default="false" />
+		<setting id="provider.5movies" type="bool" label="$NUMBER[5]MOVIES" default="false" />
+		<setting id="provider.cartoonhd" type="bool" label="CARTOONHD" default="false" />
+		<setting id="provider.easynews" type="bool" label="EASYNEWS" default="false"/>
+		<setting id="provider.filepursuit" type="bool" label="FILEPURSUIT" default="false"/>
+		<setting id="provider.filmxy" type="bool" label="FILMXY" default="false" />
+		<setting id="provider.furk" type="bool" label="FURK" default="false"/>
+		<setting id="provider.ganool" type="bool" label="GANOOL(movies only)" default="false" />
+		<setting id="provider.library" type="bool" label="LIBRARY" default="false"/>
+		<setting id="provider.maxrls" type="bool" label="MAXRLS" default="false" />
+		<setting id="provider.myvideolink" type="bool" label="MYVIDEOLINK" default="false" />
+		<setting id="provider.onlineseries" type="bool" label="ONLINESERIES" default="false" />
+		<setting id="provider.ororo" type="bool" label="ORORO" default="false"/>
+		<setting id="provider.rlsbb" type="bool" label="RLSBB" default="false" />
+		<setting id="provider.scenerls" type="bool" label="SCENERLS" default="false" />
+		<setting id="provider.watchepisodes" type="bool" label="WATCHEPISODES(shows only)" default="false" />
+		<setting id="provider.watchseries" type="bool" label="WATCHSERIES(shows only)" default="false" />
+		<setting id="provider.watchserieshd" type="bool" label="WATCHSERIESHD(shows only)" default="false" />
+		<setting id="provider.watchseriestv" type="bool" label="WATCHSERIESTV(shows only)" default="false" />
+	</category>
+
+	<!-- Torrents-2 -->
+	<category label="Torrents">
+		<setting label="Disable All Torrent Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=false)" />
+		<setting label="Enable All Torrent Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=true)" />
+		<setting label="Enable All Pack Capable Torrent Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllPackTorrent&amp;setting=true)" />
+		<setting label="      [COLOR FFA0C12C]-- pack scraper Help --[/COLOR]" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=packScrapers)" />
+		<setting type="sep" />
+		<setting id="filter.undesirables" type="bool" label="Remove Undesirables" default="true"/>
+		<setting label="      [COLOR FFA0C12C]-- undesirables filter Help --[/COLOR]" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=undesirablesFilter)" />
+		<setting id="filter.foreign.single.audio" type="bool" label="Remove identified Foreign single audio sources" default="true"/>
+		<setting type="sep" />
+		<setting id="provider.1337x" type="bool" label="$NUMBER[1337]X" default="false" />
+		<setting id="provider.7torrents" type="bool" label="$NUMBER[7]TORRENTS (Pack capable)" default="false" />
+		<setting id="provider.bitlord" type="bool" label="BITLORD (Pack capable)" default="true" />
+		<setting id="provider.btscene" type="bool" label="BTSCENE (Pack capable)" default="false" />
+		<setting id="provider.ettv" type="bool" label="ETTV" default="true" />
+		<setting id="provider.extratorrent" type="bool" label="EXTRATORRENT" default="true" />
+		<setting id="provider.eztv" type="bool" label="EZTV" default="true" />
+		<setting id="provider.glodls" type="bool" label="GLODLS" default="true" />
+		<setting id="provider.idope" type="bool" label="IDOPE (Pack capable)" default="true" />
+		<setting id="provider.isohunt2" type="bool" label="ISOHUNT2" default="false" />
+		<setting id="provider.kickass2" type="bool" label="KICKASS2 (Pack Capable)" default="true" />
+		<setting id="provider.limetorrents" type="bool" label="LIMETORRENTS (Pack capable)" default="true" />
+		<setting id="provider.magnet4you" type="bool" label="MAGNET$NUMBER[4]YOU" default="true" />
+		<setting id="provider.magnetdl" type="bool" label="MAGNETDL (Pack capable)" default="true" />
+		<setting id="provider.moviemagnet" type="bool" label="MOVIEMAGNET" default="false" />
+		<setting id="provider.nyaa" type="bool" label="NYAA" default="false" />
+		<setting id="provider.piratebay" type="bool" label="PIRATEBAY (Pack capable)" default="true" />
+		<setting id="provider.skytorrents" type="bool" label="SKYTORRENTS (Pack capable)" default="true" />
+		<setting id="provider.solidtorrents" type="bool" label="SOLIDTORRENTS (Pack capable)" default="true" />
+		<setting id="provider.topnow" type="bool" label="TOPNOW" default="false" />
+		<setting id="provider.torlock" type="bool" label="TORLOCK" default="false" />
+		<setting id="provider.torrentapi" type="bool" label="TORRENTAPI (Pack capable)" default="true" />
+		<setting id="provider.torrentdownload" type="bool" label="TORRENTDOWNLOAD (Pack capable)" default="true" />
+		<setting id="provider.torrentfunk" type="bool" label="TORRENTFUNK (Pack capable)" default="true" />
+		<setting id="provider.torrentgalaxy" type="bool" label="TORRENTGALAXY (Pack capable)" default="true" />
+		<setting id="provider.yourbittorrent" type="bool" label="YOURBITTORRENT (Pack capable)" default="false" />
+		<setting id="provider.ytsws" type="bool" label="YTSWS" default="false" />
+		<setting id="provider.zoogle" type="bool" label="ZOOGLE (Pack capable)" default="false" />
+	</category>
+
+	<!-- Accounts-3 -->
+	<category label="Scraper Accounts">
+		<setting label="My Accounts Manager" type="lsep" />
+		<setting type="action" label="Open My Accounts Addon" option="close" action="RunPlugin(plugin://script.module.fenomscrapers/?action=openMyAccount&amp;opensettings=true&amp;query=3.1)" />
+		<setting type="action" label="sync(re) with My Accounts" option="close" action="RunPlugin(plugin://script.module.fenomscrapers/?action=syncMyAccount&amp;opensettings=true&amp;query=3.2)" />
+		<setting type="action" label="      [COLOR FFA0C12C]-- my accounts Help --[/COLOR]" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=myAccountsSync&amp;query=8.2)" />
+
+		<setting type="lsep" label="Filepursuit - for key visit: rapidapi.com/azharxes/api/filepursuit" />
+		<setting id="filepursuit.api" type="text" label="Filepursuit API Key" default="" enable="false" />
+
+		<setting type="lsep" label="Furk.net" />
+		<setting id="furk.user_name" type="text" label="Furk Username" default="" enable="false" />
+		<setting id="furk.user_pass" type="text" label="Furk Password" option="hidden" default="" enable="false" />
+		<setting id="furk.api" type="text" label="Furk API Key" default="" />
+
+		<setting type="lsep" label="Easynews" />
+		<setting id="easynews.user" type="text" label="Easynews Username" default="" enable="false" />
+		<setting id="easynews.password" type="text" label="Easynews Password" default="" enable="false" />
+
+		<setting type="lsep" label="Ororo.tv" />
+		<setting id="ororo.user" type="text" label="Email" default="" enable="false" />
+		<setting id="ororo.pass" type="text" option="hidden" label="Password" default="" enable="false" />
+	</category>
+
+	<!-- Debugging - 4 -->
+	<category label="Debug">
+		<setting id="debug.enabled" type="bool" label="Enable Debug" default="false" />
+		<setting id="debug.location" type="enum" label="Logging Location" values="Kodi Log|Addon Log" default="1" enable="eq(-1,true)" />
+	</category>
+</settings>
