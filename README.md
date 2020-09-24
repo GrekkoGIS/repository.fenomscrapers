@@ -1,10 +1,11 @@
 
 
-Welcome to Fenomscrapers Project.
+# Welcome to the *Fenom Scrapers* Project
 
 
 
-# Fenomscrapers Repo
+
+## Fenomscrapers Repo
 
 You can add the source directory to your own repository for convenience and updates
 ```
@@ -14,7 +15,7 @@ You can add the source directory to your own repository for convenience and upda
     <datadir zip="true">https://raw.githubusercontent.com/mr-kodi/repository.fenomscrapers/master/zips/</datadir>
 </dir>
 ```
-# How to Import Fenom Scrapers Into Any Addon
+## How to Import Fenom Scrapers Into Any Addon
 
 Any multi-source Kodi addon can be altered to use these new scrapers instead of its own, you can follow the
 instructions below to get things updated. When applying to a different addon, change "name_of_addon" with the name
