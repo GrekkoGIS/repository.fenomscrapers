@@ -137,13 +137,10 @@ def get_release_quality(release_title, release_link=None):
 		if not quality:
 			if release_link:
 				release_link = release_link.lower()
-				try:
-					release_link = release_link.encode('utf-8')
-				except:
-					pass
+				try: release_link = release_link.encode('utf-8')
+				except: pass
 				quality = get_qual(release_link)
-				if not quality:
-					quality = 'SD'
+				if not quality: quality = 'SD'
 			else:
 				quality = 'SD'
 		info = []
@@ -152,7 +149,6 @@ def get_release_quality(release_title, release_link=None):
 				info.append('3D')
 			if any(value in fmt for value in CODEC_H265):
 				info.append('HEVC')
-
 		return quality, info
 	except:
 		log_utils.error()
@@ -232,10 +228,8 @@ def getFileType(url):
 		if any(value in fmt for value in ADDS):
 			type += ' ADDS /'
 		if any(value in fmt for value in SUBS):
-			if type != '':
-				type += ' WITH SUBS'
-			else:
-				type = 'SUBS'
+			if type != '': type += ' WITH SUBS'
+			else: type = 'SUBS'
 		type = type.rstrip('/')
 		return type
 	except:
@@ -246,10 +240,8 @@ def getFileType(url):
 def check_url(url):
 	try:
 		url = url.lower()
-		try:
-			url = url.encode('utf-8')
-		except:
-			pass
+		try: url = url.encode('utf-8')
+		except: pass
 		quality = get_qual(url)
 		if not quality:
 			quality = 'SD'
@@ -324,7 +316,6 @@ def check_title(title, aliases, release_title, hdlr, year):
 			match = False
 		if h not in n:
 			match = False
-
 		return match
 	except:
 		log_utils.error()
@@ -416,8 +407,6 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
-
-		# log_utils.log('t = %s for release_title = %s' % (str(t), str(release_title)), __name__, log_utils.LOGDEBUG)
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False
 
@@ -483,7 +472,6 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
-		# log_utils.log('t = %s for release_title = %s' % (str(t), str(release_title)), __name__, log_utils.LOGDEBUG)
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False, 0
 
@@ -512,17 +500,17 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 # remove single seasons - returned in seasonPack scrape
 		season_regex = [
-				r'season(?:\.{0,1}|-{0,1})([2-9]{1}).(?:0{1})\1.complete',	# "season.2.02.complete" when first number is >1 matches 2nd after a zero
-				r'season(?:\.{0,1}|-{0,1})([2-9]{1}).(?:[0-9]+).complete', # "season.9.10.complete" when first number is >1 followed by 2 digit number
-				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)s\d{1,2}',		   # season.02.s02
-				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)complete',		 # season.02.complete
-				r'season(?:\.{0,1}|-{0,1})\d{1,2}(?:\.|-)\d{3,4}p{0,1}',		  # "season.02.1080p" and no seperator "season02.1080p"
-				r'season(?:\.|-)\d{1,2}(?:\.|-)(?!thru|to|\d+)', # not followed by "to", "thru", or another number(which would be a range)
-				r'season(?:\.|-)\d{1,2}(?:\.)(?:$)',				 # end of line ex."season.1" or "season.01"
-				r'season(?:\.|-)\d{1,2}(?:\.|-)(?:19|20)[0-9]{2}',			# single season followed by 4 digit year ex."season.1.1971" or "season.01.1971
-				r'season(?:\.|-)\d{1,2}(?:\.|-)\d{3}(?:\.{1,2}|-{1,2})(?:19|20)[0-9]{2}',		   # single season followed by 4 digit year ex."season.1.004.1971" or "season.01.004.1971"
+				r'season(?:\.{0,1}|-)([2-9]{1}).(?:0{1})\1.complete',	# "season.2.02.complete" when first number is >1 matches 2nd after a zero
+				r'season(?:\.{0,1}|-)([2-9]{1}).(?:[0-9]+).complete', # "season.9.10.complete" when first number is >1 followed by 2 digit number
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)s\d{1,2}',		 # season.02.s02
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)complete',		 # season.02.complete
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)\d{3,4}p{0,1}',		  # "season.02.1080p" and no seperator "season02.1080p"
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?!thru|to|\d{2}\.)',		  # season.02. not followed by "to", "thru", or another 2 digit number then a dot(which would be a range)
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.{0,1})(?:$)',				 # end of line ex."season.1",  "season.01", "season01" can also have trailing dot only
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?:19|20)[0-9]{2}',			# single season followed by 4 digit year ex."season.1.1971", "season.01.1971", or "season01.1971"
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)\d{3}(?:\.{1,2}|-{1,2})(?:19|20)[0-9]{2}',		   # single season followed by 4 digits then 4 digit year ex."season.1.004.1971" or "season.01.004.1971" (comic book format)
 				r'(?<!thru)(?<!to)(?<!\d{2})(?:\.|-)s\d{2}(?:\.|-)complete',				# ".s02.complete" not proceeded by "thru", "to", or 2 digit number
-				r'(?<!thru)(?<!to)(?<!s\d{2})(?:\.|-)s\d{2}(?:\.|-)(?!thru|to|s|\d+)'		# .s02. not followed or proceeded by "thru", "to" 
+				r'(?<!thru)(?<!to)(?<!s\d{2})(?:\.|-)s\d{2}(?:\.|-)(?!thru|to|s\d+)'		# .s02. not followed or proceeded by "thru", "to" 
 				]
 		for item in season_regex:
 			if bool(re.search(item, release_title)):
@@ -582,6 +570,14 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			last_season = int(keys[0].split('-')[1])
 			return True, last_season
 
+# "1~9" range filter
+		tilde_ranges = [i.replace('.to.', '~') for i in to_season_ranges]
+		if any(i in release_title for i in tilde_ranges):
+			keys = [i for i in tilde_ranges if i in release_title]
+			last_season = int(keys[0].split('~')[1])
+			return True, last_season
+
+
 
 
 # 2 digit "01.to.09" range filter (dots or dashes)
@@ -608,6 +604,13 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		if any(i in release_title for i in dash_ranges):
 			keys = [i for i in dash_ranges if i in release_title]
 			last_season = int(keys[0].split('-')[1])
+			return True, last_season
+
+# 2 digit  "01~09" range filtering
+		tilde_ranges = [i.replace('.to.', '~') for i in to_season_ranges]
+		if any(i in release_title for i in tilde_ranges):
+			keys = [i for i in tilde_ranges if i in release_title]
+			last_season = int(keys[0].split('~')[1])
 			return True, last_season
 
 
@@ -639,6 +642,13 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			last_season = int(keys[0].split('-s')[1])
 			return True, last_season
 
+# "s1~s9" single digit range filtering (dashes)
+		tilde_ranges = [i.replace('.to.', '~') for i in to_season_ranges]
+		if any(i in release_title for i in tilde_ranges):
+			keys = [i for i in tilde_ranges if i in release_title]
+			last_season = int(keys[0].split('~s')[1])
+			return True, last_season
+
 
 
 # 2 digit "s01.to.s09" range filter (dots or dash)
@@ -665,6 +675,13 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		if any(i in release_title for i in dash_ranges):
 			keys = [i for i in dash_ranges if i in release_title]
 			last_season = int(keys[0].split('-s')[1])
+			return True, last_season
+
+# 2 digit "s01~s09" range filtering (dashes)
+		tilde_ranges = [i.replace('.to.', '~') for i in to_season_ranges]
+		if any(i in release_title for i in tilde_ranges):
+			keys = [i for i in tilde_ranges if i in release_title]
+			last_season = int(keys[0].split('~s')[1])
 			return True, last_season
 
 # 2 digit "s01.s09" range filtering (dots)
@@ -711,7 +728,7 @@ def release_title_strip(release_title):
 def release_title_format(release_title):
 	try:
 		release_title = release_title.lower().replace("'", "").lstrip('.').rstrip('.')
-		fmt = re.sub('[^a-z0-9-]+', '.', release_title)
+		fmt = re.sub('[^a-z0-9-~]+', '.', release_title)
 		fmt = fmt.replace('.-.', '-').replace('-.', '-').replace('.-', '-').replace('--', '-')
 		fmt = '.%s.' % fmt
 		return fmt

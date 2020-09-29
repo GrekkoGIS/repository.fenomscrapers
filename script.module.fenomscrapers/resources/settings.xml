@@ -9,6 +9,7 @@
 		<setting type="sep" />
 		<setting label="Show Changelog" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowChangelog)" />
 		<setting id="checkAddonUpdates" type="bool" label="Notify Me About Available Updates" default="false" />
+		<setting label="      [COLOR FFA0C12C]-- Help --[/COLOR]" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=updates)" />
 	</category>
 
 	<!-- Debrid Sources-1 -->
@@ -42,7 +43,7 @@
 	<category label="Torrents">
 		<setting label="Disable All Torrent Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=false)" />
 		<setting label="Enable All Torrent Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=true)" />
-		<setting label="Enable All Pack Capable Torrent Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllPackTorrent&amp;setting=true)" />
+		<setting label="Enable Only Pack Capable Torrent Providers" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllPackTorrent&amp;setting=true)" />
 		<setting label="      [COLOR FFA0C12C]-- pack scraper Help --[/COLOR]" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=packScrapers)" />
 		<setting type="sep" />
 		<setting id="filter.undesirables" type="bool" label="Remove Undesirables" default="true"/>

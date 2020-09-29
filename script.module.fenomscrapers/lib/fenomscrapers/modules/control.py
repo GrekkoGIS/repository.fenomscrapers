@@ -12,8 +12,8 @@ import xbmcvfs
 addon = xbmcaddon.Addon
 addonObject = addon('script.module.fenomscrapers')
 addonInfo = addonObject.getAddonInfo
-setting = addonObject.getSetting
-setSetting = addonObject.setSetting
+# setting = addonObject.getSetting
+# setSetting = addonObject.setSetting
 condVisibility = xbmc.getCondVisibility
 execute = xbmc.executebuiltin
 jsonrpc = xbmc.executeJSONRPC
@@ -32,6 +32,14 @@ except:
 cacheFile = os.path.join(dataPath, 'cache.db')
 
 
+def setting(id):
+	return xbmcaddon.Addon('script.module.fenomscrapers').getSetting(id)
+
+
+def setSetting(id, value):
+	return xbmcaddon.Addon('script.module.fenomscrapers').setSetting(id, value)
+
+
 def sleep(time):  # Modified `sleep` command that honors a user exit request
 	while time > 0 and not monitor.abortRequested():
 		xbmc.sleep(min(100, time))
@@ -40,6 +48,7 @@ def sleep(time):  # Modified `sleep` command that honors a user exit request
 
 def getKodiVersion():
 	return int(xbmc.getInfoLabel("System.BuildVersion")[:2])
+
 
 def check_version_numbers(current, new):
 	# Compares version numbers and return True if new version is newer
@@ -132,10 +141,10 @@ def notification(title=None, message=None, icon=None, time=3000, sound=False):
 def syncMyAccounts(silent=False):
 	import myaccounts
 	all_acct = myaccounts.getAllScraper()
-	
+
 	fp_acct = all_acct.get('filepursuit')
-	if setting('filepursuit.api') != fp_acct.get('filepursuit.api.key'):
-		setSetting('filepursuit.api', fp_acct.get('filepursuit.api.key'))
+	if setting('filepursuit.api') != fp_acct.get('api_key'):
+		setSetting('filepursuit.api', fp_acct.get('api_key'))
 
 	fu_acct = all_acct.get('furk')
 	if setting('furk.user_name') != fu_acct.get('username'):

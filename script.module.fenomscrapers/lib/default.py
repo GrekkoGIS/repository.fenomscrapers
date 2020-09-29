@@ -72,12 +72,15 @@ elif action == "toggleAllTorrent":
 
 
 elif action == "toggleAllPackTorrent":
+	control.execute('RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=false)')
+	control.sleep(500)
 	sourceList = []
 	from fenomscrapers import pack_sources
 	sourceList = pack_sources()
 	for i in sourceList:
 		source_setting = 'provider.' + i
 		control.setSetting(source_setting, params['setting'])
+
 
 elif action == 'openMyAccount':
 	control.openSettings('0.0', 'script.module.myaccounts')

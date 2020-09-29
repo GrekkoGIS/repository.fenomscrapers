@@ -17,33 +17,43 @@
 """
 
 from fenomscrapers.modules import control
-from fenomscrapers.modules import log_utils
+import xbmc
 
 
-def check_for_addon_update():
-	log_utils.log('Fenomscrapers checking available updates', log_utils.LOGNOTICE)
-	try:
-		import re
-		import requests
-		repo_xml = requests.get('https://raw.githubusercontent.com/mr-kodi/repository.fenomscrapers/master/zips/addons.xml')
-		if not repo_xml.status_code == 200:
-			log_utils.log('Could not connect to Fenomscrapers repo XML, status: %s' % repo_xml.status_code, log_utils.LOGNOTICE)
-			return
-		repo_version = re.findall(r'<addon id=\"script.module.fenomscrapers\".*version=\"(\d*.\d*.\d*.\d*)\"', repo_xml.text)[0]
-		local_version = control.addonVersion()
-		if control.check_version_numbers(local_version, repo_version):
-			while control.condVisibility('Library.IsScanningVideo'):
-				control.sleep(10000)
-			log_utils.log('A newer version of Fenomscrapers is available. Installed Version: v%s, Repo Version: v%s' % (local_version, repo_version), log_utils.LOGNOTICE)
-			control.notification(title = 'default', message = 'A new verison of Fenomscrapers is available from the repository. Please consider updating to v%s' % repo_version, icon = 'default', time=5000, sound=False)
-	except:
-		log_utils.error()
-		pass
+class AddonCheckUpdate:
+	def run(self):
+		xbmc.log('[ script.module.fenomscrapers ]  Addon checking available updates', xbmc.LOGNOTICE)
+		try:
+			import re
+			import requests
+			repo_xml = requests.get('https://raw.githubusercontent.com/mr-kodi/repository.fenomscrapers/master/zips/addons.xml')
+			if not repo_xml.status_code == 200:
+				xbmc.log('[ script.module.fenomscrapers ]  Could not connect to remote repo XML: status code = %s' % repo_xml.status_code, xbmc.LOGNOTICE)
+				return
+			repo_version = re.findall(r'<addon id=\"script.module.fenomscrapers\".*version=\"(\d*.\d*.\d*.\d*)\"', repo_xml.text)[0]
+			local_version = control.addonVersion()
+			if control.check_version_numbers(local_version, repo_version):
+				while control.condVisibility('Library.IsScanningVideo'):
+					control.sleep(10000)
+				xbmc.log('[ script.module.fenomscrapers ]  A newer version is available. Installed Version: v%s, Repo Version: v%s' % (local_version, repo_version), xbmc.LOGNOTICE)
+				control.notification(title = 'default', message = 'A new verison of Fenomscrapers is available from the repository. Please consider updating to v%s' % repo_version, icon='default', time=5000, sound=False)
+		except:
+			import traceback
+			traceback.print_exc()
+			pass
 
-def sync_my_accounts():
-	return control.syncMyAccounts(silent=True)
 
-sync_my_accounts()
+class SyncMyAccounts:
+	def run(self):
+		xbmc.log('[ script.module.fenomscrapers ]  Sync "My Accounts" Service Starting...', 2)
+		control.syncMyAccounts(silent=True)
+		return xbmc.log('[ script.module.fenomscrapers ]  Finished Sync "My Accounts" Service', 2)
+
+
+SyncMyAccounts().run()
 
 if control.setting('checkAddonUpdates') == 'true':
-	check_for_addon_update()
+	AddonCheckUpdate().run()
+	xbmc.log('[ script.module.fenomscrapers ]  Addon update check complete', xbmc.LOGNOTICE)
+
+xbmc.log('[ script.module.fenomscrapers ]  service stopped', xbmc.LOGNOTICE)
