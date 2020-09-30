@@ -1,3 +1,8 @@
+[B][COLOR red]Update - v1.0.4 – Sept. 30, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed library scraper.[/I]
+[COLOR yellow]--[/COLOR][I] Couple more tweaks to show packs filter.[/I]
+[COLOR yellow]--[/COLOR][I] Cleanup of unneeded modules and functions.[/I]
+[COLOR yellow]--[/COLOR][I] Added ENG translation file.[/I]
 [B][COLOR red]Update - v1.0.3 – Sept. 29, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed Library scraper error halting results.[/I]
 [COLOR yellow]--[/COLOR][I] Fixed filepursuit api key failing to import from
