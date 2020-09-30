@@ -36,7 +36,7 @@ class AddonCheckUpdate:
 				while control.condVisibility('Library.IsScanningVideo'):
 					control.sleep(10000)
 				xbmc.log('[ script.module.fenomscrapers ]  A newer version is available. Installed Version: v%s, Repo Version: v%s' % (local_version, repo_version), xbmc.LOGNOTICE)
-				control.notification(title = 'default', message = 'A new verison of Fenomscrapers is available from the repository. Please consider updating to v%s' % repo_version, icon='default', time=5000, sound=False)
+				control.notification(title = 'default', message = control.lang(32037) % repo_version, icon='default', time=5000, sound=False)
 		except:
 			import traceback
 			traceback.print_exc()
