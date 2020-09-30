@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-#  (updated 9-20-2020)
+#  (updated 9-29-2020)
 
 '''
 	Fenomscrapers Project
@@ -21,7 +21,6 @@ try: from urlparse import parse_qs
 except ImportError: from urllib.parse import parse_qs
 try: from urllib import urlencode
 except ImportError: from urllib.parse import urlencode
-
 
 from fenomscrapers.modules import control
 from fenomscrapers.modules import cleantitle
@@ -67,7 +66,6 @@ class source:
 		sources = []
 		try:
 			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -78,41 +76,36 @@ class source:
 			if content_type == 'movie':
 				title = cleantitle.get_simple(data['title']).lower()
 				ids = [data['imdb']]
-
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "originaltitle", "file"]}, "id": 1}' % years)
 				r = unicode(r, 'utf-8', errors='ignore')
 				r = json.loads(r)['result']['movies']
 				r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get_simple(i['title']), cleantitle.get_simple(i['originaltitle'])]]
-				if not r: return sources
-				try: file = i['file'].encode('utf-8')
-				except: file = i['file']
-				r = [i for i in r if not file.endswith('.strm')]
+				try: r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')]
+				except: r = [i for i in r if not i['file'].endswith('.strm')]
 				if not r: return sources
 				r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"properties": ["streamdetails", "file"], "movieid": %s }, "id": 1}' % str(r['movieid']))
 				r = unicode(r, 'utf-8', errors='ignore')
 				r = json.loads(r)['result']['moviedetails']
+
 			elif content_type == 'episode':
 				title = cleantitle.get_simple(data['tvshowtitle']).lower()
 				season, episode = data['season'], data['episode']
-
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title"]}, "id": 1}' % years)
 				r = unicode(r, 'utf-8', errors='ignore')
+				if 'tvshows' not in str(r): return sources
 				r = json.loads(r)['result']['tvshows']
-
 				r = [i for i in r if title in (cleantitle.get_simple(i['title']).lower() if not ' (' in i['title'] else cleantitle.get_simple(i['title']).split(' (')[0])]
-				# log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
 				if not r: return sources
 				else: r = r[0]
-
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["file"], "tvshowid": %s }, "id": 1}' % (str(season), str(episode), str(r['tvshowid'])))
 				r = unicode(r, 'utf-8', errors='ignore')
 				r = json.loads(r)['result']['episodes']
 				if not r: return sources
-				try: file = i['file'].encode('utf-8')
-				except: file = i['file']
-				r = [i for i in r if not file.endswith('.strm')][0]
-
+				try: r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')]
+				except: r = [i for i in r if not i['file'].endswith('.strm')]
+				if not r: return sources
+				r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodeDetails", "params": {"properties": ["streamdetails", "file"], "episodeid": %s }, "id": 1}' % str(r['episodeid']))
 				r = unicode(r, 'utf-8', errors='ignore')
 				r = json.loads(r)['result']['episodedetails']
@@ -174,8 +167,8 @@ class source:
 			try: info = info.encode('utf-8')
 			except: pass
 
-			sources.append({'source': 'local', 'quality': quality, 'language': 'en', 'url': url,
-							'info': info, 'local': True, 'direct': True, 'debridonly': False, 'size': dsize})
+			sources.append({'source': 'local', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
+										'local': True, 'direct': True, 'debridonly': False, 'size': dsize})
 			return sources
 		except:
 			source_utils.scraper_error('library')
