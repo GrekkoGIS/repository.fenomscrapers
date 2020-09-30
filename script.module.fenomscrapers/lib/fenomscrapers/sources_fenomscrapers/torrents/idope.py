@@ -109,14 +109,12 @@ class source:
 	def get_sources(self, url):
 		try:
 			r = client.request(url)
-			if not r:
-				return
+			if not r: return
 			div = client.parseDOM(r, 'div', attrs={'id': 'div2child'})
 
 			for row in div:
 				row = client.parseDOM(r, 'div', attrs={'class': 'resultdivbotton'})
-				if not row:
-					return
+				if not row: return
 
 				for post in row:
 					hash = re.findall('<div id="hideinfohash.+?" class="hideinfohash">(.+?)<', post, re.DOTALL)[0]
@@ -166,14 +164,10 @@ class source:
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
 		try:
+			if not url: return self.sources
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-
-			if not url:
-				return self.sources
-			# if debrid.status() is False:
-				# return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -212,14 +206,12 @@ class source:
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
 			r = client.request(link)
-			if not r:
-				return
+			if not r: return
 			div = client.parseDOM(r, 'div', attrs={'id': 'div2child'})
 
 			for row in div:
 				row = client.parseDOM(r, 'div', attrs={'class': 'resultdivbotton'})
-				if not row:
-					return
+				if not row: return
 
 				for post in row:
 					hash = re.findall('<div id="hideinfohash.+?" class="hideinfohash">(.+?)<', post, re.DOTALL)[0]
@@ -230,7 +222,6 @@ class source:
 						continue
 
 					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-
 					if url in str(self.sources):
 						continue
 
@@ -258,7 +249,6 @@ class source:
 						pass
 
 					quality, info = source_utils.get_release_quality(name, url)
-
 					try:
 						size = re.findall('<div class="resultdivbottonlength">(.+?)<', post)[0]
 						dsize, isize = source_utils._size(size)
@@ -266,7 +256,6 @@ class source:
 					except:
 						dsize = 0
 						pass
-
 					info = ' | '.join(info)
 
 					item = {'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
