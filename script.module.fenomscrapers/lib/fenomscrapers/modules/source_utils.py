@@ -71,7 +71,7 @@ UNDESIREABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'b
 			  'soundtrack', 'subtitle.only', 'teaser', 'trailer', 'tumbler.studio', 'tvshows', 'vostfr', 'webdlrip', 'webhdrip', 'wish666']
 
 DUBBED = ['dublado', 'dubbed']
-SUBS = ['subita', 'subfrench', 'subs', 'subspanish', 'subtitula', 'swesub']
+SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub']
 ADDS = ['1xbet', 'betwin']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
@@ -468,12 +468,18 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		release_title = release_title_format(release_title)
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '')
 		title_list.append(show_title)
-		split_list = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's1', 's01', year]
+		split_list = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's1', 's01', year] #s1 or s01 used so show pack only kept that begin with 1
+		# split_list = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's%s' % season, 's%02d' % int(season), year]
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False, 0
+
+
+
+		# log_utils.log('release_title = %s' % str(release_title), __name__, log_utils.LOGDEBUG)
+
 
 
 # remove episode ranges
@@ -500,17 +506,17 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 # remove single seasons - returned in seasonPack scrape
 		season_regex = [
-				r'season(?:\.{0,1}|-)([2-9]{1}).(?:0{1})\1.complete',	# "season.2.02.complete" when first number is >1 matches 2nd after a zero
-				r'season(?:\.{0,1}|-)([2-9]{1}).(?:[0-9]+).complete', # "season.9.10.complete" when first number is >1 followed by 2 digit number
+				r'season(?:\.{0,1}|-)([2-9]{1}).(?:0{1})\1.complete',		 # "season.2.02.complete" when first number is >1 matches 2nd after a zero
+				r'season(?:\.{0,1}|-)([2-9]{1}).(?:[0-9]+).complete',		 # "season.9.10.complete" when first number is >1 followed by 2 digit number
 				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)s\d{1,2}',		 # season.02.s02
 				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)complete',		 # season.02.complete
 				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)\d{3,4}p{0,1}',		  # "season.02.1080p" and no seperator "season02.1080p"
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?!thru|to|\d{2}\.)',		  # season.02. not followed by "to", "thru", or another 2 digit number then a dot(which would be a range)
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.{0,1})(?:$)',				 # end of line ex."season.1",  "season.01", "season01" can also have trailing dot only
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?:19|20)[0-9]{2}',			# single season followed by 4 digit year ex."season.1.1971", "season.01.1971", or "season01.1971"
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)\d{3}(?:\.{1,2}|-{1,2})(?:19|20)[0-9]{2}',		   # single season followed by 4 digits then 4 digit year ex."season.1.004.1971" or "season.01.004.1971" (comic book format)
-				r'(?<!thru)(?<!to)(?<!\d{2})(?:\.|-)s\d{2}(?:\.|-)complete',				# ".s02.complete" not proceeded by "thru", "to", or 2 digit number
-				r'(?<!thru)(?<!to)(?<!s\d{2})(?:\.|-)s\d{2}(?:\.|-)(?!thru|to|s\d+)'		# .s02. not followed or proceeded by "thru", "to" 
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?!thru|to|\d{1,2}\.)',		  # "season.02." or "season.1" not followed by "to", "thru", or another single, or 2 digit number, then a dot(which would be a range)
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.{0,1})(?:$)',		 # end of line ex."season.1",  "season.01", "season01" can also have trailing dot only
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?:19|20)[0-9]{2}',		 # single season followed by 4 digit year ex."season.1.1971", "season.01.1971", or "season01.1971"
+				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)\d{3}(?:\.{1,2}|-{1,2})(?:19|20)[0-9]{2}',		 # single season followed by 4 digits then 4 digit year ex."season.1.004.1971" or "season.01.004.1971" (comic book format)
+				r'(?<!thru)(?<!to)(?<!\d{2})(?:\.|-)s\d{2}(?:\.|-)complete',		 # ".s01.complete" not preceded by "thru", "to", or 2 digit number
+				r'(?<!thru)(?<!to)(?<!s\d{2})(?:\.|-)s\d{2}(?!\.thru|\.to|\.s\d{0,2}\.|-s\d{0,2}\.|\.\d{0,2}\.|-\d{0,2}\.)'		 # .s01. not preceded by "thru", "to", or "s02". Not followed by ".thru", ".to", ".s02", "-s02", ".02.", or "-02."
 				]
 		for item in season_regex:
 			if bool(re.search(item, release_title)):

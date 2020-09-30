@@ -69,13 +69,6 @@ class GetSum(object):
 ########################################################
 
 
-def logSum(matches):
-	number = 0
-	for match in matches:
-		log_utils.log('getSum - logSum:  %d  -  %s' % (number, match))
-		number = number + 1
-
-
 # Normal = getSum.get(url)
 # CFscrape = getSum.get(url, Type='cfscrape')
 def get(url, Type=None):
@@ -110,77 +103,6 @@ def findSum(text, type=None, timeout=10):
 		return []
 
 
-# results = getSum.findEm(text, '(?:iframe|source).+?(?:src)=(?:\"|\')(.+?)(?:\"|\')')
-# for result in results:
-def findEm(text, regex):
-	results = re.findall(regex, text, flags=re.DOTALL | re.IGNORECASE)
-	if results:
-		return results
-	else:
-		return []
-
-
-# results = getSum.findThat(text, 'hhhhh')
-# for result in results:
-def findThat(text, regex):
-	p_reg = re.compile(regex, flags=re.DOTALL | re.IGNORECASE)
-	results = p_reg.findall(text)
-	if results:
-		return results
-	else:
-		return []
-
-
-def find_match(regex, text, index=0):
-	results = re.findall(text, regex, flags=re.DOTALL | re.IGNORECASE)
-	return results[index]
-
-
-def findall(text, regex):
-	p_reg = re.compile(regex, re.DOTALL + re.MULTILINE + re.UNICODE)
-	result = p_reg.findall(text)
-	return result
-
-
-def findallIgnoreCase(text, regex):
-	p_reg = re.compile(regex, re.DOTALL + re.MULTILINE + re.UNICODE + re.IGNORECASE)
-	result = p_reg.findall(text)
-	return result
-
-
-def regex_get_all(text, start_with, end_with):
-	r = re.findall("(?i)(" + start_with + "[\S\s]+?" + end_with + ")", text)
-	return r
-
-
-def get_sources(text):
-	sources = re.compile('sources\s*:\s*\[(.+?)\]').findall(text)
-	return sources
-
-
-def get_sources_content(text):
-	sources = re.compile('\{(.+?)\}').findall(text)
-	return sources
-
-
-def get_files(text):
-	files = re.compile('''['"]?file['"]?\s*:\s*['"]([^'"]*)''').findall(text)
-	return files
-
-
-def get_files2(text):
-	match = re.findall('''['"]file['"]\s*:\s*['"]([^'"]+)''', text)
-	return match
-
-
-def get_video(text):
-	pattern = 'file(?:\'|\")?\s*(?:\:)\s*(?:\"|\')(.+?)(?:\"|\')'
-	match = re.compile(pattern).findall(text)
-	links = []
-	for url in match:
-		links.append(byteify(url))
-	return links
-
 
 def replaceHTMLCodes(text):
 	text = re.sub("(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", text)
@@ -193,32 +115,3 @@ def replaceHTMLCodes(text):
 	text = text.strip()
 	return text
 
-
-def unpacked(url):
-	try:
-		from fenomscrapers.modules import client
-		from fenomscrapers.modules import jsunpack
-		from fenomscrapers.modules import log_utils
-		unpacked = ''
-		html = client.request(url)
-		if jsunpack.detect(html):
-			unpacked = jsunpack.unpack(html)
-			# log_utils.log('WatchWrestling - unpacked: \n' + str(unpacked))
-		else:
-			log_utils.log('getSum - unpacked - Failed.')
-		return unpacked
-	except:
-		return
-
-
-def TEST_RUN():
-	from fenomscrapers.modules import jsunpack
-	from fenomscrapers.modules import log_utils
-	log_utils.log('#####################################')
-	url = 'https://site.com'
-	data = get(url, Type='cfscrape')
-	packed = find_match(data, "text/javascript'>(eval.*?)\s*</script>")
-	unpacked = jsunpack.unpack(packed)
-	log_utils.log('---getSum TEST_RUN - unpacked: \n' + str(unpacked))
-	log_utils.log('#####################################')
-	return unpacked

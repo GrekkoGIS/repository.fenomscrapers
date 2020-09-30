@@ -12,8 +12,7 @@ import xbmcvfs
 addon = xbmcaddon.Addon
 addonObject = addon('script.module.fenomscrapers')
 addonInfo = addonObject.getAddonInfo
-# setting = addonObject.getSetting
-# setSetting = addonObject.setSetting
+getLangString = addonObject.getLocalizedString
 condVisibility = xbmc.getCondVisibility
 execute = xbmc.executebuiltin
 jsonrpc = xbmc.executeJSONRPC
@@ -49,6 +48,11 @@ def sleep(time):  # Modified `sleep` command that honors a user exit request
 def getKodiVersion():
 	return int(xbmc.getInfoLabel("System.BuildVersion")[:2])
 
+def lang(language_id):
+	text = getLangString(language_id)
+	if getKodiVersion() < 19:
+		text = text.encode('utf-8', 'replace')
+	return text
 
 def check_version_numbers(current, new):
 	# Compares version numbers and return True if new version is newer
@@ -164,4 +168,4 @@ def syncMyAccounts(silent=False):
 		setSetting('ororo.user', or_acct.get('email'))
 		setSetting('ororo.pass', or_acct.get('password'))
 
-	if not silent: notification(title='default', message='My Accounts sync complete', icon='default', sound=(setting('notification.sound') == 'true'))
+	if not silent: notification(title='default', message=lang(32038), icon='default', sound=(setting('notification.sound') == 'true'))
