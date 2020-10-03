@@ -14,6 +14,7 @@ addonObject = addon('script.module.fenomscrapers')
 addonInfo = addonObject.getAddonInfo
 getLangString = addonObject.getLocalizedString
 condVisibility = xbmc.getCondVisibility
+window = xbmcgui.Window(10000)
 execute = xbmc.executebuiltin
 jsonrpc = xbmc.executeJSONRPC
 monitor = xbmc.Monitor()
