@@ -1,3 +1,6 @@
+[B][COLOR red]Update - v1.0.5 – Oct. 3, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added Danish translation. Huge thanks to TINUZ97!![/I]
+[COLOR yellow]--[/COLOR][I] Code changes for My Accounts compatibility.[/I]
 [B][COLOR red]Update - v1.0.4 – Sept. 30, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed library scraper.[/I]
 [COLOR yellow]--[/COLOR][I] Couple more tweaks to show packs filter.[/I]
