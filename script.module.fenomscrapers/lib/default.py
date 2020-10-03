@@ -83,11 +83,13 @@ elif action == "toggleAllPackTorrent":
 
 
 elif action == 'openMyAccount':
-	control.openSettings('0.0', 'script.module.myaccounts')
+	from myaccounts import openMASettings
+	openMASettings('0.0')
 	control.sleep(100)
-	while control.condVisibility('Window.IsVisible(addonsettings)'):
-		control.sleep(100)
+	while control.condVisibility('Window.IsVisible(addonsettings)') or control.window.getProperty('myaccounts.active') == 'true':
+		control.sleep(250)
 	control.syncMyAccounts()
+	control.sleep(100)
 	if params.get('opensettings') == 'true':
 		control.openSettings(query, 'script.module.fenomscrapers')
 
