@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 9-20-2020)
+# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 10-05-2020)
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -38,6 +26,7 @@ class source:
 		self.base_link = 'https://extratorrent.ag'
 		self.search_link = '/search/?search=%s&new=1&x=53&y=11'
 		self.min_seeders = 1
+		self.pack_capable = False
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -124,7 +113,7 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', link, re.DOTALL)[0])
-			url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources):
 				return

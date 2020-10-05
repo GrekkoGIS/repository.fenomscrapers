@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 9-20-2020)
+# created by Venom for Fenomscrapers (updated 10-05-2020)
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -37,6 +25,7 @@ class source:
 		self.base_link = 'https://nyaa.si'
 		self.search_link = '/?f=0&c=0_0&q=%s'
 		self.min_seeders = 1
+		self.pack_capable = False
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -116,7 +105,7 @@ class source:
 						links = zip(re.findall('href="(magnet:.+?)"', row, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL), [re.findall('<td class="text-center">([0-9]+)</td>', row, re.DOTALL)])
 
 						for link in links:
-							url = unquote_plus(link[0]).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+							url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 							url = source_utils.strip_non_ascii_and_unprintable(url)
 							hash = re.compile('btih:(.*?)&').findall(url)[0]
 							name = url.split('&dn=')[1]

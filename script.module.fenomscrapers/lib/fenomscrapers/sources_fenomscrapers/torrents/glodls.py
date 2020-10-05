@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 9-20-2020)
+# modified by Venom for Fenomscrapers (updated 10-05-2020)
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -37,6 +25,7 @@ class source:
 		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
 		self.min_seeders = 0 # to many items with no value but cached links
+		self.pack_capable = False
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -107,7 +96,6 @@ class source:
 
 					if item[2] != '0':
 						info.insert(0, item[2])
-
 					info = ' | '.join(info)
 
 					sources.append({'source': 'torrent', 'seeders': item[4], 'hash': hash, 'name': name, 'quality': quality,

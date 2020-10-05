@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 9-20-2020)
+# modified by Venom for Fenomscrapers (updated 10-05-2020)
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -33,9 +21,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['www.skytorrents.lol']
-		self.base_link = 'https://www.skytorrents.lol/'
-		self.search_link = '?query=%s'
+		self.domains = ['www.skytorrents.org']
+		# self.base_link = 'https://www.skytorrents.lol/' # .lol behind cloudflare
+		# self.search_link = '?query=%s'
+		self.base_link = 'https://skytorrents.org/'
+		self.search_link = '?search=%s'
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -109,7 +99,7 @@ class source:
 				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
 
 				for url, seeders, in link:
-					url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources):
 						return
@@ -217,13 +207,11 @@ class source:
 				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
 
 				for url, seeders, in link:
-					url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources):
 						return
-
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
-
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name):

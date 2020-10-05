@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers(updated 10-05-2020)
+# modified by Venom for Fenomscrapers (updated url 10-05-2020)
 
 '''
-	Fenomscrapers Project
+    Fenomscrapers Project
 '''
 
 import re
 
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote, unquote_plus
+try:
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote, quote_plus, unquote_plus
+except ImportError:
+	from urllib.parse import parse_qs, urljoin
+	from urllib.parse import urlencode, quote, quote_plus, unquote_plus
 
-
-from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -21,23 +21,13 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 2
+		self.priority = 15
 		self.language = ['en']
-		self.domains = ['thekat.app', 'kat.li', 'thekat.info', 'kickass.cm', 'kickass.ws',
-								'kickasshydra.net', 'kkickass.com', 'kathydra.com', 'kickass.onl',
-								'kickasstorrents.id', 'kickasst.net', 'thekat.cc', 'kkat.net',
-								'thekat.ch', 'kickasstorrents.bz', 'kickass-kat.com']
-		self._base_link = None
-		self.search = '/usearch/{0}%20category:movies'
-		self.search2 = '/usearch/{0}%20category:tv'
-		self.min_seeders = 0
+		self.domains = ['btdb.eu']
+		self.base_link = 'https://btdb.eu'
+		self.search_link = '/search/%s/0/?sort=popular'
+		self.min_seeders = 0 # to many items with no value but cached links
 		self.pack_capable = True
-
-	@property
-	def base_link(self):
-		if not self._base_link:
-			self._base_link = cache.get(self.__get_base_url, 120, 'https://%s' % self.domains[0])
-		return self._base_link
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -45,7 +35,7 @@ class source:
 			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
-		except Exception:
+		except:
 			return
 
 
@@ -54,7 +44,7 @@ class source:
 			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
 			url = urlencode(url)
 			return url
-		except Exception:
+		except:
 			return
 
 
@@ -66,7 +56,7 @@ class source:
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
 			url = urlencode(url)
 			return url
-		except Exception:
+		except:
 			return
 
 
@@ -74,7 +64,6 @@ class source:
 		self.sources = []
 		try:
 			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -89,15 +78,11 @@ class source:
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			urls = []
-			if 'tvshowtitle' in data:
-				url = self.search2.format(quote_plus(query))
-			else:
-				url = self.search.format(quote_plus(query))
+			url = self.search_link % quote(query + ' -soundtrack') # filter
 			url = urljoin(self.base_link, url)
 			urls.append(url)
-
-			# url2 = url + '/2/'
-			# urls.append(url2)
+			urls.append(url + '&page=2')
+			# log_utils.log('urls = %s' % urls, __name__, log_utils.LOGDEBUG)
 
 			threads = []
 			for url in urls:
@@ -106,26 +91,29 @@ class source:
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('KICKASS2')
+			source_utils.scraper_error('BTDB')
 			return self.sources
 
 
 	def get_sources(self, url):
-		# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 		try:
-			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers)
-			if not r:
-				return
-			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
-
+			r = client.request(url)
+			if not r: return
+			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
-				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
-				link = ref.split('url=')[1]
+				try:
+					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders:
+						return
+				except:
+					seeders = 0
+					pass
 
-				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = re.findall('<a href="(magnet:.+?)"', post, re.DOTALL)[0]
+				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
-				name = unquote_plus(url.split('&dn=')[1])
+				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(self.title, name)
 				if source_utils.remove_lang(name, self.episode_title):
 					continue
@@ -138,17 +126,9 @@ class source:
 					if not source_utils.filter_single_episodes(self.hdlr, name):
 						continue
 
-				try:
-					seeders = int(re.findall('<td class="green center">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
-					if self.min_seeders > seeders:
-						continue
-				except:
-					seeders = 0
-					pass
-
 				quality, info = source_utils.get_release_quality(name, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -157,9 +137,9 @@ class source:
 				info = ' | '.join(info)
 
 				self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
-			source_utils.scraper_error('KICKASS2')
+			source_utils.scraper_error('BTDB')
 			pass
 
 
@@ -184,13 +164,13 @@ class source:
 
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
-						self.search2.format(quote_plus(query + ' S%s' % self.season_xx)),
-						self.search2.format(quote_plus(query + ' Season %s' % self.season_x))
+						self.search_link % quote_plus(query + ' S%s' % self.season_xx + ' -soundtrack'),
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x + ' -soundtrack')
 							]
-			if self.search_series:
+			if search_series:
 				queries = [
-						self.search2.format(quote_plus(query + ' Season')),
-						self.search2.format(quote_plus(query + ' Complete'))
+						self.search_link % quote_plus(query + ' Season' + ' -soundtrack'),
+						self.search_link % quote_plus(query + ' Complete' + ' -soundtrack')
 								]
 
 			threads = []
@@ -201,26 +181,32 @@ class source:
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('KICKASS2')
+			source_utils.scraper_error('BTDB')
 			return self.sources
 
 
 	def get_sources_packs(self, link):
-		# log_utils.log('link = %s' % link, __name__, log_utils.LOGDEBUG)
+		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
-			headers = {'User-Agent': client.agent()}
-			r = client.request(link, headers=headers)
-			if not r:
-				return
-			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
-
+			r = client.request(link)
+			if not r: return
+			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
-				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
-				link = ref.split('url=')[1]
+				try:
+					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders:
+						return
+				except:
+					seeders = 0
+					pass
 
-				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = re.findall('<a href="(magnet:.+?)"', post, re.DOTALL)[0]
+				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = source_utils.strip_non_ascii_and_unprintable(url)
+				if url in str(self.sources):
+					return
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
-				name = unquote_plus(url.split('&dn=')[1])
+				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(self.title, name)
 				if source_utils.remove_lang(name):
 					continue
@@ -240,17 +226,9 @@ class source:
 						last_season = self.total_seasons
 					package = 'show'
 
-				try:
-					seeders = int(re.findall('<td class="green center">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
-					if self.min_seeders > seeders:
-						continue
-				except:
-					seeders = 0
-					pass
-
 				quality, info = source_utils.get_release_quality(name, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -264,25 +242,9 @@ class source:
 					item.update({'last_season': last_season})
 				self.sources.append(item)
 		except:
-			source_utils.scraper_error('KICKASS2')
+			source_utils.scraper_error('BTDB')
 			pass
 
 
 	def resolve(self, url):
 		return url
-
-
-	def __get_base_url(self, fallback):
-		try:
-			for domain in self.domains:
-				try:
-					url = 'https://%s' % domain
-					result = client.request(url, limit=1, timeout='5')
-					result = re.findall('<title>(.+?)</title>', result, re.DOTALL)[0]
-					if result and 'Kickass' in result:
-						return url
-				except:
-					pass
-		except:
-			pass
-		return fallback

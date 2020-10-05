@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 9-20-2020)
+# modified by Venom for Fenomscrapers (updated 10-05-2020)
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -37,6 +25,7 @@ class source:
 		self.base_link = 'https://www.ettvdl.com'
 		self.search_link = '/torrents-search.php?search=%s'
 		self.min_seeders = 1
+		self.pack_capable = False
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -73,7 +62,6 @@ class source:
 		self.sources = []
 		try:
 			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -113,19 +101,15 @@ class source:
 			url = re.compile('href="(.+?)"').findall(link)[0]
 			url = '%s%s' % (self.base_link, url)
 			result = client.request(url)
-			if result is None:
-				return
-			if 'magnet' not in result:
-				return
+			if not result: return
+			if 'magnet' not in result: return
 
 			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
-			url = unquote_plus(url).split('&xl=')[0].replace('&amp;', '&').replace(' ', '.')
+			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&xl=')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources):
 				return
-
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
-
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(self.title, name)
 			if source_utils.remove_lang(name, self.episode_title):

@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 9-20-2020)
+# created by Venom for Fenomscrapers (updated 10-05-2020)
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -24,7 +12,6 @@ except ImportError: from urllib.parse import parse_qs, urljoin
 try: from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -38,6 +25,7 @@ class source:
 		self.base_link = 'http://magnet4you.me'
 		self.search_link = '/search.php?s=%s'
 		self.min_seeders = 0
+		self.pack_capable = False
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -110,16 +98,12 @@ class source:
 
 	def get_sources(self, row):
 		try:
-			if 'magnet' not in row:
-				return
-
+			if 'magnet' not in row: return
 			url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
-			url = unquote_plus(url).split('&tr')[0].replace('&amp;', '&').replace(' ', '.')
+			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			if url in str(self.sources):
 				return
-
 			hash = re.compile('btih:(.*?)&').findall(url)[0]
-
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(self.title, name)
 			if source_utils.remove_lang(name, self.episode_title):

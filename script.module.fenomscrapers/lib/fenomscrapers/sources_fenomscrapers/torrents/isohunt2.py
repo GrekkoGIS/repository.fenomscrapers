@@ -1,20 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 9-20-2020)
+# created by Venom for Fenomscrapers (updated 10-05-2020)
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -37,6 +25,7 @@ class source:
 		self.base_link = 'https://isohunt.nz'
 		self.search_link = '/torrent/?ihq=%s&fiht=2&age=0&Torrent_sort=seeders&Torrent_page=0'
 		self.min_seeders = 0
+		self.pack_capable = False
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -124,8 +113,7 @@ class source:
 						continue
 
 					magnet = re.compile('(magnet.+?)"').findall(link)[0]
-					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.')
-					url = url.split('&tr')[0]
+					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					name = unquote_plus(url.split('&dn=')[1])
 					name = source_utils.clean_name(self.title, name)
 					if source_utils.remove_lang(name, self.episode_title):

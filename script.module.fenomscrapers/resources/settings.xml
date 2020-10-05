@@ -3,7 +3,7 @@
 	<!-- General-0 -->
 	<category label="32050">
 		<setting id="module.provider" label="32005" type="action" enable="false" visible="false" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ScraperChoice)" default="Fenomscrapers"/>
-		<setting label="32006" type="action"  action="RunPlugin(plugin://script.module.fenomscrapers/?action=Defaults&amp;setting=true)" />
+		<setting label="32006" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=Defaults&amp;setting=true)" />
 		<setting label="32007" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAll&amp;setting=false)" />
 		<setting label="32008" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAll&amp;setting=true)" />
 		<setting type="sep" />
@@ -55,6 +55,7 @@
 		<setting id="provider.1337x" type="bool" label="32101" default="false" />
 		<setting id="provider.7torrents" type="bool" label="32102" default="false" />
 		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
+		<setting id="provider.btdb" type="bool" label="32129" default="true" />
 		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="true" />
 		<setting id="provider.extratorrent" type="bool" label="32106" default="true" />
@@ -77,6 +78,7 @@
 		<setting id="provider.torrentdownload" type="bool" label="32123" default="true" />
 		<setting id="provider.torrentfunk" type="bool" label="32124" default="true" />
 		<setting id="provider.torrentgalaxy" type="bool" label="32125" default="true" />
+		<setting id="provider.torrentz2" type="bool" label="32130" default="false" />
 		<setting id="provider.yourbittorrent" type="bool" label="32126" default="false" />
 		<setting id="provider.ytsws" type="bool" label="32127" default="false" />
 		<setting id="provider.zoogle" type="bool" label="32128" default="false" />

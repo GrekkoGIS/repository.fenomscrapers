@@ -1,11 +1,21 @@
+[B][COLOR red]Update - v1.0.6 – Oct. 5, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] fixed skytorrents scraper for url change.[/I]
+COLOR yellow]--[/COLOR][I] btdb scraper resurrected.  Site has reverted back to
+    non-cloudflare v2 challenge.  Scraper is also now
+    pack capable[/I]
+COLOR yellow]--[/COLOR][I] torrentz2 scraper resurrected.  Site has reverted back to
+    non-cloudflare v2 challenge.[/I]
+
 [B][COLOR red]Update - v1.0.5 – Oct. 3, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added Danish translation. Huge thanks to TINUZ97!![/I]
 [COLOR yellow]--[/COLOR][I] Code changes for My Accounts compatibility.[/I]
+
 [B][COLOR red]Update - v1.0.4 – Sept. 30, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed library scraper.[/I]
 [COLOR yellow]--[/COLOR][I] Couple more tweaks to show packs filter.[/I]
 [COLOR yellow]--[/COLOR][I] Cleanup of unneeded modules and functions.[/I]
 [COLOR yellow]--[/COLOR][I] Added ENG translation file.[/I]
+
 [B][COLOR red]Update - v1.0.3 – Sept. 29, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed Library scraper error halting results.[/I]
 [COLOR yellow]--[/COLOR][I] Fixed filepursuit api key failing to import from
@@ -14,5 +24,6 @@
     all torrents and then enable pack capable only scrapers.[/I]
 [COLOR yellow]--[/COLOR][I] Few filter tweaks for show packs returning out of range
     results when season separator was a tilde mark.[/I]
+
 [B][COLOR red]Update - v1.0.2 – Sept. 25, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Initial commit.[/I]
