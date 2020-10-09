@@ -48,8 +48,7 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if url is None:
-				return
+			if not url: return
 			url = parse_qs(url)
 			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
 			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
@@ -62,8 +61,7 @@ class source:
 	def sources(self, url, hostDict):
 		sources = []
 		try:
-			if not url:
-				return sources
+			if not url: return sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -99,7 +97,6 @@ class source:
 					r = re.sub(r'\t', '', r)
 					tbody = client.parseDOM(r, 'tbody')
 					rows = client.parseDOM(tbody, 'tr')
-
 
 					for row in rows:
 						links = zip(re.findall('href="(magnet:.+?)"', row, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL), [re.findall('<td class="text-center">([0-9]+)</td>', row, re.DOTALL)])

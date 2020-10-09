@@ -3,18 +3,6 @@
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import json
@@ -134,7 +122,6 @@ class source:
 					else: return
 				except:
 					return
-
 			if self.hdlr not in name:
 				return
 
@@ -155,14 +142,12 @@ class source:
 			for url in links:
 				if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
 					continue
-
 				if any(x in url.lower() for x in ['youtube', 'sample', 'trailer']):
 					continue
 
 				valid, host = source_utils.is_host_valid(url, self.hostDict)
 				if not valid:
 					continue
-
 				host = client.replaceHTMLCodes(host)
 				try: host = host.encode('utf-8')
 				except: pass

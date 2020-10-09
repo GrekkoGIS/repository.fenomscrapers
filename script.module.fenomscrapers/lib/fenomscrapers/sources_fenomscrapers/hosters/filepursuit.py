@@ -1,6 +1,10 @@
 # -*- coding: UTF-8 -*-
 # (updated 9-20-2020)
 
+'''
+	Fenomscrapers Project
+'''
+
 import re
 import requests
 import json
@@ -102,10 +106,8 @@ class source:
 
 				try: name = item['file_name']
 				except: name = item['file_link'].split('/')[-1]
-
 				if source_utils.remove_lang(name):
 					continue
-
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 					continue
 

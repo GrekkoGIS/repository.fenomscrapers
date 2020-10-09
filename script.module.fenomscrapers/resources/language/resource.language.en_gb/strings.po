@@ -541,7 +541,7 @@ msgid "TORRENTZ2"
 msgstr ""
 
 msgctxt "#32131"
-msgid ""
+msgid "EXT.TO (Pack capable)"
 msgstr ""
 
 msgctxt "#32132"

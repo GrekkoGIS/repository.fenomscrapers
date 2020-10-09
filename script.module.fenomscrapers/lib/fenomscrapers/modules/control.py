@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 	Fenomscrapers Module
 """
@@ -169,4 +170,4 @@ def syncMyAccounts(silent=False):
 		setSetting('ororo.user', or_acct.get('email'))
 		setSetting('ororo.pass', or_acct.get('password'))
 
-	if not silent: notification(title='default', message=lang(32038), icon='default', sound=(setting('notification.sound') == 'true'))
+	if not silent: notification(message=32038)

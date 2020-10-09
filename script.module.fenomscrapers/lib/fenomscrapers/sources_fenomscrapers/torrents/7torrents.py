@@ -164,8 +164,7 @@ class source:
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
 
-			if not url:
-				return self.sources
+			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -204,8 +203,7 @@ class source:
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
 			r = client.request(link)
-			if not r:
-				return
+			if not r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
 			table = client.parseDOM(table, 'tbody')
 			rows = client.parseDOM(table, 'tr')
@@ -251,7 +249,6 @@ class source:
 					pass
 
 				quality, info = source_utils.get_release_quality(name, url)
-
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
@@ -259,7 +256,6 @@ class source:
 				except:
 					dsize = 0
 					pass
-
 				info = ' | '.join(info)
 
 				item = {'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,

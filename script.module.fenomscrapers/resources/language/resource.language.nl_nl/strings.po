@@ -534,16 +534,16 @@ msgid "ZOOGLE (Pack capable)"
 msgstr "ZOOGLE (Pack geschikt)"
 
 msgctxt "#32129"
-msgid "BTDB (Pack geschikt)"
-msgstr ""
+msgid "BTDB (Pack capable)"
+msgstr "BTDB (Pack geschikt)"
 
 msgctxt "#32130"
 msgid "TORRENTZ2"
-msgstr ""
+msgstr "TORRENTZ2"
 
 msgctxt "#32131"
-msgid ""
-msgstr ""
+msgid "EXT.TO (Pack capable)"
+msgstr "EXT.TO (Pack geschikt)"
 
 msgctxt "#32132"
 msgid ""

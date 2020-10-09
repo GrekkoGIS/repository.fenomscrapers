@@ -1,19 +1,7 @@
 # -*- coding: utf-8 -*-
+
 """
 	Fenomscrapers Module
-
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from fenomscrapers.modules import control
@@ -36,7 +24,7 @@ class AddonCheckUpdate:
 				while control.condVisibility('Library.IsScanningVideo'):
 					control.sleep(10000)
 				xbmc.log('[ script.module.fenomscrapers ]  A newer version is available. Installed Version: v%s, Repo Version: v%s' % (local_version, repo_version), xbmc.LOGNOTICE)
-				control.notification(title = 'default', message = control.lang(32037) % repo_version, icon='default', time=5000, sound=False)
+				control.notification(message=control.lang(32037) % repo_version, time=5000)
 		except:
 			import traceback
 			traceback.print_exc()

@@ -2,6 +2,10 @@
 # -Cleaned and Checked on 08-24-2019 by JewBMX in Scrubs.
 # modified by Venom for Fenomscrapers (updated url 9-20-2020)
 
+'''
+	Fenomscrapers Project
+'''
+
 import json
 import re
 
@@ -65,7 +69,6 @@ class source:
 			r = client.parseDOM(r, 'div', attrs={'class':'ml-img'})
 			if not r: return
 			r = zip(client.parseDOM(r, 'a', ret='href'), client.parseDOM(r, 'img', ret='alt'))
-			# url = [i for i in r if cleantitle.get(title) == cleantitle.get(i[1]) and (any(x in str(i[1]) for x in years))][0][0]
 			url = [i for i in r if cleantitle.get(title) == cleantitle.get(i[1]) and (any(x in str(i[1]) for x in years))]
 			if not url: return
 			else: url = url[0][0]

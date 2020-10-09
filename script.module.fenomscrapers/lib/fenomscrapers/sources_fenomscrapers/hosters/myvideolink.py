@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # modified by Venom for Fenomscrapers (updated 9-20-2020)
 
+'''
+	Fenomscrapers Project
+'''
+
 import re
 
 try: from urlparse import parse_qs, urljoin

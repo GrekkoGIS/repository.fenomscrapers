@@ -3,18 +3,6 @@
 
 '''
     Fenomscrapers Project
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import re
@@ -97,7 +85,6 @@ class source:
 			for item in posts:
 				if not item.startswith('<a href'):
 					continue
-
 				try:
 					name = client.parseDOM(item, "a")[0]
 					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
@@ -114,15 +101,12 @@ class source:
 					except:
 						dsize = 0
 						pass
-
 					fileType = source_utils.getFileType(name)
 					info.append(fileType)
 					info = ' | '.join(info) if fileType else info[0]
 
 					item = client.parseDOM(item, 'a', ret='href')
-
 					url = item
-
 					links = self.links(url)
 					if links is None:
 						continue
@@ -158,14 +142,12 @@ class source:
 	def links(self, url):
 		urls = []
 		try:
-			if url is None:
-				return
+			if not url: return
 
 			for url in url:
 				r = client.request(url)
 				r = client.parseDOM(r, 'div', attrs={'class': 'entry'})
 				r = client.parseDOM(r, 'a', ret='href')
-
 				if 'money' not in str(r):
 					continue
 

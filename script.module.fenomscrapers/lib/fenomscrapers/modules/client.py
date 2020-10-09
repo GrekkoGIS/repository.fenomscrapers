@@ -54,15 +54,14 @@ from fenomscrapers.modules import dom_parser
 from fenomscrapers.modules import log_utils
 from fenomscrapers.modules import workers
 
+
 def request(url, close=True, redirect=True, error=False, proxy=None, post=None, headers=None, mobile=False, XHR=False,
 			limit=None, referer=None, cookie=None, compression=True, output='', timeout='30', ignoreSsl=False,
 			flare=True, ignoreErrors=None):
 	try:
-		if url is None:
-			return None
+		if not url: return None
 
 		handlers = []
-
 		if proxy is not None:
 			handlers += [ProxyHandler({'http': '%s' % (proxy)}), HTTPHandler]
 			opener = build_opener(*handlers)
@@ -89,15 +88,12 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 		if url.startswith('//'):
 			url = 'http:' + url
 
-		try:
-			headers.update(headers)
-		except:
-			headers = {}
+		try: headers.update(headers)
+		except: headers = {}
 
 		if 'User-Agent' in headers:
 			pass
 		elif mobile is not True:
-			# headers['User-Agent'] = agent()
 			headers['User-Agent'] = cache.get(randomagent, 1)
 		else:
 			headers['User-Agent'] = 'Apple-iPhone/701.341'
@@ -147,7 +143,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 					post[key] = value.encode('utf-8')
 				except:
 					pass
-
 			post = urlencode(post)
 
 		request = Request(url, data=post)
@@ -156,18 +151,14 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 		try:
 			response = urlopen(request, timeout=int(timeout))
 		except HTTPError as response:
-			try:
-				ignore = ignoreErrors and (int(response.code) == ignoreErrors or int(response.code) in ignoreErrors)
-			except:
-				ignore = False
+			try: ignore = ignoreErrors and (int(response.code) == ignoreErrors or int(response.code) in ignoreErrors)
+			except: ignore = False
 
 			if not ignore:
 				if response.code in [301, 307, 308, 503]:
 					cf_result = response.read(5242880)
-					try:
-						encoding = response.info().getheader('Content-Encoding')
-					except:
-						encoding = None
+					try: encoding = response.info().getheader('Content-Encoding')
+					except: encoding = None
 
 					if encoding == 'gzip':
 						cf_result = gzip.GzipFile(fileobj=StringIO(cf_result)).read()
@@ -179,10 +170,8 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 							if isinstance(post, dict):
 								data = post
 							else:
-								try:
-									data = parse_qs(post)
-								except:
-									data = None
+								try: data = parse_qs(post)
+								except: data = None
 
 							scraper = cfscrape.CloudScraper()
 							response = scraper.request(method='GET' if post is None else 'POST', url=url,
@@ -193,7 +182,6 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 								cookies = response.request._cookies
 							except:
 								log_utils.error()
-
 						except:
 							log_utils.error()
 
@@ -215,14 +203,10 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 						return
 
 		if output == 'cookie':
-			try:
-				result = '; '.join(['%s=%s' % (i.name, i.value) for i in cookies])
-			except:
-				pass
-			try:
-				result = cf
-			except:
-				pass
+			try: result = '; '.join(['%s=%s' % (i.name, i.value) for i in cookies])
+			except: pass
+			try: result = cf
+			except: pass
 			if close is True:
 				response.close()
 			return result
@@ -240,22 +224,17 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 			return result
 
 		elif output == 'chunk':
-			try:
-				content = int(response.headers['Content-Length'])
-			except:
-				content = (2049 * 1024)
-			if content < (2048 * 1024):
-				return
+			try: content = int(response.headers['Content-Length'])
+			except: content = (2049 * 1024)
+			if content < (2048 * 1024): return
 			result = response.read(16 * 1024)
 			if close is True:
 				response.close()
 			return result
 
 		elif output == 'file_size':
-			try:
-				content = int(response.headers['Content-Length'])
-			except:
-				content = '0'
+			try: content = int(response.headers['Content-Length'])
+			except: content = '0'
 			response.close()
 			return content
 
@@ -267,35 +246,26 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 			else:
 				result = response.read(5242880)
 
-		try:
-			encoding = response.info().getheader('Content-Encoding')
-		except:
-			encoding = None
+		try: encoding = response.info().getheader('Content-Encoding')
+		except: encoding = None
 
 		if encoding == 'gzip':
 			result = gzip.GzipFile(fileobj=StringIO(result)).read()
 
 		if 'sucuri_cloudproxy_js' in result:
 			su = sucuri().get(result)
-
 			headers['Cookie'] = su
-
 			request = Request(url, data=post)
 			_add_request_header(request, headers)
-
 			response = urlopen(request, timeout=int(timeout))
-
 			if limit == '0':
 				result = response.read(224 * 1024)
 			elif limit is not None:
 				result = response.read(int(limit) * 1024)
 			else:
 				result = response.read(5242880)
-
-			try:
-				encoding = response.info().getheader('Content-Encoding')
-			except:
-				encoding = None
+			try: encoding = response.info().getheader('Content-Encoding')
+			except: encoding = None
 			if encoding == 'gzip':
 				result = gzip.GzipFile(fileobj=StringIO(result)).read()
 
@@ -306,26 +276,14 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 			result = _basic_request(url, headers=headers, post=post, timeout=timeout, limit=limit)
 
 		if output == 'extended':
-			try:
-				response_headers = dict([(item[0].title(), item[1]) for item in response.info().items()])
-			except:
-				response_headers = response.headers
-
-			try:
-				response_code = str(response.code)
-			except:
-				response_code = str(response.status_code)  # object from CFScrape Requests object.
-
-			try:
-				cookie = '; '.join(['%s=%s' % (i.name, i.value) for i in cookies])
-			except:
-				pass
-
-			try:
-				cookie = cf
-			except:
-				pass
-
+			try: response_headers = dict([(item[0].title(), item[1]) for item in response.info().items()])
+			except: response_headers = response.headers
+			try: response_code = str(response.code)
+			except: response_code = str(response.status_code)  # object from CFScrape Requests object.
+			try: cookie = '; '.join(['%s=%s' % (i.name, i.value) for i in cookies])
+			except: pass
+			try: cookie = cf
+			except: pass
 			if close is True:
 				response.close()
 			return (result, response_code, response_headers, headers, cookie)

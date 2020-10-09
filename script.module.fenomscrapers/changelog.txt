@@ -1,3 +1,9 @@
+[B][COLOR red]Update - v1.0.7 – Oct. 9, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added "ext.to" torrent scraper.[/I]
+[COLOR yellow]--[/COLOR][I] Fix for "My Accounts" sync notification not
+    being displayed.[/I]
+[COLOR yellow]--[/COLOR][I] Few default scraper changes.[/I]
+
 [B][COLOR red]Update - v1.0.6 – Oct. 5, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] fixed skytorrents scraper for url change.[/I]
 COLOR yellow]--[/COLOR][I] btdb scraper resurrected.  Site has reverted back to

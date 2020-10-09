@@ -53,9 +53,9 @@ def enabledCheck(module_name):
 
 
 def pack_sources():
-	return ['7torrents', 'bitlord', 'btdb', 'btscene', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay',
-				'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy',
-				'yourbittorrent', 'zoogle']
+	return ['7torrents', 'bitlord', 'btdb', 'btscene', 'ext', 'idope', 'kickass2', 'limetorrents', 'magnetdl',
+				'piratebay', 'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk',
+				'torrentgalaxy', 'yourbittorrent', 'zoogle']
 
 
 def providerSources():
