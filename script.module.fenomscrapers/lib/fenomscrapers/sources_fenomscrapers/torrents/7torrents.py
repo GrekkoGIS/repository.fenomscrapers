@@ -6,7 +6,6 @@
 '''
 
 import re
-
 try:
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote_plus, unquote_plus
@@ -62,9 +61,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -139,7 +137,6 @@ class source:
 					pass
 
 				quality, info = source_utils.get_release_quality(name, url)
-
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
@@ -147,7 +144,6 @@ class source:
 				except:
 					dsize = 0
 					pass
-
 				info = ' | '.join(info)
 
 				self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
@@ -159,12 +155,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])

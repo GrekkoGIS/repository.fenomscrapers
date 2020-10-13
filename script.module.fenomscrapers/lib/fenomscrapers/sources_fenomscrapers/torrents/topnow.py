@@ -58,10 +58,9 @@ class source:
 
 
 	def sources(self, url, hostDict):
+		sources = []
+		if not url: return sources
 		try:
-			sources = []
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -85,8 +84,7 @@ class source:
 
 			r = client.request(url)
 			if not r: return sources
-			if 'No results were found' in r:
-				return sources
+			if 'No results were found' in r: return sources
 
 			r = client.parseDOM(r, 'div', attrs={'class': 'card'})
 			for i in r:

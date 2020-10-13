@@ -23,25 +23,19 @@ from fenomscrapers.modules import log_utils
 from fenomscrapers.modules import pyaes
 
 
-RES_4K = ['.4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra.hd', '2160', '2160p', '2160i', 'hd2160', '2160hd',
-		  '1716p', '1716i', 'hd1716', '1716hd', '2664p', '2664i', 'hd2664', '2664hd', '3112p',
-		  '3112i', 'hd3112', '3112hd', '2880p', '2880i', 'hd2880', '2880hd']
-RES_1080 = ['1080', '1080p', '1080i', 'hd1080', '1080hd', '1200p', '1200i', 'hd1200', '1200hd']
-RES_720 = ['720', '720p', '720i', 'hd720', '720hd', 'hdtv', '.hd.']
-RES_SD = ['576', '576p', '576i', 'sd576', '576sd', '480', '480p', '480i', 'sd480', '480sd', '360', '360p',
-		  '360i', 'sd360', '360sd', '240', '240p', '240i', 'sd240', '240sd']
-
-SCR = ['dvdscr', 'screener', '.scr.', 'r5', 'r6']
-
-CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', 'cam', 'telesync', 'tele.sync']
-HDCAM = ['hdcam', '.hd.cam.', 'hdts', '.hd.ts.', '.hdtc.', '.hd.tc.', '.hctc.', 'hc.tc.']
+RES_4K = ['.4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd']
+RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
+RES_720 = ['720p', '720i', 'hd720', '720hd']
+RES_SD = ['576p', '576i', 'sd576', '576sd', '480p', '480i', 'sd480', '480sd']
+SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
+CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', '.cam', 'telecine', 'telesync', 'tele.sync']
+HDCAM = ['hdcam', '.hd.cam', 'hdts', '.hd.ts', '.hdtc', '.hd.tc', '.hctc', '.hc.tc']
 
 CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
 CODEC_H264 = ['avc', 'h264', 'h.264', 'x264', 'x.264']
 CODEC_XVID = ['xvid', '.x.vid']
 CODEC_DIVX = ['divx', 'divx ', 'div2', 'div2 ', 'div3']
-CODEC_MPEG = ['mpeg', 'm4v', 'mpg', 'mpg1', 'mpg2', 'mpg3', 'mpg4', 'mp4 ', '.mp.4.', 'msmpeg', 'msmpeg4',
-			  'msmpeg.4.', 'mpegurl']
+CODEC_MPEG = ['mpeg', 'm4v', 'mpg', 'mpg1', 'mpg2', 'mpg3', 'mpg4', 'mp4 ', '.mp.4.', 'msmpeg', 'msmpeg4', 'msmpeg.4.', 'mpegurl']
 CODEC_MKV = ['mkv', '.mkv', 'matroska']
 
 AUDIO_8CH = ['ch8.', '8ch.', '.7.1.']
@@ -49,8 +43,7 @@ AUDIO_7CH = ['ch7.', '7ch.', '.6.1.']
 AUDIO_6CH = ['ch6.', '6ch.', '.5.1.']
 AUDIO_2CH = ['ch2', '2ch', '2.0', 'audio.2.0.', 'stereo']
 
-VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom',
-			'top.and.bottom']
+VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom', 'top.and.bottom']
 
 MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng', 'dut.eng', 'ell.eng', 'esl.eng',
 			  'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng',
@@ -70,7 +63,7 @@ UNDESIREABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'b
 			  'megapeer', 'minutemen.empire', 'omskbird', 'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample',
 			  'soundtrack', 'subtitle.only', 'teaser', 'trailer', 'tumbler.studio', 'tvshows', 'vostfr', 'webdlrip', 'webhdrip', 'wish666']
 
-DUBBED = ['dublado', 'dubbed']
+DUBBED = ['dublado', 'dubbed', 'pldub']
 SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub']
 ADDS = ['1xbet', 'betwin']
 
@@ -98,7 +91,6 @@ season_ordinal_dict = {'1': 'first', '2': 'second', '3': 'third', '4': 'fourth',
 season_ordinal2_dict = {'1': '1st', '2': '2nd', '3': '3rd', '4': '4th', '5': '5th', '6': '6th', '7': '7th', '8': '8th', '9': '9th', '10': '10th',
 			'11': '11th', '12': '12th', '13': '13th', '14': '14th', '15': '15th', '16': '16th', '17': '17th', '18': '18th', '19': '19th',
 			'20': '20th', '21': '21st', '22': '22nd', '23': '23rd', '24': '24th', '25': '25th'}
-
 
 
 def is_anime(content, type, type_id):
@@ -189,7 +181,7 @@ def getFileType(url):
 			type += ' DOLBY-TRUEHD /'
 		if 'atmos' in fmt:
 			type += ' ATMOS /'
-		if '.dts.' in fmt:
+		if '.dts' in fmt:
 			type += ' DTS /'
 		if any(value in fmt for value in ['dts.hd.', 'dtshd']):
 			type += ' DTS-HD /'
@@ -291,25 +283,25 @@ def check_title(title, aliases, release_title, hdlr, year):
 	except:
 		aliases = None
 
-	# log_utils.log('aliases = %s' % str(aliases), __name__, log_utils.LOGDEBUG)
-	# log_utils.log('aliases type = %s' % type(aliases), __name__, log_utils.LOGDEBUG)
-
 	title_list = []
 	if aliases:
 		for item in aliases:
-			alias = item.replace('!', '').replace('(', '').replace(')', '')
-			# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', item)
-			for match in re.finditer(r'(.+?)(U\.S|U\.K)', alias):
-				alias = match.group(1) + match.group(2).replace('.', '')
+			try:
+				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
 				title_list.append(alias)
-
+			except:
+				log_utils.error()
+				continue
 	try:
-		release_title = release_title_format(release_title)
 		match = True
-		title = title.replace('!', '').replace('(', '').replace(')', '')
+		title = title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
 		title_list.append(title)
-		n = release_title
+		# log_utils.log('title_list = %s' % str(title_list), __name__, log_utils.LOGDEBUG)
+
+		release_title = release_title_format(release_title)
+		n = release_title #release_title already lower case
 		h = hdlr.lower()
 		t = n.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
@@ -374,23 +366,24 @@ def filter_single_episodes(hdlr, release_title):
 
 def filter_season_pack(show_title, aliases, year, season, release_title):
 	try:
-		try:
-			aliases = json.loads(aliases)
-			aliases = aliases_to_array(aliases, filter=None)
-		except:
-			aliases = None
+		aliases = json.loads(aliases)
+		aliases = aliases_to_array(aliases)
+	except:
+		aliases = None
 
-		title_list = []
-		if aliases:
-			for item in aliases:
-				alias = item.replace('!', '').replace('(', '').replace(')', '')
-				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', item)
-				for match in re.finditer(r'(.+?)(U\.S|U\.K)', alias):
-					alias = match.group(1) + match.group(2).replace('.', '')
-					title_list.append(alias)
-
-		release_title = release_title_format(release_title)
-		show_title = show_title.replace('!', '').replace('(', '').replace(')', '')
+	title_list = []
+	if aliases:
+		for item in aliases:
+			try:
+				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
+				title_list.append(alias)
+			except:
+				log_utils.error()
+				continue
+	try:
+		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+		# show_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', show_title)
 		title_list.append(show_title)
 
 		season_fill = season.zfill(2)
@@ -402,8 +395,9 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		season_full_fill_check_ns = '.season%s.' % season_fill
 
 		string_list = [season_check, season_fill_check, season_full_check, season_full_check_ns, season_full_fill_check, season_full_fill_check_ns]
-
 		split_list = [season_check, season_fill_check, '.' + season + '.season', 'total.season', 'season', 'the.complete', 'complete', year]
+
+		release_title = release_title_format(release_title)
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
@@ -448,38 +442,35 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
-	# log_utils.log('release_title = %s' % str(release_title), __name__, log_utils.LOGDEBUG)
 	try:
-		try:
-			aliases = json.loads(aliases)
-			aliases = aliases_to_array(aliases, filter=None)
-		except:
-			aliases = None
+		aliases = json.loads(aliases)
+		aliases = aliases_to_array(aliases, filter=None)
+	except:
+		aliases = None
 
-		title_list = []
-		if aliases:
-			for item in aliases:
-				alias = item.replace('!', '').replace('(', '').replace(')', '')
-				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', item)
-				for match in re.finditer(r'(.+?)(U\.S|U\.K)', alias):
-					alias = match.group(1) + match.group(2).replace('.', '')
-					title_list.append(alias)
-
-		release_title = release_title_format(release_title)
-		show_title = show_title.replace('!', '').replace('(', '').replace(')', '')
+	title_list = []
+	if aliases:
+		for item in aliases:
+			try:
+				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
+				title_list.append(alias)
+			except:
+				log_utils.error()
+				continue
+	try:
+		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+		# show_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', show_title)
 		title_list.append(show_title)
+
 		split_list = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's1', 's01', year] #s1 or s01 used so show pack only kept that begin with 1
-		# split_list = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's%s' % season, 's%02d' % int(season), year]
+		release_title = release_title_format(release_title)
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False, 0
-
-
-
 		# log_utils.log('release_title = %s' % str(release_title), __name__, log_utils.LOGDEBUG)
-
 
 
 # remove episode ranges
@@ -770,7 +761,7 @@ def clean_name(title, release_title):
 					'www.torrenting.org', 'www.torrent9.nz', '[.www.omgtorrent.com.]', '[.www.torrent9.uno.]', '[agusiq.torrents.pl]', '[katmoviehd.to]', '[3d.hentai]', '[dark.media]',
 					'[filetracker.pl]', 'www-torrenting-com', 'www-torrenting-org', '[katmoviehd.eu]', 'www.scenetime.com', 'www.tamilrockerrs.pl', '[.torrent9.tv.]', '[nextorrent.net]',
 					'+katmoviehd.pw+', 'www.movcr.tv', 'www.bludv.tv', '[www.torrent9.ph.]','[acesse.]', '[acesse-hd-elite-me]', '[torrentcouch.net]', 'ramin.djawadi', '[prof]', '[reup]',
-					'[ah]', '[ul]', '+13.+', 'taht.oyunlar', '[agusiq-torrents.pl]', 'agusiq-torrents-pl', 'crazy4tv.com', '[tv]']
+					'[ah]', '[ul]', '+13.+', 'taht.oyunlar', '[agusiq-torrents.pl]', 'agusiq-torrents-pl', 'crazy4tv.com', 'xtorrenty.org', '[tv]']
 
 		unwanted2 = ['.', '..', '...', '{', '}', '[.]', '[.]', '[.', '+-+-', '-', '-.', '.-.']
 
@@ -791,7 +782,6 @@ def clean_name(title, release_title):
 			release_title = release_title.lstrip(i)
 		# log_utils.log('final release_title: ' + str(release_title), log_utils.LOGDEBUG)
 		return release_title
-
 	except:
 		log_utils.error()
 

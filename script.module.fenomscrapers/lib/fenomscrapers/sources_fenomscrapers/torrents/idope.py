@@ -60,9 +60,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -151,8 +150,8 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter

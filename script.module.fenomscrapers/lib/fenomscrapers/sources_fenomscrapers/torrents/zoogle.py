@@ -60,8 +60,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -112,13 +112,11 @@ class source:
 			for entry in rows:
 				try:
 					try:
-						if 'magnet:' not in entry:
-							continue
+						if 'magnet:' not in entry: continue
 						url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
 						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 						url = source_utils.strip_non_ascii_and_unprintable(url)
-						if url in str(self.sources):
-							continue
+						if url in str(self.sources): continue
 					except:
 						continue
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
@@ -177,11 +175,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -224,8 +222,7 @@ class source:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
 			html = client.request(link, ignoreErrors = 404)
-			if not html:
-				return
+			if not html: return
 			html = html.replace('&nbsp;', ' ')
 
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
@@ -237,13 +234,11 @@ class source:
 			for entry in rows:
 				try:
 					try:
-						if 'magnet:' not in entry:
-							continue
+						if 'magnet:' not in entry: continue
 						url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
 						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 						url = source_utils.strip_non_ascii_and_unprintable(url)
-						if url in str(self.sources):
-							continue
+						if url in str(self.sources): continue
 					except:
 						continue
 

@@ -50,11 +50,13 @@ def sleep(time):  # Modified `sleep` command that honors a user exit request
 def getKodiVersion():
 	return int(xbmc.getInfoLabel("System.BuildVersion")[:2])
 
+
 def lang(language_id):
 	text = getLangString(language_id)
 	if getKodiVersion() < 19:
 		text = text.encode('utf-8', 'replace')
 	return text
+
 
 def check_version_numbers(current, new):
 	# Compares version numbers and return True if new version is newer

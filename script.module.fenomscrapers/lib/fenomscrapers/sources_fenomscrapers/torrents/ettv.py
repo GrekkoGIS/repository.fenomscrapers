@@ -21,8 +21,8 @@ class source:
 	def __init__(self):
 		self.priority = 8
 		self.language = ['en']
-		self.domain = ['ettvdl.com', 'ettv.to']
-		self.base_link = 'https://www.ettvdl.com'
+		self.domain = ['ettvcentral.com', 'ettvdl.com']
+		self.base_link = 'https://www.ettvcentral.com'
 		self.search_link = '/torrents-search.php?search=%s'
 		self.min_seeders = 1
 		self.pack_capable = False
@@ -60,8 +60,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 

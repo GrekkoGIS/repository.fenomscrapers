@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-05-2020)
+# modified by Venom for Fenomscrapers (updated 10-12-2020)
 
 '''
     Fenomscrapers Project
@@ -25,12 +25,12 @@ class source:
 		self.priority = 3
 		self.language = ['en']
 		self.base_link = 'https://torrentapi.org' #-just to satisfy scraper_test
-		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&ranked=0&limit=100&format=json_extended'
-		self.tvshowearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_tvdb={1}&ranked=0&limit=100&format=json_extended' #thinking more on using this
+		self.tvsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_string={1}&ranked=0&limit=100&format=json_extended' # string query
+		self.tvshowsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&search_string={2}&ranked=0&limit=100&format=json_extended' # imdb_id + string query
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&ranked=0&limit=100&format=json_extended'
 		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
 		self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
-		self.min_seeders = 1
+		self.min_seeders = 0
 		self.pack_capable = True
 
 
@@ -72,9 +72,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -88,7 +87,7 @@ class source:
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 
 			if 'tvshowtitle' in data:
-				search_link = self.tvsearch.format(self.key, quote_plus(query))
+				search_link = self.tvshowsearch.format(self.key, data['imdb'], hdlr)
 			else:
 				search_link = self.msearch.format(self.key, data['imdb'])
 			# log_utils.log('search_link = %s' % search_link, log_utils.LOGDEBUG)
@@ -99,7 +98,6 @@ class source:
 				return sources
 
 			files = json.loads(rjson)['torrent_results']
-
 			for file in files:
 				url = file["download"]
 				url = url.split('&tr')[0]
@@ -146,12 +144,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		sources = []
-		self.bypass_filter = bypass_filter
-
+		if not url: return sources
 		if search_series: # torrentapi does not have showPacks
 			return sources
 		try:
-			if not url: return sources
+			self.bypass_filter = bypass_filter
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -162,9 +159,8 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
-			search_link = self.tvsearch.format(self.key, quote_plus(query + ' S%s' % self.season_xx))
-			# log_utils.log('search_link = %s' % str(search_link), __name__, log_utils.LOGDEBUG)
+			search_link = self.tvshowsearch.format(self.key, data['imdb'], 'S%s' % self.season_xx)
+			# log_utils.log('search_link = %s' % str(search_link), log_utils.LOGDEBUG)
 
 			time.sleep(2.1)
 			rjson = client.request(search_link, error=True)

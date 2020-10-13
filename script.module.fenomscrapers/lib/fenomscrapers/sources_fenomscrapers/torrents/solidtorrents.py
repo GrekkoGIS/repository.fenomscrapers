@@ -61,9 +61,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -111,6 +110,8 @@ class source:
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = item['infohash'].lower()
+					if url in str(self.sources):
+						continue
 
 					name = item['title']
 					name = source_utils.clean_name(self.title, name)
@@ -124,9 +125,6 @@ class source:
 					if self.episode_title:
 						if not source_utils.filter_single_episodes(self.hdlr, name):
 							continue
-
-					if url in str(self.sources):
-						continue
 
 					try:
 						seeders = int(item['swarm']['seeders'])
@@ -157,12 +155,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -212,6 +209,8 @@ class source:
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = item['infohash'].lower()
+					if url in str(self.sources):
+						continue
 
 					name = item['title']
 					name = source_utils.clean_name(self.title, name)
@@ -233,9 +232,6 @@ class source:
 							last_season = self.total_seasons
 						package = 'show'
 
-					if url in str(self.sources):
-						continue
-
 					try:
 						seeders = int(item['swarm']['seeders'])
 						if self.min_seeders > seeders: 
@@ -254,7 +250,7 @@ class source:
 					info = ' | '.join(info)
 
 					item = {'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
+								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 					if self.search_series:
 						item.update({'last_season': last_season})
 					self.sources.append(item)

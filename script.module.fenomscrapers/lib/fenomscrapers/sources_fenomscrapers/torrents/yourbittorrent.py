@@ -60,9 +60,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -82,8 +81,7 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url, timeout='5')
-			if not r:
-				return self.sources
+			if not r: return self.sources
 			links = re.findall('<a href="(/torrent/.+?)"', r, re.DOTALL)
 
 			threads = []
@@ -120,8 +118,7 @@ class source:
 					return
 
 			url = '%s%s%s' % (url, '&dn=', str(name))
-			if url in str(self.sources):
-				return
+			if url in str(self.sources): return
 
 			try:
 				seeders = int(re.findall('<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
@@ -151,11 +148,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -195,15 +192,13 @@ class source:
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-
 			links = re.findall('<a href="(/torrent/.+?)"', r, re.DOTALL)
+
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
 				result = client.request(url, timeout='5')
-				if result is None:
-					continue
-				if '<kbd>' not in result:
-					continue
+				if not result: continue
+				if '<kbd>' not in result: continue
 				hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
 				url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 

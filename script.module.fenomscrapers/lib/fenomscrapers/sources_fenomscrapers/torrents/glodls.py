@@ -59,10 +59,9 @@ class source:
 
 
 	def sources(self, url, hostDict):
+		sources = []
+		if not url: return sources
 		try:
-			sources = []
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -84,7 +83,6 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			items = self.get_sources(url)
-
 			for item in items:
 				try:
 					name = item[0]

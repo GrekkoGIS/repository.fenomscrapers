@@ -60,9 +60,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -98,10 +97,8 @@ class source:
 
 	def get_sources(self, link):
 		try:
-			try:
-				url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
-			except:
-				url = link[0].replace('&nbsp;', ' ')
+			try: url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
+			except: url = link[0].replace('&nbsp;', ' ')
 			if '/torrent/' not in url: return
 
 			try: name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.')
@@ -160,12 +157,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -205,15 +201,13 @@ class source:
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
 			links = re.findall('<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
 
 			for link in links:
 				try: url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
 				except: url = link[0].replace('&nbsp;', ' ')
-				if '/torrent/' not in url:
-					continue
+				if '/torrent/' not in url: continue
 
 				try:
 					name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.')

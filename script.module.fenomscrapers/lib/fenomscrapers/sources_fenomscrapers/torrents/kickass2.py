@@ -72,9 +72,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -115,8 +114,7 @@ class source:
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = client.request(url, headers=headers)
-			if not r:
-				return
+			if not r: return
 			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
 
 			for post in posts:
@@ -165,12 +163,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -210,8 +207,7 @@ class source:
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = client.request(link, headers=headers)
-			if not r:
-				return
+			if not r: return
 			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
 
 			for post in posts:
@@ -273,16 +269,14 @@ class source:
 
 
 	def __get_base_url(self, fallback):
-		try:
-			for domain in self.domains:
-				try:
-					url = 'https://%s' % domain
-					result = client.request(url, limit=1, timeout='5')
-					result = re.findall('<title>(.+?)</title>', result, re.DOTALL)[0]
-					if result and 'Kickass' in result:
-						return url
-				except:
-					pass
-		except:
-			pass
+		for domain in self.domains:
+			try:
+				url = 'https://%s' % domain
+				result = client.request(url, limit=1, timeout='5')
+				result = re.findall('<title>(.+?)</title>', result, re.DOTALL)[0]
+				if result and 'Kickass' in result:
+					return url
+			except:
+				source_utils.scraper_error('KICKASS2')
+				pass
 		return fallback

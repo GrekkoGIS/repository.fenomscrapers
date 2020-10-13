@@ -6,7 +6,6 @@
 '''
 
 import re
-
 try:
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote_plus, unquote_plus
@@ -62,9 +61,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -106,8 +104,7 @@ class source:
 			posts = client.parseDOM(posts, 'tr')
 
 			for post in posts:
-				if '<th' in post:
-					continue
+				if '<th' in post: continue
 				links = re.compile('<a href="(.+?)">.*?<td class="tdnormal">((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class="tdseed">([0-9]+|[0-9]+,[0-9]+)</td>').findall(post)
 
 				for items in links:
@@ -157,11 +154,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -211,8 +208,7 @@ class source:
 
 		for post in posts:
 			try:
-				if '<th' in post:
-					continue
+				if '<th' in post: continue
 				links = re.compile('<a href="(.+?)">.*?<td class="tdnormal">((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class="tdseed">([0-9]+|[0-9]+,[0-9]+)</td>').findall(post)
 
 				for items in links:

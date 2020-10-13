@@ -59,11 +59,10 @@ class source:
 
 
 	def sources(self, url, hostDict):
+		self._sources = []
+		self.items = []
+		if not url: return self._sources
 		try:
-			self._sources = []
-			self.items = []
-			if not url: return self._sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -149,9 +148,7 @@ class source:
 					pass
 
 				self.items.append((name, link, isize, dsize, seeders))
-
 			return self.items
-
 		except:
 			source_utils.scraper_error('1337X')
 			return self.items
@@ -160,7 +157,6 @@ class source:
 	def _get_sources(self, item):
 		try:
 			name = item[0]
-
 			quality, info = source_utils.get_release_quality(name, item[1])
 
 			if item[2] != '0':

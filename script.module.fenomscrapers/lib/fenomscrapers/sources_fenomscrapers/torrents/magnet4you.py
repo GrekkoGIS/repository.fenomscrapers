@@ -60,9 +60,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		self.sources = []
+		if not url: return self.sources
 		try:
-			if not url: return self.sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -81,8 +80,7 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			r = client.request(url)
-			if not r:
-				return self.sources
+			if not r: return self.sources
 			rows = client.parseDOM(r, 'div', attrs={'id': 'profile1'})
 
 			threads = []

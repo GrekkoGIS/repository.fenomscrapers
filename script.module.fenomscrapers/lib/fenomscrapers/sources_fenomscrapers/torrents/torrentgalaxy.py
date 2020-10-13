@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 10-05-2020)
+# created by Venom for Fenomscrapers (updated 10-12-2020)
 
 '''
     Fenomscrapers Project
@@ -22,9 +22,9 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
-		self.domains = ['torrentgalaxy.to', 'torrentgalaxy.pw']
+		self.domains = ['torrentgalaxy.to', 'torrentgalaxy.org', 'torrentgalaxy.pw']
 		self.base_link = 'https://torrentgalaxy.to'
-		self.search_link = '/torrents.php?search=%s&sort=size&order=desc'
+		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
 		self.min_seeders = 0
 		self.scraper = cfscrape.create_scraper()
 		self.pack_capable = True
@@ -62,9 +62,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -74,10 +73,12 @@ class source:
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
-			query = '%s %s' % (title, hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
-
-			url = self.search_link % quote_plus(query)
+			if 'tvshowtitle' in data:
+				query = '%s %s' % (title, hdlr)
+				query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+				url = self.search_link % quote_plus(query)
+			else:
+				url = self.search_link % data['imdb']
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
@@ -134,11 +135,11 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
-			if not url: return self.sources
 
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])

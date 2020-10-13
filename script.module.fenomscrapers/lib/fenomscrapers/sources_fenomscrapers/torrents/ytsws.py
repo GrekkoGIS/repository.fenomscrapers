@@ -36,10 +36,9 @@ class source:
 
 
 	def sources(self, url, hostDict):
+		sources = []
+		if not url: return sources
 		try:
-			sources = []
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -56,8 +55,7 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			html = client.request(url)
-			if html is None:
-				return sources
+			if not html: return sources
 
 			quality_size = client.parseDOM(html, 'p', attrs={'class': 'quality-size'})
 			tit = client.parseDOM(html, 'title')[0]

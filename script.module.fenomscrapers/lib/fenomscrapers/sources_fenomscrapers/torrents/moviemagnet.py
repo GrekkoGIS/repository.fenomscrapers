@@ -38,11 +38,10 @@ class source:
 
 
 	def sources(self, url, hostDict):
-		scraper = cfscrape.create_scraper()
 		sources = []
+		if not url: return sources
 		try:
-			if not url: return sources
-
+			scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -89,10 +88,8 @@ class source:
 						continue
 
 					url = link[1]
-					try:
-						url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
-					except:
-						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+					try: url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
+					except: url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 					url = url.split('&tr')[0]
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 

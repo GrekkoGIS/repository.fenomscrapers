@@ -1,3 +1,14 @@
+[B][COLOR red]Update - v1.0.8 – Oct. 12, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Filter tweaks for better alias title matching.[/I]
+[COLOR yellow]--[/COLOR][I] Switched piratebay(pack files only), torrentapi,
+    and torrentgalaxy(movies and pack files) to now
+    use imdb_id for query.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed ext.to retreives random ".\." in magnet
+    hash.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed eztv title query for meta titles containing
+    dashes.[/I]
+[COLOR yellow]--[/COLOR][I] Updated cfscrape to v1.2.48.[/I]
+
 [B][COLOR red]Update - v1.0.7 – Oct. 9, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added "ext.to" torrent scraper.[/I]
 [COLOR yellow]--[/COLOR][I] Fix for "My Accounts" sync notification not

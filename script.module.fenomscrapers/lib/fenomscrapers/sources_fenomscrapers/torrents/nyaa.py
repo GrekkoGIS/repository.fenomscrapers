@@ -60,9 +60,8 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -116,7 +115,6 @@ class source:
 
 							if hdlr in name:
 								t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-
 							if hdlr2 in name:
 								t = name.split(hdlr2)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 
@@ -128,7 +126,6 @@ class source:
 								continue
 
 							quality, info = source_utils.get_release_quality(name, url)
-
 							try:
 								size = link[1]
 								dsize, isize = source_utils._size(size)
@@ -136,7 +133,6 @@ class source:
 							except:
 								dsize = 0
 								pass
-
 							info = ' | '.join(info)
 
 							sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
