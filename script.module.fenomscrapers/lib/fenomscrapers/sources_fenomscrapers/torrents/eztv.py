@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-12-2020)
+# modified by Venom for Fenomscrapers (updated 10-13-2020)
 
 '''
     Fenomscrapers Project
@@ -61,6 +61,7 @@ class source:
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
 
+			query = '%s %s' % (title, hdlr)
 			# query = re.sub('[^A-Za-z0-9\s\.-]+', '', query) #eztv has issues with dashes in titles
 			query = re.sub('[^A-Za-z0-9\s\.]+', '', query)
 

@@ -31,7 +31,7 @@ class source:
 # https://utorrentz2.in/v1.php?q=joker+2019
 
 		self.search_link = '/search?f=%s'
-		self.min_seeders = 1
+		self.min_seeders = 0
 		self.pack_capable = False
 
 

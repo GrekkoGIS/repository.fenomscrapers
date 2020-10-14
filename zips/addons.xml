@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.0.8" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.0.9" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -28,16 +28,12 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.0.8 – Oct. 12, 2020[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Filter tweaks for better alias title matching.[/I]
-[COLOR yellow]--[/COLOR][I] Switched piratebay(pack files only), torrentapi,
-    and torrentgalaxy(movies and pack files) to now
-    use imdb_id for query.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed ext.to retreives random ".\." in magnet
-    hash.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed eztv title query for meta titles containing
-    dashes.[/I]
-[COLOR yellow]--[/COLOR][I] Updated cfscrape to v1.2.48.[/I]
+[B][COLOR red]Update - v1.0.9 – Oct. 13, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed typo in previous eztv query change.[/I]
+[COLOR yellow]--[/COLOR][I] Removed release_year from trakt aliases.  This
+    caused the title check for some random shows
+    to fails.  This should fix the random issues for
+    you "Big Brother" show fans.  [/I]
 		</news>
 	</extension>
 </addon>

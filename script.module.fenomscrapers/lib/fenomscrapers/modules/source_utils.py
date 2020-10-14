@@ -287,8 +287,10 @@ def check_title(title, aliases, release_title, hdlr, year):
 	if aliases:
 		for item in aliases:
 			try:
-				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
+				if alias in title_list:
+					continue
 				title_list.append(alias)
 			except:
 				log_utils.error()
@@ -298,12 +300,13 @@ def check_title(title, aliases, release_title, hdlr, year):
 		title = title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
 		title_list.append(title)
-		# log_utils.log('title_list = %s' % str(title_list), __name__, log_utils.LOGDEBUG)
 
 		release_title = release_title_format(release_title)
 		n = release_title #release_title already lower case
 		h = hdlr.lower()
 		t = n.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
+		# log_utils.log('cleantitle.get(t) = %s' % str(cleantitle.get(t)), __name__, log_utils.LOGDEBUG)
+
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			match = False
 		if h not in n:
@@ -317,8 +320,7 @@ def check_title(title, aliases, release_title, hdlr, year):
 def remove_lang(release_title, episode_title=None):
 	try:
 		fmt = release_title_strip(release_title)
-		if fmt is None:
-			return False
+		if fmt is None: return False
 		# log_utils.log('fmt = %s for release_title = %s' % (str(fmt), str(release_title)), __name__, log_utils.LOGDEBUG)
 		if episode_title:
 			episode_title = episode_title.lower().replace("'", "")
@@ -375,8 +377,10 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 	if aliases:
 		for item in aliases:
 			try:
-				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
+				if alias in title_list:
+					continue
 				title_list.append(alias)
 			except:
 				log_utils.error()
@@ -452,8 +456,10 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 	if aliases:
 		for item in aliases:
 			try:
-				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
+				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
+				if alias in title_list:
+					continue
 				title_list.append(alias)
 			except:
 				log_utils.error()
@@ -470,7 +476,6 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			t = t.split(i)[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False, 0
-		# log_utils.log('release_title = %s' % str(release_title), __name__, log_utils.LOGDEBUG)
 
 
 # remove episode ranges

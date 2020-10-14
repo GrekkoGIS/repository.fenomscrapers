@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-12-2020)
+# modified by Venom for Fenomscrapers (updated 10-13-2020)
 
 '''
     Fenomscrapers Project
@@ -82,9 +82,8 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			rjson = client.request(url, error=True)
-			if not rjson or 'No results returned' in str(rjson) or 'Connection Time-out' in str(rjson):
+			if any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out']) or not rjson:
 				return sources
-
 			files = json.loads(rjson)
 			for file in files:
 				try:
@@ -176,7 +175,7 @@ class source:
 		try:
 			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 			rjson = client.request(link, error=True)
-			if not rjson or 'No results returned' in str(rjson) or 'Connection Time-out' in str(rjson):
+			if any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out']) or not rjson:
 				return
 			files = json.loads(rjson)
 		except:
