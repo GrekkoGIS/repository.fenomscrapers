@@ -119,7 +119,7 @@ msgid "Easynews Username"
 msgstr ""
 
 msgctxt "#32029"
-msgid "Easynews Username"
+msgid "Easynews Password"
 msgstr ""
 
 msgctxt "#32030"
@@ -159,7 +159,7 @@ msgid "My Accounts sync complete"
 msgstr ""
 
 msgctxt "#32039"
-msgid ""
+msgid "GDrive Worker URL"
 msgstr ""
 
 msgctxt "#32040"
@@ -335,7 +335,7 @@ msgid "WATCHSERIESTV (shows only)"
 msgstr ""
 
 msgctxt "#32081"
-msgid ""
+msgid "GDRIVE"
 msgstr ""
 
 msgctxt "#32082"

@@ -120,8 +120,8 @@ msgid "Easynews Username"
 msgstr "Easynews Gebruikersnaam"
 
 msgctxt "#32029"
-msgid "Easynews Username"
-msgstr "Easynews Gebruikersnaam"
+msgid "Easynews Password"
+msgstr "Easynews Wachtwoord"
 
 msgctxt "#32030"
 msgid "Ororo.tv"
@@ -160,8 +160,8 @@ msgid "My Accounts sync complete"
 msgstr "Mijn Accounts zijn gesynchroniseerd"
 
 msgctxt "#32039"
-msgid ""
-msgstr ""
+msgid "GDrive Worker URL"
+msgstr "GDrive Worker URL"
 
 msgctxt "#32040"
 msgid ""
@@ -336,8 +336,8 @@ msgid "WATCHSERIESTV (shows only)"
 msgstr "WATCHSERIESTV (alleen series)"
 
 msgctxt "#32081"
-msgid ""
-msgstr ""
+msgid "GDRIVE"
+msgstr "GDRIVE"
 
 msgctxt "#32082"
 msgid ""

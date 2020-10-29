@@ -1,9 +1,16 @@
+[B][COLOR red]Update - v1.1.0 – Oct. 29, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added Google Drive scraper. See url setup
+    in "My Accounts" addon.[/I]
+[COLOR yellow]--[/COLOR][I] Removed extratorrent scraper.  Main site
+    is gone and proxy mirror's query returns
+    useless results.[/I]
+
 [B][COLOR red]Update - v1.0.9 – Oct. 13, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed typo in previous eztv query change.[/I]
 [COLOR yellow]--[/COLOR][I] Removed release_year from trakt aliases.  This
     caused the title check for some random shows
     to fails.  This should fix the random issues for
-    you "Big Brother" show fans.  [/I]
+    you "Big Brother" show fans.[/I]
 
 [B][COLOR red]Update - v1.0.8 – Oct. 12, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Filter tweaks for better alias title matching.[/I]
