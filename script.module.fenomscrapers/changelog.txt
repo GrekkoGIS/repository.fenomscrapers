@@ -1,18 +1,22 @@
-[B][COLOR red]Update - v1.1.0 – Oct. 29, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.1.1 - Oct. 30, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed duplicate entry in settings.xml for Easynews.[/I]
+[COLOR yellow]--[/COLOR][I] Added fanart.png for addon.[/I]
+
+[B][COLOR red]Update - v1.1.0 - Oct. 29, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added Google Drive scraper. See url setup
     in "My Accounts" addon.[/I]
 [COLOR yellow]--[/COLOR][I] Removed extratorrent scraper.  Main site
     is gone and proxy mirror's query returns
     useless results.[/I]
 
-[B][COLOR red]Update - v1.0.9 – Oct. 13, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.9 - Oct. 13, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed typo in previous eztv query change.[/I]
 [COLOR yellow]--[/COLOR][I] Removed release_year from trakt aliases.  This
     caused the title check for some random shows
     to fails.  This should fix the random issues for
     you "Big Brother" show fans.[/I]
 
-[B][COLOR red]Update - v1.0.8 – Oct. 12, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.8 - Oct. 12, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Filter tweaks for better alias title matching.[/I]
 [COLOR yellow]--[/COLOR][I] Switched piratebay(pack files only), torrentapi,
     and torrentgalaxy(movies and pack files) to now
@@ -23,13 +27,13 @@
     dashes.[/I]
 [COLOR yellow]--[/COLOR][I] Updated cfscrape to v1.2.48.[/I]
 
-[B][COLOR red]Update - v1.0.7 – Oct. 9, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.7 - Oct. 9, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added "ext.to" torrent scraper.[/I]
 [COLOR yellow]--[/COLOR][I] Fix for "My Accounts" sync notification not
     being displayed.[/I]
 [COLOR yellow]--[/COLOR][I] Few default scraper changes.[/I]
 
-[B][COLOR red]Update - v1.0.6 – Oct. 5, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.6 - Oct. 5, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] fixed skytorrents scraper for url change.[/I]
 COLOR yellow]--[/COLOR][I] btdb scraper resurrected.  Site has reverted back to
     non-cloudflare v2 challenge.  Scraper is also now
@@ -37,17 +41,17 @@ COLOR yellow]--[/COLOR][I] btdb scraper resurrected.  Site has reverted back to
 COLOR yellow]--[/COLOR][I] torrentz2 scraper resurrected.  Site has reverted back to
     non-cloudflare v2 challenge.[/I]
 
-[B][COLOR red]Update - v1.0.5 – Oct. 3, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.5 - Oct. 3, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added Danish translation. Huge thanks to TINUZ97!![/I]
 [COLOR yellow]--[/COLOR][I] Code changes for My Accounts compatibility.[/I]
 
-[B][COLOR red]Update - v1.0.4 – Sept. 30, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.4 - Sept. 30, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed library scraper.[/I]
 [COLOR yellow]--[/COLOR][I] Couple more tweaks to show packs filter.[/I]
 [COLOR yellow]--[/COLOR][I] Cleanup of unneeded modules and functions.[/I]
 [COLOR yellow]--[/COLOR][I] Added ENG translation file.[/I]
 
-[B][COLOR red]Update - v1.0.3 – Sept. 29, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.3 - Sept. 29, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed Library scraper error halting results.[/I]
 [COLOR yellow]--[/COLOR][I] Fixed filepursuit api key failing to import from
     "My Accounts".[/I]
@@ -56,5 +60,5 @@ COLOR yellow]--[/COLOR][I] torrentz2 scraper resurrected.  Site has reverted bac
 [COLOR yellow]--[/COLOR][I] Few filter tweaks for show packs returning out of range
     results when season separator was a tilde mark.[/I]
 
-[B][COLOR red]Update - v1.0.2 – Sept. 25, 2020[/COLOR][/B]
+[B][COLOR red]Update - v1.0.2 - Sept. 25, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Initial commit.[/I]

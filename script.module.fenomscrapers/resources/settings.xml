@@ -104,9 +104,6 @@
 		<setting id="easynews.user" type="text" label="32028" default="" enable="false" />
 		<setting id="easynews.password" type="text" label="32029" default="" enable="false" />
 
-		<setting type="lsep" label="32027" />
-		<setting id="easynews.user" type="text" label="32028" default="" enable="false" />
-
 		<setting type="lsep" label="32081" />
 		<setting id="gdrive.cloudflare_url" type="text" label="32039" default="" enable="false" />
 	</category>
