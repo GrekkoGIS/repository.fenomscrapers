@@ -441,7 +441,7 @@ msgid "ETTV"
 msgstr ""
 
 msgctxt "#32106"
-msgid "EXTRATORRENT"
+msgid "EXTRATORRENT (Pack capable)"
 msgstr ""
 
 msgctxt "#32107"

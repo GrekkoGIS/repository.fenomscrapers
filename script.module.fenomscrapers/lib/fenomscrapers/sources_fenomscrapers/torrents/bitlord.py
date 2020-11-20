@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 10-05-2020)
+# created by Venom for Fenomscrapers (updated 11-19-2020)
 
 '''
     Fenomscrapers Project
@@ -98,6 +98,8 @@ class source:
 				'filters[risky]': False}
 
 			rjson = client.request(api_url, post=query_data, headers=headers)
+			if not rjson:
+				return sources
 			files = json.loads(rjson)
 			error = files.get('error')
 			if error:
@@ -157,7 +159,7 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
-		if not url: return sources
+		if not url: return self.sources
 		try:
 			self.search_series = search_series
 			self.total_seasons = total_seasons
@@ -215,11 +217,12 @@ class source:
 
 			api_url = urljoin(self.base_link, self.api_search_link)
 			rjson = client.request(api_url, post=query_data, headers=self.headers)
-
+			if not rjson:
+				return self.sources
 			files = json.loads(rjson)
 			error = files.get('error')
 			if error:
-				return sources
+				return self.sources
 
 			for file in files.get('content'):
 				try:

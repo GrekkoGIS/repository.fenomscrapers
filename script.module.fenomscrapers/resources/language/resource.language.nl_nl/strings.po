@@ -442,8 +442,8 @@ msgid "ETTV"
 msgstr "ETTV"
 
 msgctxt "#32106"
-msgid "EXTRATORRENT"
-msgstr "EXTRATORRENT"
+msgid "EXTRATORRENT (Pack capable)"
+msgstr "EXTRATORRENT (Pack geschikt)"
 
 msgctxt "#32107"
 msgid "EZTV"

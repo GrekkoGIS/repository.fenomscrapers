@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-05-2020)
+# modified by Venom for Fenomscrapers (updated 11-19-2020)
 
 '''
     Fenomscrapers Project
@@ -98,7 +98,7 @@ class source:
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
-					if url in str(self.sources):
+					if url in str(sources):
 						return
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 

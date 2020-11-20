@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-12-2020)
+# modified by Venom for Fenomscrapers (updated 11-19-2020)
 
 '''
     Fenomscrapers Project
@@ -94,7 +94,7 @@ class source:
 
 			time.sleep(2.1)
 			rjson = client.request(search_link, error=True)
-			if not rjson or not 'torrent_results' in str(rjson):
+			if not rjson or 'torrent_results' not in str(rjson):
 				return sources
 
 			files = json.loads(rjson)['torrent_results']
@@ -164,7 +164,7 @@ class source:
 
 			time.sleep(2.1)
 			rjson = client.request(search_link, error=True)
-			if not rjson or not 'torrent_results' in str(rjson):
+			if not rjson or 'torrent_results' not in str(rjson):
 				return sources
 
 			files = json.loads(rjson)['torrent_results']

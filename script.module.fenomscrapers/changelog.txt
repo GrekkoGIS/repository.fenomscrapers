@@ -1,3 +1,9 @@
+[B][COLOR red]Update - v1.1.2 - Nov. 20, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed eztv torrent scraper.[/I]
+[COLOR yellow]--[/COLOR][I] extratorrent scraper resurrected.  Scraper has also
+    been converted to pack capable.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed some bogus log errors when url timeout occurs.[/I]
+
 [B][COLOR red]Update - v1.1.1 - Oct. 30, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed duplicate entry in settings.xml for Easynews.[/I]
 [COLOR yellow]--[/COLOR][I] Added fanart.png for addon.[/I]

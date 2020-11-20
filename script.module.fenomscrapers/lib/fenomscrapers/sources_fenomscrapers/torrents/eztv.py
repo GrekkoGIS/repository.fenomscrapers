@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-13-2020)
+# modified by Venom for Fenomscrapers (updated 11-19-2020)
 
 '''
     Fenomscrapers Project
@@ -21,10 +21,11 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['eztv.io']
-		self.base_link = 'https://eztv.io'
+		self.domains = ['eztv.re', 'eztv.ag', 'eztv.it', 'eztv.ch']
+		self.base_link = 'https://eztv.re'
+		# eztv has api but it sucks. Site query returns more results vs. api (eztv db seems to be missing the imdb_id for many so they are dopped)
 		self.search_link = '/search/%s'
-		self.min_seeders = 1
+		self.min_seeders = 0
 		self.pack_capable = False
 
 
@@ -69,34 +70,33 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			html = client.request(url)
+
 			try:
-				results = client.parseDOM(html, 'table', attrs={'class': 'forum_header_border'})
-				for result in results:
-					if 'magnet:' in result:
-						results = result
-						break
+				tables = client.parseDOM(html, 'table', attrs={'class': 'forum_header_border'})
+				for table in tables:
+					if 'magnet:' not in table: continue
+					else: break
 			except:
+				source_utils.scraper_error('EZTV')
 				return sources
 
-			rows = re.findall('<tr name="hover" class="forum_header_border">(.+?)</tr>', results, re.DOTALL)
-			if not rows:
-				return sources
+			rows = re.findall('<tr name="hover" class="forum_header_border">(.+?)</tr>', table, re.DOTALL)
+			if not rows: return sources
 
-			for entry in rows:
+			for row in rows:
 				try:
 					try:
-						columns = re.findall('<td\s.+?>(.+?)</td>', entry, re.DOTALL)
-						derka = re.findall('href="magnet:(.+?)" class="magnet" title="(.+?)"', columns[2], re.DOTALL)[0]
+						columns = re.findall('<td\s.+?>(.+?)</td>', row, re.DOTALL)
+						link = re.findall('href="(magnet:.+?)".*title="(.+?)"', columns[2], re.DOTALL)[0]
 					except:
 						continue
 
-					url = 'magnet:%s' % (str(client.replaceHTMLCodes(derka[0]).split('&tr')[0]))
+					url = str(client.replaceHTMLCodes(link[0]).split('&tr')[0])
 					try: url = unquote(url).decode('utf8')
 					except: pass
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 
-					magnet_title = derka[1]
-					name = re.search(r'(.+?\[eztv\])(.*)', unquote_plus(magnet_title)).group(1)
+					name = link[1].split(' [eztv]')[0].split(' Torrent:')[0]
 					name = source_utils.clean_name(title, name)
 					if source_utils.remove_lang(name, episode_title):
 						continue
@@ -110,7 +110,7 @@ class source:
 							continue
 
 					try:
-						seeders = int(re.findall('<font color=".+?">([0-9]+|[0-9]+,[0-9]+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
+						seeders = int(re.findall('<font color=".+?">(\d+|\d+\,\d+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
 						if self.min_seeders > seeders:
 							continue
 					except:
@@ -119,7 +119,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name, url)
 					try:
-						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', magnet_title)[-1]
+						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', columns[3])[-1]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:

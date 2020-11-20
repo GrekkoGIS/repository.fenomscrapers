@@ -60,6 +60,7 @@
 		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.ext" type="bool" label="32131" default="true" />
+		<setting id="provider.extratorrent" type="bool" label="32106" default="true" />
 		<setting id="provider.eztv" type="bool" label="32107" default="false" />
 		<setting id="provider.glodls" type="bool" label="32108" default="false" />
 		<setting id="provider.idope" type="bool" label="32109" default="false" />
@@ -98,7 +99,7 @@
 		<setting type="lsep" label="32023" />
 		<setting id="furk.user_name" type="text" label="32024" default="" enable="false" />
 		<setting id="furk.user_pass" type="text" label="32025" option="hidden" default="" enable="false" />
-		<setting id="furk.api" type="text" label="32026" default="" />
+		<setting id="furk.api" type="text" label="32026" default="" enable="false" />
 
 		<setting type="lsep" label="32027" />
 		<setting id="easynews.user" type="text" label="32028" default="" enable="false" />
