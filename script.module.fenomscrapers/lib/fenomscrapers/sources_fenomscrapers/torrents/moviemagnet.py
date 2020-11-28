@@ -57,23 +57,21 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			try:
 				r = scraper.get(url).content
-				if not r:
+				if not r: return sources
+				if any(value in str(r) for value in ['No movies found', 'something went wrong', 'Connection timed out', '521: Web server is down']):
 					return sources
-				if any(value in str(r) for value in ['No movies found', 'something went wrong', 'Connection timed out']):
-					return sources
+
 				r = json.loads(r)
 				id = ''
 				for i in r:
 					if i['original_title'] == title and i['release_date'] == year:
 						id = i['id']
 						break
-				if id == '':
-					return sources
+				if id == '': return sources
 				link = '%s%s%s' % (self.base_link, '/movies/torrents?id=', id)
 
 				result = scraper.get(link).content
-				if 'magnet' not in result:
-					return sources
+				if 'magnet' not in result: return sources
 				result = re.sub(r'\n', '', result)
 				links = re.findall(r'<tr>.*?<a title="Download:\s*(.+?)"href="(magnet:.+?)">.*?title="File Size">\s*(.+?)\s*</td>.*?title="Seeds">([0-9]+|[0-9]+,[0-9]+)\s*<', result)
 

@@ -125,7 +125,6 @@ class source:
 						name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
 						name = unquote_plus(name)
 						name = source_utils.clean_name(self.title, name)
-						# name = url.split('&dn=')[1]
 					except:
 						continue
 					if source_utils.remove_lang(name, self.episode_title):
@@ -141,9 +140,12 @@ class source:
 					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
 						continue
 
-					# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-					if self.episode_title:
+					if self.episode_title: # filter for episode multi packs (ex. S01E01-E17 is also returned in query)
 						if not source_utils.filter_single_episodes(self.hdlr, name):
+							continue
+					elif not self.episode_title: #filter for eps returned in movie query (rare but movie Run and show exists in 2018)
+						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+						if any(re.search(item, name.lower()) for item in ep_strings):
 							continue
 
 					try:

@@ -14,7 +14,7 @@ except:
 	from urllib.parse import urlencode, quote_plus
 
 from fenomscrapers.modules import client
-from fenomscrapers.modules import source_utils
+from fenomscrapers.modules import source_utils, log_utils
 
 
 class source:
@@ -83,9 +83,14 @@ class source:
 			query = re.sub('[^A-Za-z0-9\s\.\-\"\^]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			try:
 				r = client.request(url)
+				if not r: return sources
+				if any(value in str(r) for value in ['something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable']):
+					return sources
+				log_utils.log('r = %s' % r, log_utils.LOGDEBUG)
+
 				posts = client.parseDOM(r, 'div', attrs={'class': 'results'})[0]
 				posts = client.parseDOM(posts, 'dl')
 
@@ -110,9 +115,12 @@ class source:
 
 						url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
-						# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-						if episode_title:
+						if episode_title: # filter for episode multi packs (ex. S01E01-E17 is also returned in query)
 							if not source_utils.filter_single_episodes(hdlr, name):
+								continue
+						elif not episode_title: #filter for eps returned in movie query (rare but movie Run and show exists in 2018)
+							ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+							if any(re.search(item, name.lower()) for item in ep_strings):
 								continue
 
 						quality, info = source_utils.get_release_quality(name, url)

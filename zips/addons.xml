@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.1.2" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.1.3" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -28,11 +28,14 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.1.2 - Nov. 20, 2020[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Fixed eztv torrent scraper.[/I]
-[COLOR yellow]--[/COLOR][I] extratorrent scraper resurrected.  Scraper has also
-    been converted to pack capable.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed some bogus log errors when url timeout occurs.[/I]
+[B][COLOR red]Update - v1.1.3 - Nov. 28, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added a new filter to all scrapers for query results when
+    a movie title exists and a show with same tile and year
+    also exists.  The new filter will now check Movie results
+    for season info and remove those results.  A perfect
+    example is the movie "Run (2020)" a show also exists
+    with the same title and previousely returned results.
+    The new filter will now remove those show results.[/I]
 		</news>
 	</extension>
 </addon>
