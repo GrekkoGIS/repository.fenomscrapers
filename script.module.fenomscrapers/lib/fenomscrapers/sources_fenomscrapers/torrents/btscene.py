@@ -8,13 +8,12 @@
 import re
 
 try: from urlparse import parse_qs, urljoin
-
 except ImportError: from urllib.parse import parse_qs, urljoin
 try: from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import client
-from fenomscrapers.modules import source_utils, log_utils
+from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
 
@@ -121,7 +120,7 @@ class source:
 					if self.episode_title: 	# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
 						if not source_utils.filter_single_episodes(self.hdlr, name):
 							continue
-					elif not self.episode_title: #filter for eps returned in movie query (rare but movie Run and show exists in 2018)
+					elif not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
 						if any(re.search(item, name.lower()) for item in ep_strings):
 							continue

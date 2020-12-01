@@ -73,7 +73,7 @@
 		<setting id="provider.nyaa" type="bool" label="32116" default="false" />
 		<setting id="provider.piratebay" type="bool" label="32117" default="true" />
 		<setting id="provider.skytorrents" type="bool" label="32118" default="true" />
-		<setting id="provider.solidtorrents" type="bool" label="32119" default="true" />
+		<setting id="provider.solidtorrents" type="bool" label="32119" default="false" />
 		<setting id="provider.topnow" type="bool" label="32120" default="false" />
 		<setting id="provider.torlock" type="bool" label="32121" default="false" />
 		<setting id="provider.torrentapi" type="bool" label="32122" default="true" />
@@ -82,8 +82,8 @@
 		<setting id="provider.torrentgalaxy" type="bool" label="32125" default="true" />
 		<setting id="provider.torrentz2" type="bool" label="32130" default="false" />
 		<setting id="provider.yourbittorrent" type="bool" label="32126" default="false" />
-		<setting id="provider.ytsws" type="bool" label="32127" default="false" />
-		<setting id="provider.zoogle" type="bool" label="32128" default="false" />
+		<setting id="provider.ytsmx" type="bool" label="32127" default="true" />
+		<setting id="provider.zooqle" type="bool" label="32128" default="false" />
 	</category>
 
 	<!-- Accounts-3 -->

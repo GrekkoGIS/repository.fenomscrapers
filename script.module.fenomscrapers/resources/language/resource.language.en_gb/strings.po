@@ -525,11 +525,11 @@ msgid "YOURBITTORRENT (Pack capable)"
 msgstr ""
 
 msgctxt "#32127"
-msgid "YTSWS"
+msgid "YTSMX"
 msgstr ""
 
 msgctxt "#32128"
-msgid "ZOOGLE (Pack capable)"
+msgid "ZOOQLE (Pack capable)"
 msgstr ""
 
 msgctxt "#32129"
