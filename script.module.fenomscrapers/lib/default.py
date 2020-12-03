@@ -17,6 +17,7 @@ name = params.get('name')
 
 
 if action is None:
+	xbmc.log('Hello from FenomScrapers', 2)
 	control.openSettings('0.0', 'script.module.fenomscrapers')
 
 
@@ -99,3 +100,7 @@ elif action == 'syncMyAccount':
 	control.syncMyAccounts()
 	if params.get('opensettings') == 'true':
 		control.openSettings(query, 'script.module.fenomscrapers')
+
+
+elif action == 'cleanSettings':
+	control.clean_settings()

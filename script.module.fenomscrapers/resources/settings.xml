@@ -7,6 +7,7 @@
 		<setting label="32007" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAll&amp;setting=false)" />
 		<setting label="32008" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAll&amp;setting=true)" />
 		<setting type="sep" />
+		<setting label="32041" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=cleanSettings)" />
 		<setting label="32009" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowChangelog)" />
 		<setting id="checkAddonUpdates" type="bool" label="32010" default="false" />
 		<setting label="32001" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=updates)" />
@@ -44,6 +45,7 @@
 	<!-- Torrents-2 -->
 	<!-- Provider lang. string range 32101-32140 -->
 	<category label="32052">
+		<setting label="32040" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=torrentInfo)" />
 		<setting label="32013" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=false)" />
 		<setting label="32014" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllTorrent&amp;setting=true)" />
 		<setting label="32015" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=toggleAllPackTorrent&amp;setting=true)" />
@@ -54,14 +56,14 @@
 		<setting id="filter.foreign.single.audio" type="bool" label="32017" default="true"/>
 		<setting type="sep" />
 		<setting id="provider.1337x" type="bool" label="32101" default="false" />
-		<setting id="provider.7torrents" type="bool" label="32102" default="false" />
+		<setting id="provider.7torrents" type="bool" label="32102" default="true" />
 		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
 		<setting id="provider.btdb" type="bool" label="32129" default="true" />
 		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.ext" type="bool" label="32131" default="true" />
 		<setting id="provider.extratorrent" type="bool" label="32106" default="true" />
-		<setting id="provider.eztv" type="bool" label="32107" default="false" />
+		<setting id="provider.eztv" type="bool" label="32107" default="true" />
 		<setting id="provider.glodls" type="bool" label="32108" default="false" />
 		<setting id="provider.idope" type="bool" label="32109" default="false" />
 		<setting id="provider.isohunt2" type="bool" label="32110" default="false" />
@@ -80,7 +82,7 @@
 		<setting id="provider.torrentdownload" type="bool" label="32123" default="true" />
 		<setting id="provider.torrentfunk" type="bool" label="32124" default="true" />
 		<setting id="provider.torrentgalaxy" type="bool" label="32125" default="true" />
-		<setting id="provider.torrentz2" type="bool" label="32130" default="false" />
+		<setting id="provider.torrentz2" type="bool" label="32130" default="true" />
 		<setting id="provider.yourbittorrent" type="bool" label="32126" default="false" />
 		<setting id="provider.ytsmx" type="bool" label="32127" default="true" />
 		<setting id="provider.zooqle" type="bool" label="32128" default="false" />

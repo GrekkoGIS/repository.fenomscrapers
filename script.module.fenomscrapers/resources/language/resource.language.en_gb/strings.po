@@ -163,19 +163,19 @@ msgid "GDrive Worker URL"
 msgstr ""
 
 msgctxt "#32040"
-msgid ""
+msgid "[COLOR FFA0C12C]-- Torrent scraper Info --[/COLOR]"
 msgstr ""
 
 msgctxt "#32041"
-msgid ""
+msgid "Clean Settings file"
 msgstr ""
 
 msgctxt "#32042"
-msgid ""
+msgid "{} Obsolete Settings Entries Removed"
 msgstr ""
 
 msgctxt "#32043"
-msgid ""
+msgid "Error Cleaning Settings.xml. Old settings.xml files Restored."
 msgstr ""
 
 msgctxt "#32044"
@@ -537,7 +537,7 @@ msgid "BTDB (Pack capable)"
 msgstr ""
 
 msgctxt "#32130"
-msgid "TORRENTZ2"
+msgid "TORRENTZ2  (Pack capable)"
 msgstr ""
 
 msgctxt "#32131"

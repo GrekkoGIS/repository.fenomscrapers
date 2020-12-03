@@ -21,8 +21,8 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['btscene.nl', 'btscene.today']
-		self.base_link = 'http://btscene.nl/' # 7torrents mirror?
+		self.domains = ['btscene.nl'] # 7torr.com is a mirror
+		self.base_link = 'http://btscene.nl/'
 		self.search_link = 'search?q=%s'
 		self.min_seeders = 1
 		self.pack_capable = True

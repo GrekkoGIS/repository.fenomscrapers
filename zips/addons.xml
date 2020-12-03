@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.1.4" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.1.5" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -28,13 +28,20 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.1.4 - Nov. 30, 2020[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] YTS scraper has been re-written to utilize the yts.mx api.
-    the query uses the imdb_id so results are now more
-    accurate than before.  File size is also returned in the
-    api response that we did not have site wide before.[/I]
-[COLOR yellow]--[/COLOR][I] Torrentz2 and Solidtorrents has been down for a few days
-    now so their default has been switched to "false".[/I]
+[B][COLOR red]Update - v1.1.5 - Dec. 3, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] 7torrents scraper switched base_url to "7torrents.cc"
+    since "7torr.com" is a btscene mirror.[/I]
+[COLOR yellow]--[/COLOR][I] Torrentz2 new domain and back to working again.
+     New domain is now a single request with magnets
+    on results page so the scraper has also been
+    converted to pack capable.[/I]
+[COLOR yellow]--[/COLOR][I] Added torrent specific Help info to the "Torrents"
+    category in Settings.  This lists what torrents are api
+    requests, single html parsed, and two request html
+    parsed(slow). Also lists which scrapers use cfscrape module.[/I]
+[COLOR yellow]--[/COLOR][I] Added "Clean Settings File" action to the "General"
+    category in Settings. This will also auto run when
+    a new update install detected.[/I]
 		</news>
 	</extension>
 </addon>

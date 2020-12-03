@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 10-05-2020)
+# created by Venom for Fenomscrapers (updated 12-01-2020)
 
 '''
     Fenomscrapers Project
@@ -22,9 +22,10 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['7torr.com'] # 7torrents.cc seems to be a magnetdl mirror but not 7torr.com
-		self.base_link = 'http://7torr.com'
-		self.search_link = '/search?q=%s'
+		# 7torr.com is a mirror of btscene
+		self.domain = ['7torrents.cc']
+		self.base_link = 'https://www.7torrents.cc'
+		self.search_link = '/search?query=%s'
 		self.min_seeders = 1
 		self.pack_capable = True
 
@@ -80,7 +81,7 @@ class source:
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			urls.append(url)
-			urls.append(url + '&p=2')
+			urls.append(url + '&page=2')
 
 			threads = []
 			for url in urls:
@@ -97,20 +98,17 @@ class source:
 		# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 		try:
 			r = client.request(url)
-			if not r:
-				return self.sources
-			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
-			table = client.parseDOM(table, 'tbody')
-			rows = client.parseDOM(table, 'tr')
+			if not r: return self.sources
+			table = client.parseDOM(r, 'div', attrs={'id': 'results'})
+			rows = client.parseDOM(table, 'div', attrs={'class': 'media'})
 		except:
 			source_utils.scraper_error('7torrents')
 			return
 
 		for row in rows:
 			try:
-				if 'magnet' not in row:
-					continue
-				url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
+				if 'magnet' not in row: continue
+				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
@@ -132,7 +130,7 @@ class source:
 						continue
 
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'seeds is-hidden-sm-mobile'})[0].replace(',', ''))
+					seeders = int(re.findall(r'Seeders.*?">(.*?)<', row)[0])
 					if self.min_seeders > seeders:
 						continue
 				except:
@@ -141,7 +139,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -193,7 +191,7 @@ class source:
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('7torrents')
+			source_utils.scraper_error('7TORRENTS')
 			return self.sources
 
 
@@ -202,17 +200,15 @@ class source:
 		try:
 			r = client.request(link)
 			if not r: return
-			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
-			table = client.parseDOM(table, 'tbody')
-			rows = client.parseDOM(table, 'tr')
+			table = client.parseDOM(r, 'div', attrs={'id': 'results'})
+			rows = client.parseDOM(table, 'div', attrs={'class': 'media'})
 		except:
-			source_utils.scraper_error('7torrents')
+			source_utils.scraper_error('7TORRENTS')
 			return
 
 		for row in rows:
 			try:
-				if 'magnet' not in row:
-					continue
+				if 'magnet' not in row: continue
 				url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
@@ -239,7 +235,7 @@ class source:
 					package = 'show'
 
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'seeds is-hidden-sm-mobile'})[0].replace(',', ''))
+					seeders = int(re.findall(r'Seeders.*?">(.*?)<', row)[0])
 					if self.min_seeders > seeders:
 						continue
 				except:
@@ -261,9 +257,8 @@ class source:
 				if self.search_series:
 					item.update({'last_season': last_season})
 				self.sources.append(item)
-
 			except:
-				source_utils.scraper_error('7torrents')
+				source_utils.scraper_error('7TORRENTS')
 				pass
 
 

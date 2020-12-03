@@ -4,8 +4,8 @@
 	Fenomscrapers Module
 """
 
-from fenomscrapers.modules import control
 import xbmc
+from fenomscrapers.modules import control
 
 
 class AddonCheckUpdate:
@@ -38,10 +38,17 @@ class SyncMyAccounts:
 		return xbmc.log('[ script.module.fenomscrapers ]  Finished Sync "My Accounts" Service', 2)
 
 
-SyncMyAccounts().run()
+def main():
+	while not control.monitor.abortRequested():
+		xbmc.log('[ script.module.fenomscrapers ]  Service Started', 2)
+		SyncMyAccounts().run()
+		if control.setting('checkAddonUpdates') == 'true':
+			AddonCheckUpdate().run()
+			xbmc.log('[ script.module.fenomscrapers ]  Addon update check complete', 2)
+		if control.isVersionUpdate():
+			control.clean_settings()
+			xbmc.log('[ script.module.fenomscrapers ]  Settings file cleaned complete', 2)
+		xbmc.log('[ script.module.fenomscrapers ]  Service Stopped', 2)
+		break
 
-if control.setting('checkAddonUpdates') == 'true':
-	AddonCheckUpdate().run()
-	xbmc.log('[ script.module.fenomscrapers ]  Addon update check complete', xbmc.LOGNOTICE)
-
-xbmc.log('[ script.module.fenomscrapers ]  service stopped', xbmc.LOGNOTICE)
+main()

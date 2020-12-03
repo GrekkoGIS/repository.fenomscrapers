@@ -28,8 +28,7 @@ def sources(specified_folders=None):
 			sourceSubFolders = specified_folders
 		for i in sourceSubFolders:
 			for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(sourceFolderLocation, i)]):
-				if is_pkg:
-					continue
+				if is_pkg: continue
 				if enabledCheck(module_name):
 					try:
 						module = loader.find_module(module_name).load_module(module_name)
@@ -52,10 +51,24 @@ def enabledCheck(module_name):
 	return True
 
 
+# def pack_sources():
+	# return ['7torrents', 'bitlord', 'btdb', 'btscene', 'ext', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl',
+				# 'piratebay', 'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy',
+				# 'torrentz2', 'yourbittorrent', 'zooqle']
+
+
 def pack_sources():
-	return ['7torrents', 'bitlord', 'btdb', 'btscene', 'ext', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl',
-				'piratebay', 'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk',
-				'torrentgalaxy', 'yourbittorrent', 'zooqle']
+	try:
+		pack_sources = []
+		for source in sources():
+			if getattr(source[1], 'pack_capable', False):
+				pack_sources.append(source[0])
+		log_utils.log('pack_sources = %s' % pack_sources, log_utils.LOGDEBUG)
+	except Exception as e:
+		if debug:
+			log_utils.log('Error: Returning Pack Sources: %s' % e, log_utils.LOGDEBUG)
+		pass
+	return pack_sources
 
 
 def providerSources():
@@ -71,8 +84,7 @@ def providerNames():
 	sourceSubFolders = [x[1] for x in os.walk(sourceFolderLocation)][0]
 	for i in sourceSubFolders:
 		for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(sourceFolderLocation, i)]):
-			if is_pkg:
-				continue
+			if is_pkg: continue
 			correctName = module_name.split('_')[0]
 			providerList.append(correctName)
 	return providerList
@@ -84,14 +96,10 @@ def getAllHosters():
 		sourceSubFolders = [x[1] for x in os.walk(sourceFolderLocation)][0]
 		for i in sourceSubFolders:
 			for loader, module_name, is_pkg in pkgutil.walk_packages([os.path.join(sourceFolderLocation, i)]):
-				if is_pkg:
-					continue
-				try:
-					mn = str(module_name).split('_')[0]
-				except:
-					mn = str(module_name)
+				if is_pkg: continue
+				try: mn = str(module_name).split('_')[0]
+				except: mn = str(module_name)
 				appendList.append(mn)
-
 	sourceSubFolders = [x[1] for x in os.walk(os.path.dirname(__file__))][0]
 	appendList = []
 	for item in sourceSubFolders:
@@ -108,8 +116,6 @@ def getScraperFolder(scraper_source):
 def getModuleName(scraper_folders):
 	nameList = []
 	for s in scraper_folders:
-		try:
-			nameList.append(s.split('_')[1].lower().title())
-		except:
-			pass
+		try: nameList.append(s.split('_')[1].lower().title())
+		except: pass
 	return nameList

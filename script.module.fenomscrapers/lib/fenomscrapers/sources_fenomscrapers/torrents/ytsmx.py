@@ -23,7 +23,7 @@ class source:
 		self.language = ['en']
 		self.domains = ['yts.mx']
 		self.base_link = 'https://yts.mx'
-		self.search_link = '/api/v2/list_movies.json?query_term=%s'
+		self.search_link = '/api/v2/list_movies.json?query_term=%s' #accepts imdb_id as query_term
 		self.min_seeders = 0
 		self.pack_capable = False
 
