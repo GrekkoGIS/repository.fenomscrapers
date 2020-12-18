@@ -165,19 +165,19 @@ msgstr "GDrive Worker URL"
 
 msgctxt "#32040"
 msgid "[COLOR FFA0C12C]-- Torrent scraper Info --[/COLOR]"
-msgstr "[COLOR FFA0C12C]-- Torrent-schraper Info --[/COLOR]"
+msgstr "[COLOR FFA0C12C]-- Torrent scraper Info --[/COLOR]"
 
 msgctxt "#32041"
 msgid "Clean Settings file"
-msgstr "Schoon instellingenbestand"
+msgstr "Reinig Instellingenbestand"
 
 msgctxt "#32042"
 msgid "{} Obsolete Settings Entries Removed"
-msgstr "{} Verouderde instellingengegevens verwijderd"
+msgstr "{} Verouderde Instellingen Gegevens Verwijderd"
 
 msgctxt "#32043"
 msgid "Error Cleaning Settings.xml. Old settings.xml files Restored."
-msgstr "Fout bij het opschonen van Settings.xml. Oude settings.xml-bestanden hersteld"
+msgstr "Fout Bij Het Opschonen Van Settings.xml. Oude settings.xml bestanden Hersteld"
 
 msgctxt "#32044"
 msgid ""
@@ -526,8 +526,8 @@ msgid "YOURBITTORRENT (Pack capable)"
 msgstr "YOURBITTORRENT (Pack geschikt)"
 
 msgctxt "#32127"
-msgid "YTSMX"
-msgstr "YTSMX"
+msgid "YTSMX (movies only)"
+msgstr "YTSMX (alleen films)"
 
 msgctxt "#32128"
 msgid "ZOOQLE (Pack capable)"

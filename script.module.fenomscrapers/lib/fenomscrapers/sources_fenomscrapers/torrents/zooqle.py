@@ -127,6 +127,7 @@ class source:
 						name = source_utils.clean_name(self.title, name)
 					except:
 						continue
+
 					if source_utils.remove_lang(name, self.episode_title):
 						continue
 

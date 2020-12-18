@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 	Fenomscrapers Module
 """
@@ -21,8 +20,11 @@ execute = xbmc.executebuiltin
 jsonrpc = xbmc.executeJSONRPC
 monitor = xbmc.Monitor()
 dialog = xbmcgui.Dialog()
+
+existsPath = xbmcvfs.exists
 openFile = xbmcvfs.File
 makeFile = xbmcvfs.mkdir
+joinPath = os.path.join
 
 SETTINGS_PATH = xbmc.translatePath(os.path.join(addonInfo('path'), 'resources', 'settings.xml'))
 
@@ -130,9 +132,6 @@ def clean_settings():
 		current_user_settings = []
 		addon = xbmcaddon.Addon(id=addon_id)
 		addon_name = addon.getAddonInfo('name')
-
-		xbmc.log('addon_name = %s' % addon_name, 2)
-
 		addon_dir = xbmc.translatePath(addon.getAddonInfo('path'))
 		profile_dir = xbmc.translatePath(addon.getAddonInfo('profile'))
 		active_settings_xml = os.path.join(addon_dir, 'resources', 'settings.xml')

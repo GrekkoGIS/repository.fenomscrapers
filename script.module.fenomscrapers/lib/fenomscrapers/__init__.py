@@ -14,13 +14,12 @@ except:
 
 debug = __addon__.getSetting('debug.enabled') == 'true'
 
+
 def sources(specified_folders=None):
 	try:
 		sourceDict = []
-		if __addon__ is not None:
-			provider = __addon__.getSetting('module.provider')
-		else:
-			provider = 'fenomscrapers'
+		if __addon__: provider = __addon__.getSetting('module.provider')
+		else: provider = 'fenomscrapers'
 		sourceFolder = getScraperFolder(provider)
 		sourceFolderLocation = os.path.join(os.path.dirname(__file__), sourceFolder)
 		sourceSubFolders = [x[1] for x in os.walk(sourceFolderLocation)][0]
@@ -46,15 +45,8 @@ def enabledCheck(module_name):
 	if __addon__ is not None:
 		if __addon__.getSetting('provider.' + module_name) == 'true':
 			return True
-		else:
-			return False
+		else: return False
 	return True
-
-
-# def pack_sources():
-	# return ['7torrents', 'bitlord', 'btdb', 'btscene', 'ext', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl',
-				# 'piratebay', 'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy',
-				# 'torrentz2', 'yourbittorrent', 'zooqle']
 
 
 def pack_sources():
@@ -63,10 +55,9 @@ def pack_sources():
 		for source in sources():
 			if getattr(source[1], 'pack_capable', False):
 				pack_sources.append(source[0])
-		log_utils.log('pack_sources = %s' % pack_sources, log_utils.LOGDEBUG)
 	except Exception as e:
 		if debug:
-			log_utils.log('Error: Returning Pack Sources: %s' % e, log_utils.LOGDEBUG)
+			log_utils.log('Error: Returning Pack Sources: %s' % str(e), log_utils.LOGDEBUG)
 		pass
 	return pack_sources
 

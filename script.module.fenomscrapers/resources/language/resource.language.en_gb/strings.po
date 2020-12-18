@@ -525,7 +525,7 @@ msgid "YOURBITTORRENT (Pack capable)"
 msgstr ""
 
 msgctxt "#32127"
-msgid "YTSMX"
+msgid "YTSMX (movies only)"
 msgstr ""
 
 msgctxt "#32128"

@@ -23,7 +23,7 @@ class source:
 		self.priority = 1
 		self.language = ['en']
 		self.domains = ['solidtorrents.net']
-		self.base_link = 'https://solidtorrents.net' # down as of 11/30/20
+		self.base_link = 'https://solidtorrents.net'
 		self.search_link = '/api/v1/search?q=%s&category=all&sort=size'
 		self.min_seeders = 0
 		self.pack_capable = True

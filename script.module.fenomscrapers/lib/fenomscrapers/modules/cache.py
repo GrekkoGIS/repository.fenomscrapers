@@ -8,49 +8,44 @@ import hashlib
 import re
 import time
 try:
-	from sqlite3 import dbapi2 as db, OperationalError
+	from sqlite3 import dbapi2 as db
 except ImportError:
-	from pysqlite2 import dbapi2 as db, OperationalError
+	from pysqlite2 import dbapi2 as db
 
 from fenomscrapers.modules import control
 from fenomscrapers.modules import log_utils
 
-cache_table = 'cache'
-
 
 def get(function, duration, *args):
-	# type: (function, int, object) -> object or None
 	"""
-	Gets cached value for provided function with optional arguments, or executes and stores the result
 	:param function: Function to be executed
 	:param duration: Duration of validity of cache in hours
 	:param args: Optional arguments for the provided function
 	"""
-
 	try:
 		key = _hash_function(function, args)
 		cache_result = cache_get(key)
 		if cache_result:
+			try: result = ast.literal_eval(cache_result['value'].encode('utf-8'))
+			except: result = ast.literal_eval(cache_result['value'])
 			if _is_cache_valid(cache_result['date'], duration):
-				try:
-					result = ast.literal_eval(cache_result['value'].encode('utf-8'))
-				except:
-					result = ast.literal_eval(cache_result['value'])
 				return result
 
 		fresh_result = repr(function(*args))
-		if not fresh_result:
-			# If the cache is old, but we didn't get fresh result, return the old cache
-			if cache_result:
-				return cache_result
-			return None
+		try:  # Sometimes None is returned as a string instead of None type for "fresh_result"
+			invalid = False
+			if not fresh_result: invalid = True
+			elif fresh_result == 'None' or fresh_result == '' or fresh_result == '[]' or fresh_result == '{}': invalid = True
+			elif len(fresh_result) == 0: invalid = True
+		except: pass
 
-		cache_insert(key, fresh_result)
-		try:
-			result = ast.literal_eval(fresh_result.encode('utf-8'))
-		except:
-			result = ast.literal_eval(fresh_result)
-		return result
+		if invalid: # If the cache is old, but we didn't get "fresh_result", return the old cache
+			if cache_result: return result
+			else: return None
+		else:
+			cache_insert(key, fresh_result)
+			try: return ast.literal_eval(fresh_result.encode('utf-8'))
+			except: result = ast.literal_eval(fresh_result)
 	except:
 		log_utils.error()
 		return None
@@ -59,40 +54,30 @@ def get(function, duration, *args):
 def cache_get(key):
 	try:
 		cursor = _get_connection_cursor()
-		cursor.execute("SELECT * FROM sqlite_master WHERE type='table' AND name='%s';" % cache_table)
-		ck_table = cursor.fetchone()
-		if not ck_table:
-			cursor.close()
-			return None
-		cursor.execute("SELECT * FROM %s WHERE key = ?" % cache_table, [key])
-		results = cursor.fetchone()
-		cursor.close()
+		ck_table = cursor.execute('''SELECT * FROM sqlite_master WHERE type='table' AND name='cache';''').fetchone()
+		if not ck_table: return None
+		results = cursor.execute('''SELECT * FROM cache WHERE key=?''', (key,)).fetchone()
 		return results
 	except:
 		log_utils.error()
-		try:
-			cursor.close()
-		except:
-			pass
 		return None
+	finally:
+		cursor.close()
 
 
 def cache_insert(key, value):
 	try:
 		cursor = _get_connection_cursor()
 		now = int(time.time())
-		cursor.execute("CREATE TABLE IF NOT EXISTS %s (key TEXT, value TEXT, date INTEGER, UNIQUE(key))" % cache_table)
-		update_result = cursor.execute("UPDATE %s SET value=?,date=? WHERE key=?" % cache_table, (value, now, key))
+		cursor.execute('''CREATE TABLE IF NOT EXISTS cache (key TEXT, value TEXT, date INTEGER, UNIQUE(key));''')
+		update_result = cursor.execute('''UPDATE cache SET value=?,date=? WHERE key=?''', (value, now, key))
 		if update_result.rowcount is 0:
-			cursor.execute("INSERT INTO %s Values (?, ?, ?)" % cache_table, (key, value, now))
+			cursor.execute('''INSERT INTO cache Values (?, ?, ?)''', (key, value, now))
 		cursor.connection.commit()
-		cursor.close()
 	except:
 		log_utils.error()
-		try:
-			cursor.close()
-		except:
-			pass
+	finally:
+		cursor.close()
 
 
 def _get_connection_cursor():
@@ -124,10 +109,8 @@ def _get_function_name(function_instance):
 
 def _generate_md5(*args):
 	md5_hash = hashlib.md5()
-	try:
-		[md5_hash.update(str(arg)) for arg in args]
-	except:
-		[md5_hash.update(str(arg).encode('utf-8')) for arg in args]
+	try: [md5_hash.update(str(arg)) for arg in args]
+	except: [md5_hash.update(str(arg).encode('utf-8')) for arg in args]
 	return str(md5_hash.hexdigest())
 
 

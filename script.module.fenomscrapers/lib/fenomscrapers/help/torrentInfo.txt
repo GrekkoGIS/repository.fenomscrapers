@@ -4,7 +4,8 @@ api torrents(fast):
 --------------------------------------------
 bitlord
 piratebay
-torrentapi (uses imdb_id query, rarbg api)
+solidtorrents
+torrentapi (uses imdb_id query, rarbg's api)
 ytsmx (uses imdb_id query, movies only site)
 
 single request html parsed sites:
@@ -23,7 +24,6 @@ magnet4you
 magnetdl
 nyaa (anime)
 skytorrents
-solidtorrents (site down as of 12/1/20)
 topnow
 torrentdownload
 torrentgalaxy (uses cfscrape)
@@ -37,7 +37,7 @@ zooqle
 ettv
 isohunt2
 moviemagnet (uses api to fetch their ID, movies only, uses cfscrape,
-    site down as of 12/1/220)
+    site down as of 12/1/220-scraper removed)
 torlock
 torrentfunk
 yourbittorrent

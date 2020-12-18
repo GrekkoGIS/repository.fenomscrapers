@@ -212,29 +212,24 @@ class source:
 				except: url = link[0].replace('&nbsp;', ' ')
 				if '/torrent/' not in url: continue
 
-				try:
-					name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.')
-				except:
-					name = link[1].replace('&nbsp;', '.')
+				try: name = link[1].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', '.')
+				except: name = link[1].replace('&nbsp;', '.')
 				if '<span' in name:
 					nam = name.split('<span')[0].replace(' ', '.')
 					span = client.parseDOM(name, 'span')[0].replace('-', '.')
 					name = '%s%s' % (nam, span)
 				name = source_utils.clean_name(self.title, name)
-				if source_utils.remove_lang(name):
-					continue
+				if source_utils.remove_lang(name): continue
 
 				if not self.search_series:
 					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-							continue
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name): continue
 					package = 'season'
 
 				elif self.search_series:
 					if not self.bypass_filter:
 						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
-						if not valid:
-							continue
+						if not valid: continue
 					else:
 						last_season = self.total_seasons
 					package = 'show'

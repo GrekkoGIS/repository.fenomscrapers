@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 	Fenomscrapers Module
-
 """
 
 import json

@@ -48,10 +48,8 @@ def google(url, ref=None):
 
 		headers = {'User-Agent': client.agent()}
 		result = client.request(url, output='extended', headers=headers)
-		try:
-			headers['Cookie'] = result[2]['Set-Cookie']
-		except:
-			pass
+		try: headers['Cookie'] = result[2]['Set-Cookie']
+		except: pass
 		result = result[0]
 
 		if netloc == 'docs' or netloc == 'drive':
@@ -93,10 +91,8 @@ def google(url, ref=None):
 
 		url = []
 		for q in ['4K', '1440p', '1080p', '720p', 'SD']:
-			try:
-				url += [[i for i in result if i.get('quality') == q][0]]
-			except:
-				pass
+			try: url += [[i for i in result if i.get('quality') == q][0]]
+			except: pass
 
 		for i in url:
 			i.pop('height', None)
@@ -112,10 +108,8 @@ def google(url, ref=None):
 def googletag(url, append_height=False):
 	quality = re.compile('itag=(\d*)').findall(url)
 	quality += re.compile('=m(\d*)$').findall(url)
-	try:
-		quality = quality[0]
-	except:
-		return []
+	try: quality = quality[0]
+	except: return []
 
 	itag_map = {'151': {'quality': 'SD', 'height': 72}, '212': {'quality': 'SD', 'height': 480}, '313': {'quality': '4K', 'height': 2160},
 				'242': {'quality': 'SD', 'height': 240}, '315': {'quality': '4K', 'height': 2160}, '219': {'quality': 'SD', 'height': 480},
@@ -141,26 +135,19 @@ def googletag(url, append_height=False):
 
 	if quality in itag_map:
 		quality = itag_map[quality]
-		if append_height:
-			return [{'quality': quality['quality'], 'height': quality['height'], 'url': url}]
-		else:
-			return [{'quality': quality['quality'], 'url': url}]
-	else:
-		return []
+		if append_height: return [{'quality': quality['quality'], 'height': quality['height'], 'url': url}]
+		else: return [{'quality': quality['quality'], 'url': url}]
+	else: return []
 
 
 def googlepass(url):
 	try:
-		try:
-			headers = dict(parse_qsl(url.rsplit('|', 1)[1]))
-		except:
-			headers = None
+		try: headers = dict(parse_qsl(url.rsplit('|', 1)[1]))
+		except: headers = None
 		url = url.split('|')[0].replace('\\', '')
 		url = client.request(url, headers=headers, output='geturl')
-		if 'requiressl=yes' in url:
-			url = url.replace('http://', 'https://')
-		else:
-			url = url.replace('https://', 'http://')
+		if 'requiressl=yes' in url: url = url.replace('http://', 'https://')
+		else: url = url.replace('https://', 'http://')
 		if headers: url += '|%s' % urlencode(headers)
 		return url
 	except:
@@ -171,41 +158,28 @@ def googlepass(url):
 def vk(url):
 	try:
 		query = parse_qs(urlparse(url).query)
-		try:
-			oid, video_id = query['oid'][0], query['id'][0]
-		except:
-			oid, video_id = re.findall('\/video(.*)_(.*)', url)[0]
+		try: oid, video_id = query['oid'][0], query['id'][0]
+		except: oid, video_id = re.findall('\/video(.*)_(.*)', url)[0]
 		sources_url = 'http://vk.com/al_video.php?act=show_inline&al=1&video=%s_%s' % (oid, video_id)
 		html = client.request(sources_url)
 		html = re.sub(r'[^\x00-\x7F]+', ' ', html)
 		sources = re.findall('(\d+)x\d+.+?(http.+?\.m3u8.+?)n', html)
-		if not sources:
-			sources = re.findall('"url(\d+)"\s*:\s*"(.+?)"', html)
+		if not sources: sources = re.findall('"url(\d+)"\s*:\s*"(.+?)"', html)
 		sources = [(i[0], i[1].replace('\\', '')) for i in sources]
 		sources = dict(sources)
 		url = []
-		try:
-			url += [{'quality': '720p', 'url': sources['720']}]
-		except:
-			pass
-		try:
-			url += [{'quality': 'SD', 'url': sources['540']}]
-		except:
-			pass
-		try:
-			url += [{'quality': 'SD', 'url': sources['480']}]
-		except:
-			pass
+		try: url += [{'quality': '720p', 'url': sources['720']}]
+		except: pass
+		try: url += [{'quality': 'SD', 'url': sources['540']}]
+		except: pass
+		try: url += [{'quality': 'SD', 'url': sources['480']}]
+		except: pass
 		if not url == []: return url
-		try:
-			url += [{'quality': 'SD', 'url': sources['360']}]
-		except:
-			pass
+		try: url += [{'quality': 'SD', 'url': sources['360']}]
+		except: pass
 		if not url == []: return url
-		try:
-			url += [{'quality': 'SD', 'url': sources['240']}]
-		except:
-			pass
+		try: url += [{'quality': 'SD', 'url': sources['240']}]
+		except: pass
 		if not url == []: return url
 	except:
 		log_utils.error()

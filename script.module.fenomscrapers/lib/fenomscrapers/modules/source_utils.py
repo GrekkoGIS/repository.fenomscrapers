@@ -30,6 +30,7 @@ RES_SD = ['576p', '576i', 'sd576', '576sd', '480p', '480i', 'sd480', '480sd']
 SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
 CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', '.cam', 'telecine', 'telesync', 'tele.sync']
 HDCAM = ['hdcam', '.hd.cam', 'hdts', '.hd.ts', '.hdtc', '.hd.tc', '.hctc', '.hc.tc']
+VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom', 'top.and.bottom']
 
 CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
 CODEC_H264 = ['avc', 'h264', 'h.264', 'x264', 'x.264']
@@ -42,8 +43,6 @@ AUDIO_8CH = ['ch8.', '8ch.', '.7.1.']
 AUDIO_7CH = ['ch7.', '7ch.', '.6.1.']
 AUDIO_6CH = ['ch6.', '6ch.', '.5.1.']
 AUDIO_2CH = ['ch2', '2ch', '2.0', 'audio.2.0.', 'stereo']
-
-VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom', 'top.and.bottom']
 
 MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng', 'dut.eng', 'ell.eng', 'esl.eng',
 			  'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng',
@@ -104,20 +103,13 @@ def is_anime(content, type, type_id):
 
 
 def get_qual(term):
-	if any(i in term for i in RES_4K):
-		return '4K'
-	elif any(i in term for i in RES_1080):
-		return '1080p'
-	elif any(i in term for i in RES_720):
-		return '720p'
-	elif any(i in term for i in RES_SD):
-		return 'SD'
-	elif any(i in term for i in SCR):
-		return 'SCR'
-	elif any(i in term for i in CAM):
-		return 'CAM'
-	elif any(i in term for i in HDCAM):
-		return 'CAM'
+	if any(i in term for i in RES_4K): return '4K'
+	elif any(i in term for i in RES_1080): return '1080p'
+	elif any(i in term for i in RES_720): return '720p'
+	elif any(i in term for i in RES_SD): return 'SD'
+	elif any(i in term for i in SCR): return 'SCR'
+	elif any(i in term for i in CAM): return 'CAM'
+	elif any(i in term for i in HDCAM): return 'CAM'
 
 
 def get_release_quality(release_title, release_link=None):
@@ -133,8 +125,7 @@ def get_release_quality(release_title, release_link=None):
 				except: pass
 				quality = get_qual(release_link)
 				if not quality: quality = 'SD'
-			else:
-				quality = 'SD'
+			else: quality = 'SD'
 		info = []
 		if fmt is not None:
 			if any(value in fmt for value in VIDEO_3D):
@@ -151,8 +142,7 @@ def getFileType(url):
 	try:
 		type = ''
 		fmt = url_strip(url)
-		if fmt is None:
-			return type
+		if fmt is None: return type
 		if any(value in fmt for value in ['blu.ray', 'bluray', '.bd.']):
 			type += ' BLURAY /'
 		if any(value in fmt for value in ['bd.r', 'bdr', 'bd.rip', 'bdrip', 'br.rip', 'brrip']):
@@ -235,8 +225,7 @@ def check_url(url):
 		try: url = url.encode('utf-8')
 		except: pass
 		quality = get_qual(url)
-		if not quality:
-			quality = 'SD'
+		if not quality: quality = 'SD'
 		return quality
 	except:
 		log_utils.error()
@@ -245,18 +234,12 @@ def check_url(url):
 
 def label_to_quality(label):
 	try:
-		try:
-			label = int(re.search('(\d+)', label).group(1))
-		except:
-			label = 0
-		if label >= 2160:
-			return '4K'
-		elif 1920 <= label:
-			return '1080p'
-		elif 1280 <= label:
-			return '720p'
-		elif label <= 576:
-			return 'SD'
+		try: label = int(re.search('(\d+)', label).group(1))
+		except: label = 0
+		if label >= 2160: return '4K'
+		elif 1920 <= label: return '1080p'
+		elif 1280 <= label: return '720p'
+		elif label <= 576: return 'SD'
 	except:
 		log_utils.error()
 		return 'SD'
@@ -264,12 +247,9 @@ def label_to_quality(label):
 
 def aliases_to_array(aliases, filter=None):
 	try:
-		if all(isinstance(x, str) for x in aliases):
-			return aliases
-		if not filter:
-			filter = []
-		if isinstance(filter, str):
-			filter = [filter]
+		if all(isinstance(x, str) for x in aliases): return aliases
+		if not filter: filter = []
+		if isinstance(filter, str): filter = [filter]
 		return [x.get('title') for x in aliases if not filter or x.get('country') in filter]
 	except:
 		log_utils.error()
@@ -282,15 +262,13 @@ def check_title(title, aliases, release_title, hdlr, year):
 		aliases = aliases_to_array(aliases)
 	except:
 		aliases = None
-
 	title_list = []
 	if aliases:
 		for item in aliases:
 			try:
 				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
-				if alias in title_list:
-					continue
+				if alias in title_list: continue
 				title_list.append(alias)
 			except:
 				log_utils.error()
@@ -300,28 +278,21 @@ def check_title(title, aliases, release_title, hdlr, year):
 		title = title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
 		title_list.append(title)
-
-		release_title = release_title_format(release_title)
-		n = release_title #release_title already lower case
+		release_title = release_title_format(release_title) # converted to .lower()
 		h = hdlr.lower()
-		t = n.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
-		# log_utils.log('cleantitle.get(t) = %s' % str(cleantitle.get(t)), __name__, log_utils.LOGDEBUG)
-
-		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
-			match = False
-		if h not in n:
-			match = False
+		t = release_title.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
+		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): match = False
+		if h not in release_title: match = False
 		return match
 	except:
 		log_utils.error()
-		match = False
+		return match
 
 
 def remove_lang(release_title, episode_title=None):
 	try:
 		fmt = release_title_strip(release_title)
 		if fmt is None: return False
-		# log_utils.log('fmt = %s for release_title = %s' % (str(fmt), str(release_title)), __name__, log_utils.LOGDEBUG)
 		if episode_title:
 			episode_title = episode_title.lower().replace("'", "")
 			episode_title = re.sub('[^a-z0-9]+', '.', episode_title)
@@ -618,7 +589,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 
 
-# "s1.to.s9" single digit range filte (dots or dashes)
+# "s1.to.s9" single digit range filter (dots or dashes)
 		to_season_ranges = []
 		start_season = 's1'
 		season_count = 2
@@ -693,7 +664,6 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			last_season = int(keys[0].split('.s')[1])
 			return True, last_season
 
-
 		return True, total_seasons
 	except:
 		# return True, total_seasons
@@ -702,10 +672,8 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 def release_title_strip(release_title):
 	try:
-		try:
-			release_title = release_title.encode('utf-8')
-		except:
-			pass
+		try: release_title = release_title.encode('utf-8')
+		except: pass
 		release_title = release_title.lower().replace("'", "").lstrip('.').rstrip('.')
 		fmt = re.sub('[^a-z0-9]+', '.', release_title)
 		fmt = '.%s.' % fmt
@@ -718,10 +686,8 @@ def release_title_strip(release_title):
 # fmt = ''
 # may be best to pass "tvshowtitle" and "ep_title" and strip that off, as well as strip seaon/s01 type info off
 
-		if fmt == '':
-			return None
-		else:
-			return '.%s' % fmt
+		if fmt == '': return None
+		else: return '.%s' % fmt
 	except:
 		log_utils.error()
 		return None
@@ -748,12 +714,9 @@ def url_strip(url):
 		fmt = re.sub('[^a-z0-9]+', '.', url)
 		fmt = '.%s.' % fmt
 		fmt = re.sub(r'(.+)((?:19|20)[0-9]{2}|season.\d+|s[0-3]{1}[0-9]{1}|e\d+|complete)(.complete\.|.episode\.\d+\.|.episodes\.\d+\.\d+\.|.series|.extras|.ep\.\d+\.|.\d{1,2}\.|-|\.|\s)', '', fmt) # new for pack files
-		if '.http' in fmt:
-			fmt = None
-		if fmt == '':
-			return None
-		else:
-			return '.%s' % fmt
+		if '.http' in fmt: fmt = None
+		if fmt == '': return None
+		else: return '.%s' % fmt
 	except:
 		log_utils.error()
 		return None
@@ -761,28 +724,32 @@ def url_strip(url):
 
 def clean_name(title, release_title):
 	try:
-		unwanted = ['[zooqle.com]', '[horriblesubs]', '[.www.cpasbien.cm.]', '[.www.cpasbien.pw.]', '[auratorrent.pl].nastoletni.wilkoak', '[auratorrent.pl]', 'tamilrockers.com',
-					'www.tamilrockers.com', '[.oxtorrent.com.]', '[.www.torrenting.com.]', '[.Www.nextorrent.site.]', '[.oxtorrent.com.]', '[gktorrent.com]', 'www.torrenting.com',
-					'www.torrenting.org', 'www.torrent9.nz', '[.www.omgtorrent.com.]', '[.www.torrent9.uno.]', '[agusiq.torrents.pl]', '[katmoviehd.to]', '[3d.hentai]', '[dark.media]',
-					'[filetracker.pl]', 'www-torrenting-com', 'www-torrenting-org', '[katmoviehd.eu]', 'www.scenetime.com', 'www.tamilrockerrs.pl', '[.torrent9.tv.]', '[nextorrent.net]',
-					'+katmoviehd.pw+', 'www.movcr.tv', 'www.bludv.tv', '[www.torrent9.ph.]','[acesse.]', '[acesse-hd-elite-me]', '[torrentcouch.net]', 'ramin.djawadi', '[prof]', '[reup]',
-					'[ah]', '[ul]', '+13.+', 'taht.oyunlar', '[agusiq-torrents.pl]', 'agusiq-torrents-pl', 'crazy4tv.com', 'xtorrenty.org', '[tv]']
+		unwanted = [
+							'[.www.tamilrockers.com.]', 'tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl',
+							'[.www.torrenting.com.]', 'www.torrenting.com', 'www.torrenting.org', 'www-torrenting-com', 'www-torrenting-org',
+							'[katmoviehd.eu]', '[katmoviehd.to]', '[katmoviehd.tv]', '+katmoviehd.pw+', 'katmoviehd-pw',
+							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', 
+							'[agusiq.torrents.pl]', '[agusiq-torrents.pl]', 'agusiq-torrents-pl',
+							'[.oxtorrent.com.]', '[oxtorrent-com]', 'oxtorrent-com',
+							'[acesse.]', '[acesse-hd-elite-me]',
+							'[torrentcouch.net]', '[torrentcouch-net]',
+							'[.www.cpasbien.cm.]', '[.www.cpasbien.pw.]',
+							'[auratorrent.pl].nastoletni.wilkoak', '[auratorrent.pl]',
+							'[.www.nextorrent.site.]', '[nextorrent.net]',
+							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]',
+							'[filetracker.pl]', 'www.scenetime.com', 'www.movcr.tv', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]',
+							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', 'xtorrenty.org', '[tv]', '[noobsubs]', 'dc.-.', '[.freecourseweb.com.]',
+							'best-torrents-net']
+		unwanted2 = ['().-.', '()--', '[..].', '[..]', '.[.].', '[.].','[.]-', '[]', '[.', '.]', ' ]-', '].', '{..}.', '{..}', '.{.}.', '{.}.', '{.}-', '{}', '{.', '.}', ' }-', '}.', '+-+-', '.-.', '-.-', '.-', '-.', '--', '-', '...', '..', '.']
 
-		unwanted2 = ['.', '..', '...', '{', '}', '[.]', '[.]', '[.', '+-+-', '-', '-.', '.-.']
-
-		if release_title.lower().startswith('rifftrax'):
-			return release_title
-
+		if release_title.lower().startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
 		release_title = strip_non_ascii_and_unprintable(release_title)
-		release_title = release_title.lstrip('/ ')
-		release_title = release_title.lower()
-		release_title = release_title.replace(' ', '.')
+		release_title = release_title.lstrip('/ ').replace(' ', '.')
 
 		for i in unwanted:
-			if release_title.startswith(i):
-				release_title = release_title.replace(i, '')
-				break
-
+			if release_title.lower().startswith(i):
+				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else i
+				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.IGNORECASE)
 		for i in unwanted2:
 			release_title = release_title.lstrip(i)
 		# log_utils.log('final release_title: ' + str(release_title), log_utils.LOGDEBUG)
@@ -846,10 +813,8 @@ def strip_domain(url):
 		if url.lower().startswith('http') or url.startswith('/'):
 			url = re.findall('(?://.+?|)(/.+)', url)[0]
 		url = client.replaceHTMLCodes(url)
-		try:
-			url = url.encode('utf-8')
-		except:
-			pass
+		try: url = url.encode('utf-8')
+		except: pass
 		return url
 	except:
 		log_utils.error()
@@ -894,24 +859,19 @@ def check_directstreams(url, hoster='', quality='SD'):
 		urls = directstream.google(url)
 		if not urls:
 			tag = directstream.googletag(url)
-			if tag:
-				urls = [{'quality': tag[0]['quality'], 'url': url}]
-		if urls:
-			host = 'gvideo'
+			if tag: urls = [{'quality': tag[0]['quality'], 'url': url}]
+		if urls: host = 'gvideo'
 	elif 'ok.ru' in url:
 		urls = directstream.odnoklassniki(url)
-		if urls:
-			host = 'vk'
+		if urls: host = 'vk'
 	elif 'vk.com' in url:
 		urls = directstream.vk(url)
-		if urls:
-			host = 'vk'
+		if urls: host = 'vk'
 	elif any(x in url for x in ['akamaized', 'blogspot', 'ocloud.stream']):
 		urls = [{'url': url}]
 		if urls: host = 'CDN'
 	direct = True if urls else False
-	if not urls:
-		urls = [{'quality': quality, 'url': url}]
+	if not urls: urls = [{'quality': quality, 'url': url}]
 	return urls, host, direct
 
 

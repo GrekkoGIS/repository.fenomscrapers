@@ -82,8 +82,7 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 				handlers += [HTTPSHandler(context=ssl_context)]
 				opener = build_opener(*handlers)
 				opener = install_opener(opener)
-			except:
-				pass
+			except: pass
 
 		if url.startswith('//'):
 			url = 'http:' + url
@@ -91,35 +90,24 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 		try: headers.update(headers)
 		except: headers = {}
 
-		if 'User-Agent' in headers:
-			pass
-		elif mobile is not True:
-			headers['User-Agent'] = cache.get(randomagent, 1)
-		else:
-			headers['User-Agent'] = 'Apple-iPhone/701.341'
+		if 'User-Agent' in headers: pass
+		elif mobile is not True: headers['User-Agent'] = cache.get(randomagent, 1)
+		else: headers['User-Agent'] = 'Apple-iPhone/701.341'
 
-		if 'Referer' in headers:
-			pass
-		elif referer is not None:
-			headers['Referer'] = referer
+		if 'Referer' in headers: pass
+		elif referer is not None: headers['Referer'] = referer
 
 		if 'Accept-Language' not in headers:
 			headers['Accept-Language'] = 'en-US'
 
-		if 'X-Requested-With' in headers:
-			pass
-		elif XHR is True:
-			headers['X-Requested-With'] = 'XMLHttpRequest'
+		if 'X-Requested-With' in headers: pass
+		elif XHR is True: headers['X-Requested-With'] = 'XMLHttpRequest'
 
-		if 'Cookie' in headers:
-			pass
-		elif cookie is not None:
-			headers['Cookie'] = cookie
+		if 'Cookie' in headers: pass
+		elif cookie is not None: headers['Cookie'] = cookie
 
-		if 'Accept-Encoding' in headers:
-			pass
-		elif compression and limit is None:
-			headers['Accept-Encoding'] = 'gzip'
+		if 'Accept-Encoding' in headers: pass
+		elif compression and limit is None: headers['Accept-Encoding'] = 'gzip'
 
 		if redirect is False:
 			class NoRedirection(HTTPErrorProcessor):
@@ -129,20 +117,16 @@ def request(url, close=True, redirect=True, error=False, proxy=None, post=None, 
 			opener = build_opener(NoRedirection)
 			opener = install_opener(opener)
 
-			try:
-				del headers['Referer']
-			except:
-				pass
+			try: del headers['Referer']
+			except: pass
 
 		if isinstance(post, dict):
 			# Gets rid of the error: 'ascii' codec can't decode byte 0xd0 in position 0: ordinal not in range(128)
 			try: iter_items = post.iteritems()
 			except: iter_items = post.items()
 			for key, value in iter_items:
-				try:
-					post[key] = value.encode('utf-8')
-				except:
-					pass
+				try: post[key] = value.encode('utf-8')
+				except: pass
 			post = urlencode(post)
 
 		request = Request(url, data=post)
@@ -473,21 +457,18 @@ class cfcookie:
 				request = Request(query)
 				_add_request_header(request, headers)
 				response = urlopen(request, timeout=int(timeout))
-			except:
-				pass
+			except: pass
 
 			cookie = '; '.join(['%s=%s' % (i.name, i.value) for i in cookies])
 
 			if 'cf_clearance' in cookie:
 				self.cookie = cookie
-		except:
-			pass
+		except: pass
 
 	def parseJSString(self, s):
 		try:
 			offset = 1 if s[0] == '+' else 0
-			val = int(
-				eval(s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]))
+			val = int(eval(s.replace('!+[]', '1').replace('!![]', '1').replace('[]', '0').replace('(', 'str(')[offset:]))
 			return val
 		except:
 			pass
@@ -503,16 +484,14 @@ class bfcookie:
 			result = _basic_request(netloc, headers=headers, timeout=timeout)
 
 			match = re.findall('xhr\.open\("GET","([^,]+),', result)
-			if not match:
-				return False
+			if not match: return False
 
 			url_Parts = match[0].split('"')
 			url_Parts[1] = '1680'
 			url = urljoin(netloc, ''.join(url_Parts))
 
 			match = re.findall('rid=([0-9a-zA-Z]+)', url_Parts[0])
-			if not match:
-				return False
+			if not match: return False
 
 			headers['Cookie'] = 'rcksid=%s' % match[0]
 			result = _basic_request(url, headers=headers, timeout=timeout)
@@ -535,8 +514,7 @@ class bfcookie:
 		key = unhexlify(key)
 		iv = unhexlify(iv)
 
-		if len(iv) != 16:
-			return False
+		if len(iv) != 16: return False
 
 		decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
 		plain_text = decrypter.feed(msg)
