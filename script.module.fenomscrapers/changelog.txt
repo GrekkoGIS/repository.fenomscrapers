@@ -1,12 +1,34 @@
+[B][COLOR red]Update - v1.1.7 - Dec. 30, 2020[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] 7torrents torrent scraper removed due to Cloudflare v2
+    challenge.[/I]
+[COLOR yellow]--[/COLOR][I] Moviemagnet torrent scraper removed, site appears to
+    be dead.[/I]
+[COLOR yellow]--[/COLOR][I] Removed rlsbb and watchseries hosters due to
+    Cloudflare v2 challenge.[/I]
+[COLOR yellow]--[/COLOR][I] Removed ganool, onlineseries, and watchseriestv
+    hosters.  Hosters appear to be dead.[/I]
+[COLOR yellow]--[/COLOR][I] Updated all scrapers to pass "link_name" to
+    be shown by addon.[/I]
+[COLOR yellow]--[/COLOR][I] Item above now allows source select to be shown with
+     "link_name" for all vs. old standard info line.[/I]
+[COLOR yellow]--[/COLOR][I] Removed 5movies, cartoonhd, filmxy, watchepisodes, and
+    watchserieshd.  These sites do not provide the minimum
+    standard of file info for addon display so they are removed.[/I]
+[COLOR yellow]--[/COLOR][I] Added new Heading section groups to "Premium Hosters".
+    Account Required scrapers, and Local Scrapers are now
+    grouped.[/I]
+[COLOR yellow]--[/COLOR][I] Removed unused modules for above changes.[/I]
+[COLOR yellow]--[/COLOR][I] Removed unused functions for above changes.[/I]
+
 [B][COLOR red]Update - v1.1.6 - Dec. 18, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Moviemagnet.co looks to be dead and gone.  Scraper
     is now removed.[/I]
 [COLOR yellow]--[/COLOR][I] Solidtorrents site is back to working so default switched
     to "ON".[/I]
-COLOR yellow]--[/COLOR][I] Solidtorrents was previously incorrectly listed as a single
+[COLOR yellow]--[/COLOR][I] Solidtorrents was previously incorrectly listed as a single
     html request site. Solidtorrents is an api and has been
     fixed in the "torrentInfo" file.[/I]
-COLOR yellow]--[/COLOR][I] Fixed a few "release_title" format issues.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed a few "release_title" format issues.[/I]
 
 [B][COLOR red]Update - v1.1.5 - Dec. 3, 2020[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] 7torrents scraper switched base_url to "7torrents.cc"

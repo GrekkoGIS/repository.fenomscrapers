@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 10-05-2020)
-
+# created by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
@@ -69,57 +68,53 @@ class source:
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ('(' + data['year'] + ')')
+			year = data['year']
 
-			# query = '%s %s' % (title, hdlr) #site now  fails with year in query
 			query = title
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
-
-			if 'tvshowtitle' in data:
-				url = self.show_link % query.replace(' ', '-')
-			else:
-				url = self.search_link % quote_plus(query)
-
+			if 'tvshowtitle' in data: url = self.show_link % query.replace(' ', '-')
+			else: url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 
 			r = client.request(url)
-			if not r: return sources
-			if 'No results were found' in r: return sources
-
+			r = r.replace('\r', '').replace('\n', '').replace('\t', '')
 			r = client.parseDOM(r, 'div', attrs={'class': 'card'})
-			for i in r:
-				url = re.compile('href="(magnet.+?)\s*?"').findall(i)[0]
+			if not r: return sources
+		except:
+			source_utils.scraper_error('TOPNOW')
+			return sources
+
+		for i in r:
+			try:
+				url = re.compile('href="(magnet.+?)"').findall(i)[0]
 				try: url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
 				except: url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 				url = url.split('&tr=')[0].replace(' ', '.')
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
 				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(title, name)
-				if source_utils.remove_lang(name, episode_title):
-					continue
-
-				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), data['year']):
-					continue
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), year): continue
+				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+				if source_utils.remove_lang(name_info): continue
 
 				seeders = 0 # seeders not available on topnow
-				quality, info = source_utils.get_release_quality(name, url)
+				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', i)[-1] # file size is no longer available on topnow's new site
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
 					dsize = 0
-					pass
 				info = ' | '.join(info)
 
-				sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+				sources.append({'provider': 'topnow', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('TOPNOW')
+		return sources
 
-			return sources
-		except:
-			source_utils.scraper_error('TOPNOW')
-			return sources
 
 	def resolve(self, url):
 		return url

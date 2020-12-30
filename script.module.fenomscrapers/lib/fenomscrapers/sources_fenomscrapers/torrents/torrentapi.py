@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-19-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import json
@@ -82,10 +81,10 @@ class source:
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
-
 			if 'tvshowtitle' in data:
 				search_link = self.tvshowsearch.format(self.key, data['imdb'], hdlr)
 			else:
@@ -96,53 +95,44 @@ class source:
 			rjson = client.request(search_link, error=True)
 			if not rjson or 'torrent_results' not in str(rjson):
 				return sources
-
 			files = json.loads(rjson)['torrent_results']
-			for file in files:
-				url = file["download"]
-				url = url.split('&tr')[0]
+		except:
+			source_utils.scraper_error('TORRENTAPI')
+			return sources
+
+		for file in files:
+			try:
+				url = file["download"].split('&tr')[0]
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				name = unquote_plus(file["title"])
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+				if source_utils.remove_lang(name_info): continue
 
-				name = file["title"]
-				name = unquote_plus(name)
-				name = source_utils.clean_name(title, name)
-				if source_utils.remove_lang(name, episode_title):
-					continue
-
-				if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
-					continue
-
-				if episode_title: # filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-					if not source_utils.filter_single_episodes(hdlr, name):
-						continue
-				elif not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-					if any(re.search(item, name.lower()) for item in ep_strings):
-						continue
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
 					seeders = int(file["seeders"])
-					if self.min_seeders > seeders: 
-						continue
+					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
-					pass
 
-				quality, info = source_utils.get_release_quality(name, name)
+				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils.convert_size(file["size"], to='GB')
 					info.insert(0, isize)
 				except:
 					dsize = 0
-					pass
 				info = ' | '.join(info)
 
-				sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-			return sources
-		except:
-			source_utils.scraper_error('TORRENTAPI')
-			return sources
+			except:
+				source_utils.scraper_error('TORRENTAPI')
+		return sources
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -152,7 +142,6 @@ class source:
 			return sources
 		try:
 			self.bypass_filter = bypass_filter
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -169,47 +158,45 @@ class source:
 			rjson = client.request(search_link, error=True)
 			if not rjson or 'torrent_results' not in str(rjson):
 				return sources
-
 			files = json.loads(rjson)['torrent_results']
-			for file in files:
-				url = file["download"]
-				url = url.split('&tr')[0]
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+		except:
+			source_utils.scraper_error('TORRENTAPI')
+			return sources
 
-				name = file["title"]
-				name = unquote_plus(name)
-				name = source_utils.clean_name(self.title, name)
-				if source_utils.remove_lang(name):
-					continue
+		for file in files:
+			try:
+				url = file["download"].split('&tr')[0]
+				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				name = unquote_plus(file["title"])
+				name = source_utils.clean_name(name)
 
 				if not self.bypass_filter:
 					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
 						continue
 				package = 'season'
 
+				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
+				if source_utils.remove_lang(name_info): continue
+
 				try:
 					seeders = int(file["seeders"])
-					if self.min_seeders > seeders: 
-						continue
+					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
-					pass
 
-				quality, info = source_utils.get_release_quality(name, name)
+				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils.convert_size(file["size"], to='GB')
 					info.insert(0, isize)
 				except:
 					dsize = 0
-					pass
 				info = ' | '.join(info)
 
-				sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package})
-			return sources
-		except:
-			source_utils.scraper_error('TORRENTAPI')
-			return sources
+			except:
+				source_utils.scraper_error('TORRENTAPI')
+		return sources
 
 
 	def resolve(self, url):

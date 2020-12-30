@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 9-20-2020)
-
+# (updated 12-23-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -29,7 +28,6 @@ class source:
 		self.movie_link = '/api/v2/movies/%s'
 		self.show_link = '/api/v2/shows/%s'
 		self.episode_link = '/api/v2/episodes/%s'
-
 		self.user = control.setting('ororo.user')
 		self.password = control.setting('ororo.pass')
 		self.headers = {
@@ -50,25 +48,28 @@ class source:
 		return auth
 
 
-	def movie(self, imdb, title, aliases, year):
+	def movie(self, imdb, title, aliases, year): # seems Ororo does not provide Movies
 		try:
-			if (self.user == '' or self.password == ''):
-				return
+			if (self.user == '' or self.password == ''): return
 			url = cache.get(self.ororo_moviecache, 60, self.user)
-			url = [i[0] for i in url if imdb == i[1]][0]
-			url = self.movie_link % url
+			if not url: return
+			url = [i[0] for i in url if imdb == i[1]]
+			if not url: return
+			url = self.movie_link % url[0]
 			return url
 		except:
 			source_utils.scraper_error('ORORO')
 			return
 
+
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
-			if (self.user == '' or self.password == ''):
-				return
+			if (self.user == '' or self.password == ''): return
 			url = cache.get(self.ororo_tvcache, 120, self.user)
-			url = [i[0] for i in url if imdb == i[1]][0]
-			url = self.show_link % url
+			if not url: return
+			url = [i[0] for i in url if imdb == i[1]]
+			if not url: return
+			url = self.show_link % url[0]
 			return url
 		except:
 			source_utils.scraper_error('ORORO')
@@ -77,18 +78,15 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			if (self.user == '' or self.password == ''):
-				return
-			if not url:
-				return
+			if (self.user == '' or self.password == ''): return
+			if not url: return
 			url = urljoin(self.base_link, url)
-
 			r = client.request(url, headers=self.headers)
 			r = json.loads(r)['episodes']
 			r = [(str(i['id']), str(i['season']), str(i['number']), str(i['airdate'])) for i in r]
-
-			url = [i for i in r if season == int(i[1]) and episode == int(i[2])]
+			url = [i for i in r if season == i[1] and episode == i[2]]
 			url += [i for i in r if premiered == i[3]]
+			if not url: return
 			url= self.episode_link % url[0][0]
 			return url
 		except:
@@ -124,20 +122,20 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
-			if not url:
-				return sources
-			if (self.user == '' or self.password == ''):
-				return sources
+			if (self.user == '' or self.password == ''): return sources
 
 			url = urljoin(self.base_link, url)
 			url = client.request(url, headers=self.headers)
 			url = json.loads(url)['url']
+			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 
-			quality, info = source_utils.get_release_quality(url)
+			name = re.sub(r'(.*?)\/video/file/(.*?)/', '', url).split('.smil')[0].split('-')[0]
+			quality, info = source_utils.get_release_quality(name)
 
-			sources.append({'source': 'direct', 'quality': quality, 'language': 'en', 'url': url,
-									'info': info, 'direct': True, 'debridonly': False})
+			sources.append({'provider': 'ororo', 'source': 'direct', 'name': name, 'quality': quality, 'language': 'en', 'url': url,
+									'info': info, 'direct': True, 'debridonly': False, 'size': 0}) # Ororo does not return a file size
 			return sources
 		except:
 			source_utils.scraper_error('ORORO')

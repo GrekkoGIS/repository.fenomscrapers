@@ -1,6 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 10-08-2020)
-
+# (updated 12-23-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -8,6 +7,11 @@
 import json
 import requests
 import sys
+try:
+	from urlparse import parse_qs
+	from urllib import urlencode
+except ImportError:
+	from urllib.parse import parse_qs, urlencode
 
 from fenomscrapers.modules import control
 from fenomscrapers.modules import cleantitle
@@ -33,8 +37,7 @@ class source:
 			user_pass = control.setting('furk.user_pass')
 			api_key = control.setting('furk.api')
 			if api_key == '':
-				if user_name == '' or user_pass == '':
-					return
+				if user_name == '' or user_pass == '': return
 				s = requests.Session()
 				link = (self.base_link + self.login_link % (user_name, user_pass))
 				p = s.post(link)
@@ -42,17 +45,16 @@ class source:
 				if p['status'] == 'ok':
 					api_key = p['api_key']
 					control.setSetting('furk.api', api_key)
-				else:
-					pass
+				else: pass
 			return api_key
 		except:
 			source_utils.scraper_error('FURK')
-			pass
 
 
 	def movie(self, imdb, title, aliases, year):
 		try:
-			url = {'imdb': imdb, 'title': title, 'year': year}
+			url = {'imdb': imdb, 'title': title, 'aliases': aliases, 'year': year}
+			url = urlencode(url)
 			return url
 		except:
 			return
@@ -60,52 +62,64 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
-			url = tvshowtitle
+			url = {'imdb': imdb, 'tvdb': tvdb, 'tvshowtitle': tvshowtitle, 'aliases': aliases, 'year': year}
+			url = urlencode(url)
 			return url
 		except:
-			pass
+			return
 
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			url = {'tvshowtitle': url, 'season': season, 'episode': episode}
+			if not url: return
+			url = parse_qs(url)
+			url = dict([(i, url[i][0]) if url[i] else (i, '') for i in url])
+			url['title'], url['premiered'], url['season'], url['episode'] = title, premiered, season, episode
+			url = urlencode(url)
 			return url
 		except:
-			pass
+			return
 
 
 	def sources(self, url, hostDict):
-		api_key = self.get_api()
-		if not api_key: return
 		sources = []
-
+		if not url: return sources
+		api_key = self.get_api()
+		if not api_key: return sources
 		try:
-			content_type = 'episode' if 'tvshowtitle' in url else 'movie'
+			data = parse_qs(url)
+			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
+
+			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
+			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
+			aliases = data['aliases'] # not used atm
+			episode_title = data['title'] if 'tvshowtitle' in data else None
+			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
+
+			content_type = 'episode' if 'tvshowtitle' in data else 'movie'
 			match = 'extended'
 			moderated = 'no' if content_type == 'episode' else 'yes'
 			search_in = ''
 
 			if content_type == 'movie':
-				title = cleantitle.normalize(url.get('title'))
-				year = url.get('year')
 				query = '@name+%s+%s+@files+%s+%s' % (title, year, title, year)
 
 			elif content_type == 'episode':
-				title = cleantitle.normalize(url.get('tvshowtitle'))
-				season = int(url['season'])
-				episode = int(url['episode'])
+				season = int(data['season'])
+				episode = int(data['episode'])
 				seasEpList = self._seas_ep_query_list(season, episode)
 				query = '@name+%s+@files+%s+|+%s+|+%s+|+%s+|+%s' % (title, seasEpList[0], seasEpList[1], seasEpList[2], seasEpList[3], seasEpList[4])
 
 			s = requests.Session()
-			link = self.base_link + self.search_link % \
-				   (api_key, query, match, moderated, search_in)
+			link = self.base_link + self.search_link % (api_key, query, match, moderated, search_in)
 
 			p = s.get(link)
 			p = json.loads(p.text)
-			if p['status'] != 'ok': return
+			if p.get('status') != 'ok': return
 
-			files = p['files']
+			files = p.get('files')
+			if not files: return sources
 			for i in files:
 				if i['is_ready'] == '1' and i['type'] == 'video':
 					try:
@@ -113,28 +127,38 @@ class source:
 						if int(i['files_num_video']) > 3:
 							source = 'PACK [B](x%02d)[/B]' % int(i['files_num_video'])
 						file_name = i['name']
+						name = source_utils.clean_name(file_name)
+						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+
 						file_id = i['id']
 						file_dl = i['url_dl']
-						size = float(i['size']) / 1073741824
 
 						if content_type == 'episode':
 							url = json.dumps({'content': 'episode', 'file_id': file_id, 'season': season, 'episode': episode})
 						else:
 							url = json.dumps({'content': 'movie', 'file_id': file_id, 'title': title, 'year': year})
 
-						quality = source_utils.get_release_quality(file_name, file_dl)[0]
-						info = source_utils.getFileType(file_name)
-						info = '%.2f GB | %s | %s' % (size, info, file_name.replace('.', ' ').upper())
+						quality, info = source_utils.get_release_quality(name_info, file_dl)
+						try:
+							size = float(i['size'])
+							if 'PACK' in source:
+								size = float(size) / int(i['files_num_video'])
+							dsize, isize = source_utils.convert_size(size, to='GB')
+							info.insert(0, isize)
+						except:
+							source_utils.scraper_error('FURK')
+							dsize = 0
+						info = ' | '.join(info)
 
-						sources.append({'source': source, 'quality': quality, 'language': "en", 'url': url, 'info': info, 'direct': True, 'debridonly': False})
+						sources.append({'provider': 'furk', 'source': source, 'name': name, 'name_info': name_info, 'quality': quality, 'language': "en", 'url': url,
+													'info': info, 'direct': True, 'debridonly': False, 'size': dsize})
 					except:
-						pass
+						source_utils.scraper_error('FURK')
 				else:
 					continue
 			return sources
 		except:
 			source_utils.scraper_error('FURK')
-			pass
 
 
 	def resolve(self, url):
@@ -150,8 +174,7 @@ class source:
 			s = requests.Session()
 			p = s.get(link)
 			p = json.loads(p.text)
-			if p['status'] != 'ok' or p['found_files'] != '1':
-				return
+			if p['status'] != 'ok' or p['found_files'] != '1': return
 
 			files = p['files'][0]
 			files = files['t_files']
@@ -162,20 +185,17 @@ class source:
 			return url
 		except:
 			source_utils.scraper_error('FURK')
-			pass
 
 
 	def _manage_pack(self):
 		for i in self.files:
 			if self.content_type == 'movie':
-				if 'is_largest' in i:
-					url = i['url_dl']
+				if 'is_largest' in i: url = i['url_dl']
 			else:
 				name = cleantitle.get_simple(i['name'])
 				if 'furk320' not in name.lower() and 'sample' not in name.lower():
 					for x in self.filtering_list:
-						if x in name.lower():
-							url = i['url_dl']
+						if x in name.lower(): url = i['url_dl']
 						else: pass
 		return url
 

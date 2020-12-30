@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-19-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
@@ -59,13 +58,13 @@ class source:
 
 			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
-			episode_title = data['title'] if 'tvshowtitle' in data else None
+			episode_title = data['title']
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
+			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
 			# query = re.sub('[^A-Za-z0-9\s\.-]+', '', query) #eztv has issues with dashes in titles
 			query = re.sub('[^A-Za-z0-9\s\.]+', '', query)
-
 			url = self.search_link % (quote_plus(query).replace('+', '-'))
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -82,63 +81,49 @@ class source:
 
 			rows = re.findall('<tr name="hover" class="forum_header_border">(.+?)</tr>', table, re.DOTALL)
 			if not rows: return sources
-
-			for row in rows:
-				try:
-					try:
-						columns = re.findall('<td\s.+?>(.+?)</td>', row, re.DOTALL)
-						link = re.findall('href="(magnet:.+?)".*title="(.+?)"', columns[2], re.DOTALL)[0]
-					except:
-						continue
-
-					url = str(client.replaceHTMLCodes(link[0]).split('&tr')[0])
-					try: url = unquote(url).decode('utf8')
-					except: pass
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
-
-					name = link[1].split(' [eztv]')[0].split(' Torrent:')[0]
-					name = source_utils.clean_name(title, name)
-					if source_utils.remove_lang(name, episode_title):
-						continue
-
-					if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
-						continue
-
-					if episode_title: # filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-						if not source_utils.filter_single_episodes(hdlr, name):
-							continue
-					elif not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-						if any(re.search(item, name.lower()) for item in ep_strings):
-							continue
-
-					try:
-						seeders = int(re.findall('<font color=".+?">(\d+|\d+\,\d+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
-					except:
-						seeders = 0
-						pass
-
-					quality, info = source_utils.get_release_quality(name, url)
-					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', columns[3])[-1]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-						pass
-					info = ' | '.join(info)
-
-					sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-				except:
-					source_utils.scraper_error('EZTV')
-					continue
-			return sources
 		except:
 			source_utils.scraper_error('EZTV')
 			return sources
+
+		for row in rows:
+			try:
+				try:
+					columns = re.findall('<td\s.+?>(.+?)</td>', row, re.DOTALL)
+					link = re.findall('href="(magnet:.+?)".*title="(.+?)"', columns[2], re.DOTALL)[0]
+				except: continue
+
+				url = str(client.replaceHTMLCodes(link[0]).split('&tr')[0])
+				try: url = unquote(url).decode('utf8')
+				except: pass
+				hash = re.compile('btih:(.*?)&').findall(url)[0]
+
+				name = link[1].split(' [eztv]')[0].split(' Torrent:')[0]
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+				if source_utils.remove_lang(name_info): continue
+
+				try:
+					seeders = int(re.findall('<font color=".+?">(\d+|\d+\,\d+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except:
+					seeders = 0
+
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', columns[3])[-1]
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except:
+					dsize = 0
+				info = ' | '.join(info)
+
+				sources.append({'provider': 'eztv', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('EZTV')
+				continue
+		return sources
 
 
 	def resolve(self, url):

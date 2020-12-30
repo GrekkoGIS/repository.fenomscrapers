@@ -180,12 +180,12 @@ msgid "Error Cleaning Settings.xml. Old settings.xml files Restored."
 msgstr "Fout Bij Het Opschonen Van Settings.xml. Oude settings.xml bestanden Hersteld"
 
 msgctxt "#32044"
-msgid ""
-msgstr ""
+msgid "Account Required Scrapers"
+msgstr "Account Vereiste Scrapers"
 
 msgctxt "#32045"
-msgid ""
-msgstr ""
+msgid "Local Scrapers"
+msgstr "Lokale Scrapers"
 
 msgctxt "#32046"
 msgid ""
@@ -340,8 +340,8 @@ msgid "GDRIVE"
 msgstr "GDRIVE"
 
 msgctxt "#32082"
-msgid ""
-msgstr ""
+msgid "RAPIDMOVIEZ"
+msgstr "RAPIDMOVIEZ"
 
 msgctxt "#32083"
 msgid ""
@@ -446,8 +446,8 @@ msgid "EXTRATORRENT (Pack capable)"
 msgstr "EXTRATORRENT (Pack geschikt)"
 
 msgctxt "#32107"
-msgid "EZTV"
-msgstr "EZTV"
+msgid "EZTV (shows only)"
+msgstr "EZTV (alleen series)"
 
 msgctxt "#32108"
 msgid "GLODLS"

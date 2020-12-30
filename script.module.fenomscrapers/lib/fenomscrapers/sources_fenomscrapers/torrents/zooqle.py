@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 11-30-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
@@ -21,7 +20,7 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
-		self.domains = ['zooqle.com', 'zooqle.unblocked.win', 'zooqle.unblocked.llc', 'zooqle.unblocked.krd'] #it's a Q not a G..lol
+		self.domains = ['zooqle.com', 'zooqle.unblocked.win', 'zooqle.unblocked.llc', 'zooqle.unblocked.krd']
 		self.base_link = 'https://zooqle.com'
 		self.search_link = '/search?pg=1&q=%s'
 		self.min_seeders = 1
@@ -76,7 +75,6 @@ class source:
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
-
 			urls = []
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url) + str(category) + '&v=t&s=sz&sd=d'
@@ -91,7 +89,7 @@ class source:
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('ZOOGLE')
+			source_utils.scraper_error('ZOOQLE')
 			return self.sources
 
 
@@ -102,78 +100,64 @@ class source:
 			html = client.request(url, ignoreErrors = 404)
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
-
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
 			except: return
-
 			rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
 			if not rows: return
-
-			for entry in rows:
-				try:
-					try:
-						if 'magnet:' not in entry: continue
-						url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
-						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-						url = source_utils.strip_non_ascii_and_unprintable(url)
-						if url in str(self.sources): continue
-					except:
-						continue
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
-					try:
-						name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
-						name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
-						name = unquote_plus(name)
-						name = source_utils.clean_name(self.title, name)
-					except:
-						continue
-
-					if source_utils.remove_lang(name, self.episode_title):
-						continue
-
-					# some titles have foreign title translation in front so remove it
-					if './.' in name:
-						name = name.split('./.', 1)[1]
-					if '.com.' in name.lower():
-						try: name = re.sub(r'(.*?)\W{2,10}', '', name)
-						except: name = name.split('-.', 1)[1].lstrip()
-
-					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
-						continue
-
-					if self.episode_title: # filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-						if not source_utils.filter_single_episodes(self.hdlr, name):
-							continue
-					elif not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-						if any(re.search(item, name.lower()) for item in ep_strings):
-							continue
-
-					try:
-						seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
-					except:
-						seeders = 0
-						pass
-
-					quality, info = source_utils.get_release_quality(name, url)
-					try:
-						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-						pass
-					info = ' | '.join(info)
-
-					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-				except:
-					continue
 		except:
-			source_utils.scraper_error('ZOOGLE')
-			pass
+			source_utils.scraper_error('ZOOQLE')
+			return
+
+		for entry in rows:
+			try:
+				try:
+					if 'magnet:' not in entry: continue
+					url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
+					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+					url = source_utils.strip_non_ascii_and_unprintable(url)
+					if url in str(self.sources): continue
+				except: continue
+				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				try:
+					name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
+					name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
+					name = unquote_plus(name)
+					name = source_utils.clean_name(name)
+				except: continue
+
+				# some titles have foreign title translation in front so remove it
+				if './.' in name: name = name.split('./.', 1)[1]
+				if '.com.' in name.lower():
+					try: name = re.sub(r'(.*?)\W{2,10}', '', name)
+					except: name = name.split('-.', 1)[1].lstrip()
+
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+				if source_utils.remove_lang(name_info): continue
+
+				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
+
+				try:
+					seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except:
+					seeders = 0
+
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except:
+					dsize = 0
+				info = ' | '.join(info)
+
+				self.sources.append({'provider': 'zooqle', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('ZOOQLE')
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -215,7 +199,7 @@ class source:
 			[i.join() for i in threads]
 			return self.sources
 		except:
-			source_utils.scraper_error('ZOOGLE')
+			source_utils.scraper_error('ZOOQLE')
 			return self.sources
 
 
@@ -227,87 +211,76 @@ class source:
 			html = client.request(link, ignoreErrors = 404)
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
-
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
 			except: return
-
 			rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
 			if not rows: return
-
-			for entry in rows:
-				try:
-					try:
-						if 'magnet:' not in entry: continue
-						url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
-						url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-						url = source_utils.strip_non_ascii_and_unprintable(url)
-						if url in str(self.sources): continue
-					except:
-						continue
-
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
-
-					try:
-						name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
-						name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
-						name = unquote_plus(name)
-						name = source_utils.clean_name(self.title, name)
-						# name = url.split('&dn=')[1]
-					except:
-						continue
-					if source_utils.remove_lang(name):
-						continue
-
-					# some titles have foreign title translation in front so remove it
-					if './.' in name:
-						name = name.split('./.', 1)[1]
-					if '.com.' in name.lower():
-						try: name = re.sub(r'(.*?)\W{2,10}', '', name)
-						except: name = name.split('-.', 1)[1].lstrip()
-
-					if not self.search_series:
-						if not self.bypass_filter:
-							if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-								continue
-						package = 'season'
-
-					elif self.search_series:
-						if not self.bypass_filter:
-							valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
-							if not valid:
-								continue
-						else:
-							last_season = self.total_seasons
-						package = 'show'
-
-					try:
-						seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
-					except:
-						seeders = 0
-						pass
-
-					quality, info = source_utils.get_release_quality(name, url)
-					try:
-						size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-						pass
-					info = ' | '.join(info)
-
-					item = {'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
-								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-					if self.search_series:
-						item.update({'last_season': last_season})
-					self.sources.append(item)
-				except:
-					continue
 		except:
-			source_utils.scraper_error('ZOOGLE')
-			pass
+			source_utils.scraper_error('ZOOQLE')
+			return
+
+		for entry in rows:
+			try:
+				try:
+					if 'magnet:' not in entry: continue
+					url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
+					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+					url = source_utils.strip_non_ascii_and_unprintable(url)
+					if url in str(self.sources): continue
+				except: continue
+				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				try:
+					name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
+					name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
+					name = unquote_plus(name)
+					name = source_utils.clean_name(name)
+				except: continue
+
+				# some titles have foreign title translation in front so remove it
+				if './.' in name: name = name.split('./.', 1)[1]
+				if '.com.' in name.lower():
+					try: name = re.sub(r'(.*?)\W{2,10}', '', name)
+					except: name = name.split('-.', 1)[1].lstrip()
+
+				if not self.search_series:
+					if not self.bypass_filter:
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
+							continue
+					package = 'season'
+
+				elif self.search_series:
+					if not self.bypass_filter:
+						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
+						if not valid: continue
+					else:
+						last_season = self.total_seasons
+					package = 'show'
+
+				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
+				if source_utils.remove_lang(name_info): continue
+
+				try:
+					seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except:
+					seeders = 0
+
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except:
+					dsize = 0
+				info = ' | '.join(info)
+
+				item = {'provider': 'zooqle', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
+				if self.search_series:
+					item.update({'last_season': last_season})
+				self.sources.append(item)
+			except:
+				source_utils.scraper_error('ZOOQLE')
 
 
 	def resolve(self, url):

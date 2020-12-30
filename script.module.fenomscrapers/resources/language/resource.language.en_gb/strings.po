@@ -179,11 +179,11 @@ msgid "Error Cleaning Settings.xml. Old settings.xml files Restored."
 msgstr ""
 
 msgctxt "#32044"
-msgid ""
+msgid "Account Required Scrapers"
 msgstr ""
 
 msgctxt "#32045"
-msgid ""
+msgid "Local Scrapers"
 msgstr ""
 
 msgctxt "#32046"
@@ -339,7 +339,7 @@ msgid "GDRIVE"
 msgstr ""
 
 msgctxt "#32082"
-msgid ""
+msgid "RAPIDMOVIEZ"
 msgstr ""
 
 msgctxt "#32083"
@@ -445,7 +445,7 @@ msgid "EXTRATORRENT (Pack capable)"
 msgstr ""
 
 msgctxt "#32107"
-msgid "EZTV"
+msgid "EZTV (shows only)"
 msgstr ""
 
 msgctxt "#32108"

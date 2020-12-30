@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 10-05-2020)
-
+# created by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
@@ -74,7 +73,6 @@ class source:
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
-
 			urls = []
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
@@ -108,52 +106,40 @@ class source:
 					# item[1] does not contain full info like the &dn= portion of magnet
 					link = urljoin(self.base_link, items[0])
 					link = client.request(link, timeout='10')
-					if not link:
-						continue
+					if not link: continue
 
 					magnet = re.compile('(magnet.+?)"').findall(link)[0]
 					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-					name = unquote_plus(url.split('&dn=')[1])
-					name = source_utils.clean_name(self.title, name)
-					if source_utils.remove_lang(name, self.episode_title):
-						continue
-
-					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
-						continue
-
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					name = unquote_plus(url.split('&dn=')[1])
+					name = source_utils.clean_name(name)
+					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+					name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+					if source_utils.remove_lang(name_info): continue
 
-					if self.episode_title: # filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-						if not source_utils.filter_single_episodes(self.hdlr, name):
-							continue
-					elif not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-						if any(re.search(item, name.lower()) for item in ep_strings):
-							continue
+						if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 					try:
 						seeders = int(items[3].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
+						if self.min_seeders > seeders: continue
 					except:
 						seeders = 0
-						pass
 
-					quality, info = source_utils.get_release_quality(name, url)
+					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[2])[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
 						dsize = 0
-						pass
 					info = ' | '.join(info)
 
-					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+					self.sources.append({'provider': 'isohunt2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 														'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('ISOHUNT2')
-			pass
 
 
 	def resolve(self, url):

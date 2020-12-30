@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 9-20-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus
+try:
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus
+except ImportError:
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
@@ -24,7 +23,6 @@ class source:
 		self.domains = ['300mbfilms.io', '300mbfilms.co']
 		self.base_link = 'https://www.300mbfilms.io'
 		self.search_link = '/?s=%s'
-		# self.search_link = '/search/%s/feed/rss2/'
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -62,77 +60,68 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
-			if not url: return sources
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			aliases = data['aliases']
+			episode_title = data['title'] if 'tvshowtitle' in data else None
+			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			r = client.request(url)
+			if not r: return sources
 			posts = client.parseDOM(r, 'h2')
 
 			urls = []
 			for item in posts:
-				if not item.startswith('<a href'):
-					continue
+				if not item.startswith('<a href'): continue
 				try:
 					name = client.parseDOM(item, "a")[0]
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-					if cleantitle.get(t) != cleantitle.get(title):
-						continue
-					if hdlr not in name:
-						continue
+					if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+					name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+					if source_utils.remove_lang(name_info): continue
 
-					quality, info = source_utils.get_release_quality(name, item[0])
+					quality, info = source_utils.get_release_quality(name_info, item[0])
 					try:
 						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
 						dsize = 0
-						pass
-					fileType = source_utils.getFileType(name)
-					info.append(fileType)
-					info = ' | '.join(info) if fileType else info[0]
+					info = ' | '.join(info)
 
 					item = client.parseDOM(item, 'a', ret='href')
 					url = item
 					links = self.links(url)
-					if links is None:
-						continue
-
-					urls += [(i, quality, info) for i in links]
-
+					if links is None: continue
+					urls += [(i, name, name_info, quality, info, dsize) for i in links]
 				except:
 					source_utils.scraper_error('300MBFILMS')
-					pass
 
 			for item in urls:
-				if 'earn-money' in item[0]:
-					continue
-				if any(x in item[0] for x in ['.rar', '.zip', '.iso', '.sample']):
-					continue
+				if 'earn-money' in item[0]: continue
+				if any(x in item[0] for x in ['.rar', '.zip', '.iso', '.sample']): continue
 				url = client.replaceHTMLCodes(item[0])
 				try: url = url.encode('utf-8')
 				except: pass
 
 				valid, host = source_utils.is_host_valid(url, hostDict)
-				if not valid:
-					continue
+				if not valid: continue
 				host = client.replaceHTMLCodes(host)
 				try: host = host.encode('utf-8')
 				except: pass
-				sources.append({'source': host, 'quality': item[1], 'language': 'en', 'url': url, 'info': item[2], 'direct': False, 'debridonly': True, 'size': dsize})
+
+				sources.append({'provider': '300mbfilms', 'source': host, 'name': item[1], 'name_info': item[2], 'quality': item[3], 'language': 'en', 'url': url,
+											'info': item[4], 'direct': False, 'debridonly': True, 'size': item[5]})
 			return sources
 		except:
 			source_utils.scraper_error('300MBFILMS')
@@ -143,13 +132,11 @@ class source:
 		urls = []
 		try:
 			if not url: return
-
 			for url in url:
 				r = client.request(url)
 				r = client.parseDOM(r, 'div', attrs={'class': 'entry'})
 				r = client.parseDOM(r, 'a', ret='href')
-				if 'money' not in str(r):
-					continue
+				if 'money' not in str(r): continue
 
 				r1 = [i for i in r if 'money' in i][0]
 				r = client.request(r1)
@@ -162,20 +149,16 @@ class source:
 					link = client.request(r1, cookie=send_post)
 				else:
 					link = client.request(r1)
-				if '<strong>Single' not in link:
-					continue
+				if '<strong>Single' not in link: continue
 
 				link = re.findall('<strong>Single(.+?)</tr', link, re.DOTALL)[0]
 				link = client.parseDOM(link, 'a', ret='href')
 				link = [(i.split('=')[-1]) for i in link]
-
 				for i in link:
 					urls.append(i)
-
 				return urls
 		except:
 			source_utils.scraper_error('300MBFILMS')
-			pass
 
 
 	def resolve(self, url):

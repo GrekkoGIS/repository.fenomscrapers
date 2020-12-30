@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (11-30-2020)
-
+# created by Venom for Fenomscrapers (12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import json
@@ -45,8 +44,9 @@ class source:
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['title'].replace('&', 'and')
-			hdlr = data['year']
 			aliases = data['aliases']
+			hdlr = data['year']
+			year = data['year']
 			imdb = data['imdb']
 
 			url = self.search_link % imdb
@@ -61,44 +61,41 @@ class source:
 
 			title_long = files.get('data').get('movies')[0].get('title_long').replace(' ', '.')
 			torrents = files.get('data').get('movies')[0].get('torrents')
+		except:
+			source_utils.scraper_error('YTSWS')
+			return sources
 
-			for torrent in torrents:
+		for torrent in torrents:
+			try:
 				quality = torrent.get('quality')
 				type = torrent.get('type')
 				hash = torrent.get('hash')
 				name = '%s.[%s].[%s].[YTS.MX]' % (title_long, quality, type)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
+				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+				name_info = source_utils.info_from_name(name, title, year, hdlr)
+				if source_utils.remove_lang(name_info): return
 
 				try:
 					seeders = torrent.get('seeds')
-					if self.min_seeders > seeders:
-						continue
+					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
-					pass
 
-				if source_utils.remove_lang(name):
-					continue
-
-				if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
-					continue
-
-				quality, info = source_utils.get_release_quality(name, url)
+				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = torrent.get('size')
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
 					dsize = 0
-					pass
 				info = ' | '.join(info)
 
-				sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+				sources.append({'provider': 'ytsmx', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-			return sources
-		except:
-			source_utils.scraper_error('YTSWS')
-			return sources
+			except:
+				source_utils.scraper_error('YTSWS')
+		return sources
 
 
 	def resolve(self, url):

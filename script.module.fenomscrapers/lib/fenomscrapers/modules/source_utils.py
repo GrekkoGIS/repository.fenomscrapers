@@ -3,8 +3,6 @@
 	Fenomscrapers Module
 """
 
-import base64
-import hashlib
 import json
 import re
 import string
@@ -16,44 +14,27 @@ except ImportError:
 	from urllib.parse import urlparse, unquote_plus
 
 from fenomscrapers.modules import cleantitle
-from fenomscrapers.modules import client
 from fenomscrapers.modules import control
-from fenomscrapers.modules import directstream
 from fenomscrapers.modules import log_utils
-from fenomscrapers.modules import pyaes
 
 
-RES_4K = ['.4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd']
+# RES_4K = ['.4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, uhd removed
+RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd']
 RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
 RES_720 = ['720p', '720i', 'hd720', '720hd']
-RES_SD = ['576p', '576i', 'sd576', '576sd', '480p', '480i', 'sd480', '480sd']
+RES_SD = ['576p', '576i', 'sd576', '576sd', 'x576', '480p', '480i', 'sd480', '480sd']
 SCR = ['dvdscr', 'screener', '.scr.', '.r5', '.r6']
 CAM = ['camrip', 'cam.rip', 'tsrip', '.ts.rip.', 'dvdcam', 'dvd.cam', 'dvdts', 'dvd.ts.', '.cam', 'telecine', 'telesync', 'tele.sync']
 HDCAM = ['hdcam', '.hd.cam', 'hdts', '.hd.ts', '.hdtc', '.hd.tc', '.hctc', '.hc.tc']
 VIDEO_3D = ['3d', 'sbs', 'hsbs', 'sidebyside', 'side.by.side', 'stereoscopic', 'tab', 'htab', 'topandbottom', 'top.and.bottom']
-
 CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
-CODEC_H264 = ['avc', 'h264', 'h.264', 'x264', 'x.264']
-CODEC_XVID = ['xvid', '.x.vid']
-CODEC_DIVX = ['divx', 'divx ', 'div2', 'div2 ', 'div3']
-CODEC_MPEG = ['mpeg', 'm4v', 'mpg', 'mpg1', 'mpg2', 'mpg3', 'mpg4', 'mp4 ', '.mp.4.', 'msmpeg', 'msmpeg4', 'msmpeg.4.', 'mpegurl']
-CODEC_MKV = ['mkv', '.mkv', 'matroska']
-
-AUDIO_8CH = ['ch8.', '8ch.', '.7.1.']
-AUDIO_7CH = ['ch7.', '7ch.', '.6.1.']
-AUDIO_6CH = ['ch6.', '6ch.', '.5.1.']
-AUDIO_2CH = ['ch2', '2ch', '2.0', 'audio.2.0.', 'stereo']
-
-MULTI_LANG = ['hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng', 'dut.eng', 'ell.eng', 'esl.eng',
-			  'esp.eng', 'fin.eng', 'fra.eng', 'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng',
-			  'gtm.eng', 'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng', 'jpn.eng', 'kor.eng',
-			  'lat.eng', 'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng',
-			  'swe.eng', 'tha.eng', 'tur.eng', 'uae.eng', 'ukr.eng', 'vie.eng', 'zho.eng', 'dual.audio', 'multi']
 
 LANG = ['arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
 			  'russian', 'spanish', 'tamil', 'telugu', 'truefrench', 'truespanish', 'turkish', 'hebrew']
-
 ABV_LANG = ['.chi.', '.chs.', '.dut.', '.fin.', '.fre.', '.ger.', '.gre.', '.heb.', '.ita.', '.jpn.', '.pol.', '.por.', '.rus.', '.spa.', '.tur.', '.ukr.']
+DUBBED = ['dublado', 'dubbed', 'pldub']
+SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs']
+ADDS = ['1xbet', 'betwin']
 
 UNDESIREABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'baibako', 'bonus.disc',
 			  'courage.bambey', '.cbr', '.cbz', 'coldfilm', 'dilnix', 'dlrip', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd',
@@ -61,10 +42,6 @@ UNDESIREABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'b
 			  'jaskier', 'kb.1080p', 'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm',
 			  'megapeer', 'minutemen.empire', 'omskbird', 'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample',
 			  'soundtrack', 'subtitle.only', 'teaser', 'trailer', 'tumbler.studio', 'tvshows', 'vostfr', 'webdlrip', 'webhdrip', 'wish666']
-
-DUBBED = ['dublado', 'dubbed', 'pldub']
-SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub']
-ADDS = ['1xbet', 'betwin']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
 			'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty', 'twenty-one', 'twenty-two', 'twenty-three',
@@ -92,16 +69,6 @@ season_ordinal2_dict = {'1': '1st', '2': '2nd', '3': '3rd', '4': '4th', '5': '5t
 			'20': '20th', '21': '21st', '22': '22nd', '23': '23rd', '24': '24th', '25': '25th'}
 
 
-def is_anime(content, type, type_id):
-	from fenomscrapers.modules import trakt
-	try:
-		r = trakt.getGenre(content, type, type_id)
-		return 'anime' in r or 'animation' in r
-	except:
-		log_utils.error()
-		return False
-
-
 def get_qual(term):
 	if any(i in term for i in RES_4K): return '4K'
 	elif any(i in term for i in RES_1080): return '1080p'
@@ -112,10 +79,10 @@ def get_qual(term):
 	elif any(i in term for i in HDCAM): return 'CAM'
 
 
-def get_release_quality(release_title, release_link=None):
+def get_release_quality(release_info, release_link=None):
 	try:
 		quality = None
-		fmt = release_title_strip(release_title)
+		fmt = release_info
 		if fmt is not None:
 			quality = get_qual(fmt)
 		if not quality:
@@ -128,121 +95,12 @@ def get_release_quality(release_title, release_link=None):
 			else: quality = 'SD'
 		info = []
 		if fmt is not None:
-			if any(value in fmt for value in VIDEO_3D):
-				info.append('3D')
-			if any(value in fmt for value in CODEC_H265):
-				info.append('HEVC')
+			if any(value in fmt for value in VIDEO_3D): info.append('3D')
+			if any(value in fmt for value in CODEC_H265): info.append('HEVC')
 		return quality, info
 	except:
 		log_utils.error()
 		return 'SD', []
-
-
-def getFileType(url):
-	try:
-		type = ''
-		fmt = url_strip(url)
-		if fmt is None: return type
-		if any(value in fmt for value in ['blu.ray', 'bluray', '.bd.']):
-			type += ' BLURAY /'
-		if any(value in fmt for value in ['bd.r', 'bdr', 'bd.rip', 'bdrip', 'br.rip', 'brrip']):
-			type += ' BR-RIP /'
-		if 'remux' in fmt:
-			type += ' REMUX /'
-		if any(i in fmt for i in ['dvd.rip', 'dvdrip']):
-			type += ' DVD /'
-		if any(value in fmt for value in ['web.dl', 'webdl', 'web.rip', 'webrip']):
-			type += ' WEB /'
-		if 'hdtv' in fmt:
-			type += ' HDTV /'
-		if 'sdtv' in fmt:
-			type += ' SDTV /'
-		if any(value in fmt for value in ['hd.rip', 'hdrip']):
-			type += ' HDRIP /'
-		if 'hdr.' in fmt:
-			type += ' HDR /'
-		if any(value in fmt for value in ['dd.5.1.', 'dd.5.1ch.', 'dd5.1.', 'dolby.digital', 'dolbydigital']):
-			type += ' DOLBYDIGITAL /'
-		if any(value in fmt for value in ['.dd.ex.', 'ddex', 'dolby.ex.', 'dolby.digital.ex.', 'dolbydigital.ex.']):
-			type += ' DD-EX /'
-		if any(value in fmt for value in ['dolby.digital.plus', 'dolbydigital.plus', 'dolbydigitalplus', 'dd.plus.', 'ddplus']):
-			type += ' DD+ /'
-		if any(value in fmt for value in ['dd.7.1ch', 'dd.true.hd.', 'dd.truehd', 'ddtruehd']):
-			type += ' DOLBY-TRUEHD /'
-		if 'atmos' in fmt:
-			type += ' ATMOS /'
-		if '.dts' in fmt:
-			type += ' DTS /'
-		if any(value in fmt for value in ['dts.hd.', 'dtshd']):
-			type += ' DTS-HD /'
-		if any(value in fmt for value in ['dts.hd.ma.', 'dtshd.ma.', 'dtshdma', '.hd.ma.', 'hdma']):
-			type += ' DTS-HD MA/'
-		if any(value in fmt for value in ['dts.x.', 'dtsx']):
-			type += ' DTS-X /'
-		if any(value in fmt for value in AUDIO_8CH):
-			type += ' 8CH /'
-		if any(value in fmt for value in AUDIO_7CH):
-			type += ' 7CH /'
-		if any(value in fmt for value in AUDIO_6CH):
-			type += ' 6CH /'
-		if any(value in fmt for value in AUDIO_2CH):
-			type += ' 2CH /'
-		if any(value in fmt for value in CODEC_XVID):
-			type += ' XVID /'
-		if any(value in fmt for value in CODEC_DIVX):
-			type += ' DIVX /'
-		if any(value in fmt for value in CODEC_MPEG):
-			type += ' MPEG /'
-		if '.avi' in fmt:
-			type += ' AVI /'
-		if any(value in fmt for value in ['.ac3', '.ac.3.']):
-			type += ' AC3 /'
-		if any(value in fmt for value in CODEC_H264):
-			type += ' X264 /'
-		if any(value in fmt for value in CODEC_H265):
-			type += ' X265 /'
-		if any(value in fmt for value in CODEC_MKV):
-			type += ' MKV /'
-		if any(value in fmt for value in HDCAM):
-			type += ' HDCAM /'
-		if any(value in fmt for value in MULTI_LANG):
-			type += ' MULTI-LANG /'
-		if any(value in fmt for value in ADDS):
-			type += ' ADDS /'
-		if any(value in fmt for value in SUBS):
-			if type != '': type += ' WITH SUBS'
-			else: type = 'SUBS'
-		type = type.rstrip('/')
-		return type
-	except:
-		log_utils.error()
-		return ''
-
-
-def check_url(url):
-	try:
-		url = url.lower()
-		try: url = url.encode('utf-8')
-		except: pass
-		quality = get_qual(url)
-		if not quality: quality = 'SD'
-		return quality
-	except:
-		log_utils.error()
-		return 'SD'
-
-
-def label_to_quality(label):
-	try:
-		try: label = int(re.search('(\d+)', label).group(1))
-		except: label = 0
-		if label >= 2160: return '4K'
-		elif 1920 <= label: return '1080p'
-		elif 1280 <= label: return '720p'
-		elif label <= 576: return 'SD'
-	except:
-		log_utils.error()
-		return 'SD'
 
 
 def aliases_to_array(aliases, filter=None):
@@ -272,15 +130,15 @@ def check_title(title, aliases, release_title, hdlr, year):
 				title_list.append(alias)
 			except:
 				log_utils.error()
-				continue
 	try:
 		match = True
 		title = title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
 		title_list.append(title)
-		release_title = release_title_format(release_title) # converted to .lower()
+		release_title = release_title_format(release_title) # converts to .lower()
 		h = hdlr.lower()
 		t = release_title.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
+		t = t.split('2160p')[0].split('4k')[0].split('1080p')[0].split('720p')[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): match = False
 		if h not in release_title: match = False
 		return match
@@ -289,52 +147,23 @@ def check_title(title, aliases, release_title, hdlr, year):
 		return match
 
 
-def remove_lang(release_title, episode_title=None):
+def remove_lang(release_info):
+	if not release_info: return False
 	try:
-		fmt = release_title_strip(release_title)
-		if fmt is None: return False
-		if episode_title:
-			episode_title = episode_title.lower().replace("'", "")
-			episode_title = re.sub('[^a-z0-9]+', '.', episode_title)
-			fmt = '%s' % re.sub(episode_title, '', fmt)
-
-		filter_undesirables = control.setting('filter.undesirables') == 'true'
-		filter_foreign_single_audio = control.setting('filter.foreign.single.audio') == 'true'
-
-		if filter_undesirables:
-			if any(value in fmt for value in UNDESIREABLES):
-				return True
-		if any(value in fmt for value in DUBBED):
-			return True
-		if any(value in fmt for value in SUBS):
-			return True
-		# if any(value in fmt for value in ADDS):
-			# return True
-		if filter_foreign_single_audio:
-			if any(value in fmt for value in LANG) and not any(value in fmt for value in ['.eng.', '.en.', 'english']):
-				return True
-			if any(value in fmt for value in ABV_LANG) and not any(value in fmt for value in ['.eng.', '.en.', 'english']):
-				return True
-		if fmt.endswith('.srt.') and not any(value in fmt for value in ['with.srt', '.avi', '.mkv', '.mp4']):
-			return True
+		fmt = release_info
+		if any(value in fmt for value in DUBBED): return True
+		if any(value in fmt for value in SUBS): return True
+		if control.setting('filter.undesirables') == 'true':
+			if any(value in fmt for value in UNDESIREABLES): return True
+			# if any(value in fmt for value in ADDS): return True
+		if control.setting('filter.foreign.single.audio') == 'true':
+			if any(value in fmt for value in LANG) and not any(value in fmt for value in ['.eng.', '.en.', 'english']): return True
+			if any(value in fmt for value in ABV_LANG) and not any(value in fmt for value in ['.eng.', '.en.', 'english']): return True
+		if fmt.endswith('.srt.') and not any(value in fmt for value in ['with.srt', '.avi', '.mkv', '.mp4']): return True
 		return False
 	except:
 		log_utils.error()
 		return False
-
-
-# removes multi epsiode ranges returned from single epsiode query (ex. S01E01-E17 is also returned in S01E01 query)
-def filter_single_episodes(hdlr, release_title):
-	try:
-		fmt = release_title_format(release_title)
-		se = hdlr.lower()
-		for item in [(se + r'(?:\.|-)e\d{1,2}(?:$|\.|-)'), (se + r'(?:\.|-)s[0-3]{1}[0-9]{1}e\d{1,2}(?:$|\.|-)'), (se + r'-\d{2}(?:$|\.|-)')]:
-			if bool(re.search(item, fmt)):
-				return False
-		return True
-	except:
-		log_utils.error()
-		return True
 
 
 def filter_season_pack(show_title, aliases, year, season, release_title):
@@ -350,12 +179,10 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 			try:
 				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
-				if alias in title_list:
-					continue
+				if alias in title_list: continue
 				title_list.append(alias)
 			except:
 				log_utils.error()
-				continue
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# show_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', show_title)
@@ -429,12 +256,10 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			try:
 				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
-				if alias in title_list:
-					continue
+				if alias in title_list: continue
 				title_list.append(alias)
 			except:
 				log_utils.error()
-				continue
 	try:
 		show_title = show_title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# show_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', show_title)
@@ -447,7 +272,6 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			t = t.split(i)[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False, 0
-
 
 # remove episode ranges
 		episode_regex = [
@@ -462,10 +286,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 # remove season ranges that do not begin at 1
 		season_range_regex = [
-				r'seasons(?:\.|-)[2-9]{1}(?:\.|-)[3-9]{1}(?:$)', # end of line ex. "seasons.5-6"
-				r'seasons(?:\.|-)[2-9]{1}(?:\.|-)[3-9]{1}(?:\.|-)', # "seasons.5-6-
-				r'season(?:\.|-)[2-9]{1}(?:\.|-)[3-9]{1}(?:$)', # end of line ex. "season.5-6"
-				r'season(?:\.|-)[2-9]{1}(?:\.|-)[3-9]{1}(?:\.|-)', # "season.5-6-
+				r'(?:season|seasons)(?:\.|-|)(?:[2-9]|1[0-9]|2[0-9])(?:\.|-|)(?:to|thru|\.|-)(?:\.|-|)(?:[3-9]|1[0-9]|2[0-9])(?:$|\.|-)' # "seasons.5-6", seasons5.to.6, seasons.5.thru.6
 				]
 		for item in season_range_regex:
 			if bool(re.search(item, release_title)):
@@ -552,8 +373,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 
 
-
-# 2 digit "01.to.09" range filter (dots or dashes)
+# "01.to.09" 2 digit range filter (dots or dashes)
 		to_season_ranges = []
 		start_season = '01'
 		season_count = 2
@@ -565,27 +385,26 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			last_season = int(keys[0].split('to.')[1])
 			return True, last_season
 
-# 2 digit "01.thru.09" range filter (dots or dashes)
+# "01.thru.09" 2 digit range filter (dots or dashes)
 		thru_ranges = [i.replace('to', 'thru') for i in to_season_ranges]
 		if any(i in dot_release_title for i in thru_ranges):
 			keys = [i for i in thru_ranges if i in dot_release_title]
 			last_season = int(keys[0].split('thru.')[1])
 			return True, last_season
 
-# 2 digit  "01-09" range filtering
+# "01-09" 2 digit range filtering
 		dash_ranges = [i.replace('.to.', '-') for i in to_season_ranges]
 		if any(i in release_title for i in dash_ranges):
 			keys = [i for i in dash_ranges if i in release_title]
 			last_season = int(keys[0].split('-')[1])
 			return True, last_season
 
-# 2 digit  "01~09" range filtering
+# "01~09" 2 digit range filtering
 		tilde_ranges = [i.replace('.to.', '~') for i in to_season_ranges]
 		if any(i in release_title for i in tilde_ranges):
 			keys = [i for i in tilde_ranges if i in release_title]
 			last_season = int(keys[0].split('~')[1])
 			return True, last_season
-
 
 
 
@@ -624,7 +443,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 
 
-# 2 digit "s01.to.s09" range filter (dots or dash)
+# "s01.to.s09"  2 digit range filter (dots or dash)
 		to_season_ranges = []
 		start_season = 's01'
 		season_count = 2
@@ -636,28 +455,28 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 			last_season = int(keys[0].split('to.s')[1])
 			return True, last_season
 
-# 2 digit "s01.thru.s09" range filter (dots or dashes)
+# "s01.thru.s09" 2 digit  range filter (dots or dashes)
 		thru_ranges = [i.replace('to', 'thru') for i in to_season_ranges]
 		if any(i in dot_release_title for i in thru_ranges):
 			keys = [i for i in thru_ranges if i in dot_release_title]
 			last_season = int(keys[0].split('thru.s')[1])
 			return True, last_season
 
-# 2 digit "s01-s09" range filtering (dashes)
+# "s01-s09" 2 digit  range filtering (dashes)
 		dash_ranges = [i.replace('.to.', '-') for i in to_season_ranges]
 		if any(i in release_title for i in dash_ranges):
 			keys = [i for i in dash_ranges if i in release_title]
 			last_season = int(keys[0].split('-s')[1])
 			return True, last_season
 
-# 2 digit "s01~s09" range filtering (dashes)
+# "s01~s09" 2 digit  range filtering (dashes)
 		tilde_ranges = [i.replace('.to.', '~') for i in to_season_ranges]
 		if any(i in release_title for i in tilde_ranges):
 			keys = [i for i in tilde_ranges if i in release_title]
 			last_season = int(keys[0].split('~s')[1])
 			return True, last_season
 
-# 2 digit "s01.s09" range filtering (dots)
+# "s01.s09" 2 digit  range filtering (dots)
 		dot_ranges = [i.replace('.to.', '.') for i in to_season_ranges]
 		if any(i in release_title for i in dot_ranges):
 			keys = [i for i in dot_ranges if i in release_title]
@@ -670,27 +489,34 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		log_utils.error()
 
 
-def release_title_strip(release_title):
+def info_from_name(release_title, title, year, hdlr=None, episode_title=None, season=None, pack=None):
 	try:
 		try: release_title = release_title.encode('utf-8')
 		except: pass
-		release_title = release_title.lower().replace("'", "").lstrip('.').rstrip('.')
-		fmt = re.sub('[^a-z0-9]+', '.', release_title)
-		fmt = '.%s.' % fmt
-		fmt = re.sub(r'(.+)((?:19|20)[0-9]{2}|season.\d+|s[0-3]{1}[0-9]{1}|e\d+|complete)(.complete\.|.episode\.\d+\.|.episodes\.\d+\.\d+\.|.series|.extras|.ep\.\d+\.|.\d{1,2}\.|-|\.|\s)', '', fmt) # new for pack files
-
-# Fails for these cases
-# release_title = Game.of.Thrones.S01.1080p.BluRay.10bit.HEVC-MkvCage.Season.1.One (ENCODED)
-# fmt = .one.
-# .yelowstone.season.03.hamsterstudio.2019.
-# fmt = ''
-# may be best to pass "tvshowtitle" and "ep_title" and strip that off, as well as strip seaon/s01 type info off
-
-		if fmt == '': return None
-		else: return '.%s' % fmt
+		release_title = release_title.lower().replace('&', 'and').replace("'", "")
+		release_title = re.sub('[^a-z0-9]+', '.', release_title)
+		title = title.lower().replace('&', 'and').replace("'", "")
+		title = re.sub('[^a-z0-9]+', '.', title)
+		name_info = release_title.replace(title, '').replace(year, '')
+		if hdlr: name_info = name_info.replace(hdlr.lower(), '')
+		if episode_title:
+			episode_title = episode_title.lower().replace('&', 'and')
+			episode_title = re.sub('[^a-z0-9]+', '.', title)
+			name_info = name_info.replace(episode_title, '')
+		if pack:
+			if pack == 'season':
+				season_fill = season.zfill(2)
+				str1_replace = ['.s%s' % season, '.s%s' % season_fill, '.season.%s' % season, '.season%s' % season, '.season.%s' % season_fill, '.season%s' % season_fill, 'complete']
+				for i in str1_replace: name_info = name_info.replace(i, '')
+			if pack == 'show':
+				str2_replace = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's1', 's01']
+				for i in str2_replace: name_info = name_info.replace(i, '')
+		name_info = name_info.lstrip('.').rstrip('.')
+		name_info = '.%s.' % name_info
+		return name_info
 	except:
 		log_utils.error()
-		return None
+		return release_title
 
 
 def release_title_format(release_title):
@@ -705,47 +531,36 @@ def release_title_format(release_title):
 		return release_title
 
 
-def url_strip(url):
-	try:
-		url = unquote_plus(url)
-		if 'magnet' in url:
-			url = url.split('&dn=')[1]
-		url = url.lower().replace("'", "").lstrip('.').rstrip('.')
-		fmt = re.sub('[^a-z0-9]+', '.', url)
-		fmt = '.%s.' % fmt
-		fmt = re.sub(r'(.+)((?:19|20)[0-9]{2}|season.\d+|s[0-3]{1}[0-9]{1}|e\d+|complete)(.complete\.|.episode\.\d+\.|.episodes\.\d+\.\d+\.|.series|.extras|.ep\.\d+\.|.\d{1,2}\.|-|\.|\s)', '', fmt) # new for pack files
-		if '.http' in fmt: fmt = None
-		if fmt == '': return None
-		else: return '.%s' % fmt
-	except:
-		log_utils.error()
-		return None
-
-
-def clean_name(title, release_title):
+def clean_name(release_title):
 	try:
 		unwanted = [
 							'[.www.tamilrockers.com.]', 'tamilrockers.com', 'www.tamilrockers.com', 'www.tamilrockers.ws', 'www.tamilrockers.pl',
 							'[.www.torrenting.com.]', 'www.torrenting.com', 'www.torrenting.org', 'www-torrenting-com', 'www-torrenting-org',
 							'[katmoviehd.eu]', '[katmoviehd.to]', '[katmoviehd.tv]', '+katmoviehd.pw+', 'katmoviehd-pw',
-							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', 
+							'[.www.torrent9.uno.]', '[www.torrent9.ph.]', 'www.torrent9.nz', '[.torrent9.tv.]', '[.torrent9.cz.]', '[ torrent9.cz ]',
 							'[agusiq.torrents.pl]', '[agusiq-torrents.pl]', 'agusiq-torrents-pl',
 							'[.oxtorrent.com.]', '[oxtorrent-com]', 'oxtorrent-com',
+							'[movcr.com]', 'www.movcr.tv', 'movcr-com', 'www.movcr.to',
+							'[ex-torrenty.org]', '[xtorrenty.org]', 'xtorrenty.org',
 							'[acesse.]', '[acesse-hd-elite-me]',
 							'[torrentcouch.net]', '[torrentcouch-net]',
 							'[.www.cpasbien.cm.]', '[.www.cpasbien.pw.]',
 							'[auratorrent.pl].nastoletni.wilkoak', '[auratorrent.pl]',
 							'[.www.nextorrent.site.]', '[nextorrent.net]',
-							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]',
-							'[filetracker.pl]', 'www.scenetime.com', 'www.movcr.tv', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]',
-							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', 'xtorrenty.org', '[tv]', '[noobsubs]', 'dc.-.', '[.freecourseweb.com.]',
-							'best-torrents-net']
-		unwanted2 = ['().-.', '()--', '[..].', '[..]', '.[.].', '[.].','[.]-', '[]', '[.', '.]', ' ]-', '].', '{..}.', '{..}', '.{.}.', '{.}.', '{.}-', '{}', '{.', '.}', ' }-', '}.', '+-+-', '.-.', '-.-', '.-', '-.', '--', '-', '...', '..', '.']
+							'[www.scenetime.com]', 'www.scenetime.com',
+							'[kst.vn]', 'kst-vn',
+							'[itfriend]', '[itf]',
+							'www.2movierulz.ac', 'www.2movierulz.ms',
+							'www.3movierulz.com', 'www.3movierulz.tv',
+							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]', '[devil-torrents.pl]',
+							'[filetracker.pl]', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]', '[.www.speed.cd.]',
+							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', '[tv]', '[noobsubs]', '[.freecourseweb.com.]',
+							'best-torrents-net', '[.www.torrentday.com.]', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid']
+		unwanted2 = ['().-.', '()--', '[..].', '[..]', '.[.].', '[.].','[.]-', '[]', '[.', '.]', ' ]-', '].', '{..}.', '{..}', '.{.}.', '{.}.', '{.}-', '{}', '{.', '.}', ' }-', '}.', '+-+-', '.-.', '-.-', '.-', '-.', '--', '-', '...', '..', '.', '4..', '4.', '4].']
 
 		if release_title.lower().startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
 		release_title = strip_non_ascii_and_unprintable(release_title)
 		release_title = release_title.lstrip('/ ').replace(' ', '.')
-
 		for i in unwanted:
 			if release_title.lower().startswith(i):
 				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else i
@@ -756,6 +571,7 @@ def clean_name(title, release_title):
 		return release_title
 	except:
 		log_utils.error()
+		return release_title
 
 
 def strip_non_ascii_and_unprintable(text):
@@ -771,30 +587,15 @@ def _size(siz):
 	return float_size, str_size
 
 
-def get_size(url): # not called
-	try:
-		size = client.request(url, output='file_size')
-		# size = client.request(url, output='chunk')
-		if size == '0':
-			size = False
-		float_size, str_size = convert_size(size)
-		return float_size, str_size
-	except:
-		log_utils.error()
-		return False
-
-
 def convert_size(size_bytes, to='GB'):
 	try:
 		import math
-		if size_bytes == 0:
-			return 0, ''
+		if size_bytes == 0: return 0, ''
 		power = {'B' : 0, 'KB': 1, 'MB' : 2, 'GB': 3, 'TB' : 4, 'EB' : 5, 'ZB' : 6, 'YB': 7}
 		i = power[to]
 		p = math.pow(1024, i)
 		float_size = round(size_bytes / p, 2)
-		# if to == 'B' or to  == 'KB':
-			# return 0, ''
+		# if to == 'B' or to  == 'KB': return 0, ''
 		str_size = "%s %s" % (float_size, to)
 		return float_size, str_size
 	except:
@@ -808,32 +609,15 @@ def scraper_error(provider):
 	log_utils.log(provider.upper() + ' - Exception: \n' + str(failure), log_utils.LOGDEBUG)
 
 
-def strip_domain(url):
-	try:
-		if url.lower().startswith('http') or url.startswith('/'):
-			url = re.findall('(?://.+?|)(/.+)', url)[0]
-		url = client.replaceHTMLCodes(url)
-		try: url = url.encode('utf-8')
-		except: pass
-		return url
-	except:
-		log_utils.error()
-		return
-
-
 def is_host_valid(url, domains):
 	try:
-		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(
-				url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
+		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
 			return False, ''
 		host = __top_domain(url)
 		hosts = [domain.lower() for domain in domains if host and host in domain.lower()]
-		if hosts and '.' not in host:
-			host = hosts[0]
-		if hosts and any([h for h in ['google', 'picasa', 'blogspot'] if h in host]):
-			host = 'gvideo'
-		if hosts and any([h for h in ['akamaized', 'ocloud'] if h in host]):
-			host = 'CDN'
+		if hosts and '.' not in host: host = hosts[0]
+		if hosts and any([h for h in ['google', 'picasa', 'blogspot'] if h in host]): host = 'gvideo'
+		if hosts and any([h for h in ['akamaized', 'ocloud'] if h in host]): host = 'CDN'
 		return any(hosts), host
 	except:
 		log_utils.error()
@@ -846,75 +630,6 @@ def __top_domain(url):
 	domain = domain.split('@')[-1].split(':')[0]
 	regex = "(?:www\.)?([\w\-]*\.[\w\-]{2,3}(?:\.[\w\-]{2,3})?)$"
 	res = re.search(regex, domain)
-	if res:
-		domain = res.group(1)
+	if res: domain = res.group(1)
 	domain = domain.lower()
 	return domain
-
-
-def check_directstreams(url, hoster='', quality='SD'):
-	urls = []
-	host = hoster
-	if 'google' in url or any(x in url for x in ['youtube.', 'docid=']):
-		urls = directstream.google(url)
-		if not urls:
-			tag = directstream.googletag(url)
-			if tag: urls = [{'quality': tag[0]['quality'], 'url': url}]
-		if urls: host = 'gvideo'
-	elif 'ok.ru' in url:
-		urls = directstream.odnoklassniki(url)
-		if urls: host = 'vk'
-	elif 'vk.com' in url:
-		urls = directstream.vk(url)
-		if urls: host = 'vk'
-	elif any(x in url for x in ['akamaized', 'blogspot', 'ocloud.stream']):
-		urls = [{'url': url}]
-		if urls: host = 'CDN'
-	direct = True if urls else False
-	if not urls: urls = [{'quality': quality, 'url': url}]
-	return urls, host, direct
-
-
-def evp_decode(cipher_text, passphrase, salt=None):
-	cipher_text = base64.b64decode(cipher_text)
-	if not salt:
-		salt = cipher_text[8:16]
-		cipher_text = cipher_text[16:]
-	data = evpKDF(passphrase, salt)
-	decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(data['key'], data['iv']))
-	plain_text = decrypter.feed(cipher_text)
-	plain_text += decrypter.feed()
-	return plain_text
-
-
-def evpKDF(passwd, salt, key_size=8, iv_size=4, iterations=1, hash_algorithm="md5"):
-	target_key_size = key_size + iv_size
-	derived_bytes = ""
-	number_of_derived_words = 0
-	block = None
-	hasher = hashlib.new(hash_algorithm)
-	while number_of_derived_words < target_key_size:
-		if block is not None:
-			hasher.update(block)
-		hasher.update(passwd)
-		hasher.update(salt)
-		block = hasher.digest()
-		hasher = hashlib.new(hash_algorithm)
-		for _i in range(1, iterations):
-			hasher.update(block)
-			block = hasher.digest()
-			hasher = hashlib.new(hash_algorithm)
-		derived_bytes += block[0: min(len(block), (target_key_size - number_of_derived_words) * 4)]
-		number_of_derived_words += len(block) / 4
-	return {"key": derived_bytes[0: key_size * 4], "iv": derived_bytes[key_size * 4:]}
-
-
-def timeIt(func):
-	import time
-	fnc_name = func.__name__
-	def wrap(*args, **kwargs):
-		started_at = time.time()
-		result = func(*args, **kwargs)
-		log_utils.log('%s.%s = %s' % (__name__ , fnc_name, time.time() - started_at), log_utils.LOGDEBUG)
-		return result
-	return wrap

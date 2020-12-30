@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-05-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
@@ -74,7 +73,6 @@ class source:
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
-
 			urls = []
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
@@ -88,7 +86,6 @@ class source:
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
-
 		except:
 			source_utils.scraper_error('BTSCENE')
 			return self.sources
@@ -102,52 +99,42 @@ class source:
 
 			for post in posts:
 				link = re.findall('a title="Download Torrent Magnet" href="(magnet:.+?)"', post, re.DOTALL)
-				if not link:
-					continue
+				if not link: continue
 
 				for url in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
+
 					name = url.split('&dn=')[1]
-					name = source_utils.clean_name(self.title, name)
-					if source_utils.remove_lang(name, self.episode_title):
-						continue
+					name = source_utils.clean_name(name)
+					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+					name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+					if source_utils.remove_lang(name_info): continue
 
-					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
-						continue
-
-					if self.episode_title: 	# filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-						if not source_utils.filter_single_episodes(self.hdlr, name):
-							continue
-					elif not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-						if any(re.search(item, name.lower()) for item in ep_strings):
-							continue
+						if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 					try:
 						seeders = int(client.parseDOM(post, 'td', attrs={'class': 'seeds is-hidden-sm-mobile'})[0].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
+						if self.min_seeders > seeders: continue
 					except:
 						seeders = 0
-						pass
 
-					quality, info = source_utils.get_release_quality(name, url)
+					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
 						dsize = 0
-						pass
 					info = ' | '.join(info)
 
-					self.sources.append({'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+					self.sources.append({'provider': 'btscene', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 													'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('BTSCENE')
-			pass
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -200,18 +187,14 @@ class source:
 
 			for post in posts:
 				link = re.findall('a title="Download Torrent Magnet" href="(magnet:.+?)"', post, re.DOTALL)
-				if not link:
-					continue
+				if not link: continue
 
 				for url in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
-
 					hash = re.compile('btih:(.*?)&').findall(url)[0]
 					name = url.split('&dn=')[1]
-					name = source_utils.clean_name(self.title, name)
-					if source_utils.remove_lang(name):
-						continue
+					name = source_utils.clean_name(name)
 
 					if not self.search_series:
 						if not self.bypass_filter:
@@ -222,38 +205,36 @@ class source:
 					elif self.search_series:
 						if not self.bypass_filter:
 							valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
-							if not valid:
-								continue
+							if not valid: continue
 						else:
 							last_season = self.total_seasons
 						package = 'show'
 
+					name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
+					if source_utils.remove_lang(name_info): continue
+
 					try:
 						seeders = int(client.parseDOM(post, 'td', attrs={'class': 'seeds is-hidden-sm-mobile'})[0].replace(',', ''))
-						if self.min_seeders > seeders:
-							continue
+						if self.min_seeders > seeders: continue
 					except:
 						seeders = 0
-						pass
 
-					quality, info = source_utils.get_release_quality(name, url)
+					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
 						dsize = 0
-						pass
 					info = ' | '.join(info)
 
-					item = {'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,
+					item = {'provider': 'btscene', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
 					if self.search_series:
 						item.update({'last_season': last_season})
 					self.sources.append(item)
 		except:
 			source_utils.scraper_error('BTSCENE')
-			pass
 
 
 	def resolve(self, url):

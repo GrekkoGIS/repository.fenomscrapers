@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 9-20-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
@@ -59,100 +58,86 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
 			scraper = cfscrape.create_scraper()
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			aliases = data['aliases']
+			episode_title = data['title'] if 'tvshowtitle' in data else None
+			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-
-			try:
-				url = self.search_link % quote_plus(query)
-				url = urljoin(self.base_link, url)
-				# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
-				r = scraper.get(url).content
-				posts = client.parseDOM(r, 'div', attrs={'class': 'post'})
-
-				items = []
-				dupes = []
-				for post in posts:
-					try:
-						content = client.parseDOM(post, "div", attrs={"class": "postContent"})
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', content[0])[0]
-						u = client.parseDOM(content, "h2")
-						u = client.parseDOM(u, 'a', ret='href')
-						u = [(i.strip('/').split('/')[-1], i, size) for i in u]
-						items += u
-					except:
-						source_utils.scraper_error('SCENERLS')
-						pass
-			except:
-				source_utils.scraper_error('SCENERLS')
-				pass
-
-			for item in items:
-				try:
-					name = item[0]
-					name = client.replaceHTMLCodes(name)
-					if source_utils.remove_lang(name):
-						return
-					t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and')
-					if cleantitle.get(t) != cleantitle.get(title):
-						continue
-					if hdlr not in name:
-						continue
-
-					# check year for reboot/remake show issues if year is available-crap shoot
-					# if 'tvshowtitle' in data:
-						# if re.search(r'([1-3][0-9]{3})', name):
-							# if not any(value in name for value in [data['year'], str(int(data['year'])+1), str(int(data['year'])-1)]):
-								# continue
-
-					quality, info = source_utils.get_release_quality(name, item[1])
-					try:
-						dsize, isize = source_utils._size(item[2])
-						info.insert(0, isize)
-					except:
-						dsize = 0
-						pass
-					info = ' | '.join(info)
-
-					url = item[1]
-					if any(x in url for x in ['.rar', '.zip', '.iso', '.sample.']):
-						continue
-
-					url = client.replaceHTMLCodes(url)
-					try: url = url.encode('utf-8')
-					except: pass
-					if url in str(sources):
-						continue
-
-					host = re.findall('([\w]+[.][\w]+)$', urlparse(url.strip().lower()).netloc)[0]
-					if not host in hostDict:
-						continue
-
-					host = client.replaceHTMLCodes(host)
-					try: host = host.encode('utf-8')
-					except: pass
-
-					sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url, 'info': info,
-									'direct': False, 'debridonly': True, 'size': dsize})
-				except:
-					source_utils.scraper_error('SCENERLS')
-					pass
-			return sources
+			url = self.search_link % quote_plus(query)
+			url = urljoin(self.base_link, url)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			r = scraper.get(url).content
+			posts = client.parseDOM(r, 'div', attrs={'class': 'post'})
+			if not posts: return sources
 		except:
 			source_utils.scraper_error('SCENERLS')
 			return sources
+
+		items = []
+		for post in posts:
+			try:
+				content = client.parseDOM(post, "div", attrs={"class": "postContent"})
+				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', content[0])[0]
+				u = client.parseDOM(content, "h2")
+				u = client.parseDOM(u, 'a', ret='href')
+				u = [(i.strip('/').split('/')[-1], i, size) for i in u]
+				items += u
+			except:
+				source_utils.scraper_error('SCENERLS')
+				return sources
+
+		for item in items:
+			try:
+				name = item[0]
+				name = client.replaceHTMLCodes(name)
+				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+				if source_utils.remove_lang(name_info): continue
+
+				# check year for reboot/remake show issues if year is available-crap shoot
+				# if 'tvshowtitle' in data:
+					# if re.search(r'([1-3][0-9]{3})', name):
+						# if not any(value in name for value in [year, str(int(year)+1), str(int(year)-1)]):
+							# continue
+
+				quality, info = source_utils.get_release_quality(name_info, item[1])
+				try:
+					dsize, isize = source_utils._size(item[2])
+					info.insert(0, isize)
+				except:
+					dsize = 0
+				info = ' | '.join(info)
+
+				url = item[1]
+				if any(x in url for x in ['.rar', '.zip', '.iso', '.sample.']): continue
+
+				url = client.replaceHTMLCodes(url)
+				try: url = url.encode('utf-8')
+				except: pass
+				if url in str(sources): continue
+
+				host = re.findall('([\w]+[.][\w]+)$', urlparse(url.strip().lower()).netloc)[0]
+				if not host in hostDict: continue
+
+				host = client.replaceHTMLCodes(host)
+				try: host = host.encode('utf-8')
+				except: pass
+
+				sources.append({'provider': 'scenerls', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
+											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('SCENERLS')
+		return sources
 
 
 	def resolve(self, url):

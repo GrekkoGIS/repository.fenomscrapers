@@ -1,4 +1,5 @@
-# (created 10-29-2020)
+# -*- coding: UTF-8 -*-
+# (updated 12-23-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -60,7 +61,7 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			search_id = url + " S" + str(season.zfill(2)) + "e" + str(episode.zfill(2))
+			search_id = url + " S" + str(season.zfill(2)) + "E" + str(episode.zfill(2))
 			return search_id
 		except:
 			source_utils.scraper_error('GDRIVE')
@@ -78,38 +79,38 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
 			if cloudflare_worker_url == '': return sources
 			simpleQuery = get_simple(url)
 			results = getResults(url)
 			results = filteredResults(results, simpleQuery)
-			if not results:
-				return sources
+			if not results: return sources
+		except:
+			source_utils.scraper_error('GDRIVE')
+			return sources
 
-			for result in results:
+		for result in results:
+			try:
 				link = result["link"]
 				name = unquote(link.rsplit("/")[-1])
-				# log_utils.log('name = %s' % name, log_utils.LOGDEBUG)
+				# name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title) # needs a decent rewrite to get this
 
-				quality, info = source_utils.get_release_quality(link, link)
+				quality, info = source_utils.get_release_quality(name, link)
 				try:
-					size = result["size_gb"]
-					size = str(size) + ' GB'
+					size = str(result["size_gb"]) + ' GB'
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
 					source_utils.scraper_error('GDRIVE')
 					dsize = 0
-					pass
 				info = ' | '.join(info)
 
-				sources.append({'source': 'Google Drive', 'quality': quality, 'name': name, 'language': 'en',
+				sources.append({'provider': 'gdrive', 'source': 'Google Drive', 'quality': quality, 'name': name, 'language': 'en',
 											'info': info, 'url': link, 'direct': True, 'debridonly': False, 'size': dsize})
-			return sources
-		except:
-			source_utils.scraper_error('GDRIVE')
-			return sources
-
+			except:
+				source_utils.scraper_error('GDRIVE')
+		return sources
 
 	def resolve(self, url):
 		return url

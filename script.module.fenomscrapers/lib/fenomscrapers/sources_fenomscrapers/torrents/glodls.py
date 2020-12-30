@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 10-05-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
-    Fenomscrapers Project
+	Fenomscrapers Project
 '''
 
 import re
@@ -74,37 +73,33 @@ class source:
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
-
-			if 'tvshowtitle' in data:
-				url = self.tvsearch.format(quote_plus(query))
-			else:
-				url = self.moviesearch.format(quote_plus(query))
+			if 'tvshowtitle' in data: url = self.tvsearch.format(quote_plus(query))
+			else: url = self.moviesearch.format(quote_plus(query))
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-
 			items = self.get_sources(url)
-			for item in items:
-				try:
-					name = item[0]
-					url = unquote_plus(item[1]).replace('&amp;', '&').replace(' ', '.')
-					url = url.split('&tr')[0]
-
-					hash = re.compile('btih:(.*?)&').findall(url)[0].lower()
-					quality, info = source_utils.get_release_quality(name, url)
-
-					if item[2] != '0':
-						info.insert(0, item[2])
-					info = ' | '.join(info)
-
-					sources.append({'source': 'torrent', 'seeders': item[4], 'hash': hash, 'name': name, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[3]})
-				except:
-					source_utils.scraper_error('GLODLS')
-					pass
-			return sources
+			if not items: return sources
 		except:
 			source_utils.scraper_error('GLODLS')
 			return sources
+
+		for item in items:
+			try:
+				name = item[0] ; name_info = item[1]
+				url = unquote_plus(item[2]).replace('&amp;', '&').replace(' ', '.')
+				url = url.split('&tr')[0]
+				hash = re.compile('btih:(.*?)&').findall(url)[0].lower()
+				quality, info = source_utils.get_release_quality(name_info, url)
+
+				if item[3] != '0':
+					info.insert(0, item[3])
+				info = ' | '.join(info)
+
+				sources.append({'provider': 'glodls', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})
+			except:
+				source_utils.scraper_error('GLODLS')
+		return sources
 
 
 	def get_sources(self, url):
@@ -112,6 +107,7 @@ class source:
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = client.request(url, headers=headers)
+			if not r: return items
 			posts = client.parseDOM(r, 'tr', attrs={'class': 't-row'})
 			posts = [i for i in posts if not 'racker:' in i]
 
@@ -121,39 +117,28 @@ class source:
 
 				name = client.parseDOM(post, 'a', ret='title')[0]
 				name = unquote_plus(name)
-				name = source_utils.clean_name(self.title, name)
-				if source_utils.remove_lang(name, self.episode_title):
-					continue
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+				if source_utils.remove_lang(name_info): continue
 
-				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year):
-					continue
-
-				if self.episode_title: # filter for episode multi packs (ex. S01E01-E17 is also returned in query)
-					if not source_utils.filter_single_episodes(self.hdlr, name):
-						continue
-				elif not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-					if any(re.search(item, name.lower()) for item in ep_strings):
-						continue
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
 					seeders = int(re.findall("<td.*?<font color='green'><b>([0-9]+|[0-9]+,[0-9]+)</b>", post)[0].replace(',', ''))
-					if self.min_seeders > seeders:
-						continue
+					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
-					pass
 
 				try:
 					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
 					dsize, isize = source_utils._size(size)
 				except:
-					isize = '0'
-					dsize = 0
-					pass
+					isize = '0' ; dsize = 0
 
-				items.append((name, url, isize, dsize, seeders))
-
+				items.append((name, name_info, url, isize, dsize, seeders))
 			return items
 		except:
 			source_utils.scraper_error('GLODLS')

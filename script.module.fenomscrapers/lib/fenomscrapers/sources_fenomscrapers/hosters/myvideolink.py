@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 9-20-2020)
-
+# modified by Venom for Fenomscrapers (updated 12-23-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -22,9 +21,9 @@ class source:
 		self.priority = 22
 		self.language = ['en']
 		self.domains = ['new.myvideolinks.net']
-		self.base_link = 'http://forum.myvideolinks.net'
-		self.search_link = '/search.php?keywords=%s'
-
+		self.base_link = 'http://new.myvideolinks.net'
+		self.search_link = '/?s=%s'
+		# http://new.myvideolinks.net/search/%s/feed/rss2/
 
 	def movie(self, imdb, title, aliases, year):
 		try:
@@ -58,27 +57,25 @@ class source:
 
 	def sources(self, url, hostDict):
 		sources = []
+		if not url: return sources
 		try:
-			if not url: return sources
-
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
-
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			episode_title = data['title'] if 'tvshowtitle' in data else None
+			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 			query = '%s %s' % (title, hdlr)
 			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			url = urljoin(self.base_link, self.search_link)
 			url = url % quote_plus(query)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
-
 			r = client.request(url, timeout='5')
 			if not r or 'Error 404' in r: return sources
-
-			r = client.parseDOM(r, 'div', attrs={'class': 'page-body'})
-			r1 = client.parseDOM(r, 'div', attrs={'class': 'postbody'})
+			r = client.parseDOM(r, 'div', attrs={'id': 'content'})
+			r1= client.parseDOM(r, 'h2')
 			posts = zip(client.parseDOM(r1, 'a', ret='href'), client.parseDOM(r1, 'a'))
 		except:
 			source_utils.scraper_error('MYVIDEOLINK')
@@ -89,64 +86,82 @@ class source:
 			try:
 				name = source_utils.strip_non_ascii_and_unprintable(post[1])
 				if '<' in name: name = re.sub('<.*?>', '', name)
-				name = client.replaceHTMLCodes(name).replace(' ', '.')
-				if 'tvshowtitle' in data:
-					if not source_utils.check_title(title, aliases, name, hdlr, data['year']):
-						if not source_utils.check_title(title, aliases, name, 'S%02d' % int(data['season']), data['year']): continue
-				else:
-					if not source_utils.check_title(title, aliases, name, hdlr, data['year']): continue
-				link = urljoin(self.base_link, post[0].lstrip('.').replace('&amp;', '&'))
-				base_u = client.request(link, timeout='5')
-				list = client.parseDOM(base_u, 'div', attrs={'class': 'content'})
+				name = client.replaceHTMLCodes(name)
+				name = source_utils.clean_name(name)
 
 				if 'tvshowtitle' in data:
-					string = list[0].replace('\r', '').replace('\n', '').replace('\t', '')
-					regex = hdlr + '.*?</ul>'
-					list = zip(re.findall(hdlr, string), re.findall(regex, string, re.DOTALL))
-					for links in list:
-						u = re.findall('\'(http.+?)\'', links[1]) + re.findall('\"(http.+?)\"', links[1])
-						t = links[0] ; s = 0
-						items += [(t, i, s) for i in u]
+					if not source_utils.check_title(title, aliases, name, hdlr, year):
+						if not source_utils.check_title(title, aliases, name, 'S%02d' % int(data['season']), year):
+							if not source_utils.check_title(title, aliases, name, 'Season.%d' % int(data['season']), year):
+								if not source_utils.check_title(title, aliases, name, 'S%d' % int(data['season']), year): continue
 				else:
-					u = client.parseDOM(list, 'ul')[0]
-					u = re.findall('\'(http.+?)\'', u) + re.findall('\"(http.+?)\"', u)
-					try: t = post[1].encode('utf-8')
-					except: t = post[1]
-					s = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', list[0])[0]
-					items += [(t, i, s) for i in u]
-			except:
-				source_utils.scraper_error('MYVIDEOLINK')
-				pass
+					if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 
-		for item in items:
-			try:
-				url = client.replaceHTMLCodes(item[1])
-				try: url = url.encode('utf-8')
-				except: pass
-				if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
-				if url in str(sources): continue
-				valid, host = source_utils.is_host_valid(url, hostDict)
-				if not valid: continue
-				host = client.replaceHTMLCodes(host)
-				try: host = host.encode('utf-8')
-				except: pass
-				quality, info = source_utils.get_release_quality(name, url)
-				try:
-					size = item[2]
-					dsize, isize = source_utils._size(size)
-					if isize:
-						info.insert(0, isize)
-				except:
-					dsize = 0
-					pass
-				fileType = source_utils.getFileType(name)
-				info.append(fileType)
-				info = ' | '.join(info) if fileType else info[0]
-				sources.append({'source': host, 'quality': quality, 'language': 'en', 'url': url,
-											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				link = post[0]
+				results = client.request(link, timeout='5')
+				results = client.parseDOM(results, 'div', attrs={'class': 'entry-content cf'})[0]
+
+				if 'tvshowtitle' in data:
+					isSeasonList = False
+					if 'Season' in name or 'S%02d' % int(data['season']) in name:
+						isSeasonList = True
+					results = re.sub(r'\n', '', results)
+					results = re.sub(r'\t', '', results).replace('> <', '><')
+					test = re.findall(r'<p><b>(.*?)</ul>', results, re.DOTALL) # parsing this site for episodes is a bitch, fuck it this is close as I'm doing
+					for x in test:
+						test2 = re.search(r'(.*?)</b>', x).group(1)
+						if hdlr in test2:
+							if isSeasonList:
+								name = re.sub(r'\.Season\.\d+', '.%s.' % test2.replace(' ', '.'), name)
+								name = re.sub(r'\.S\d+', '.%s' % test2.replace(' ', '.'), name)
+							else: name = test2
+							links = client.parseDOM(x, 'a', ret='href')
+							break
+						else:
+							try: test3 = re.search(r'<p><b>(.*?)</b></p>', x).group(1)
+							except: continue
+							if hdlr in test3:
+								if isSeasonList:
+									name = re.sub(r'\.Season\.\d+', '.%s.' % test3.replace(' ', '.'), name)
+									name = re.sub(r'\.S\d+', '.%s' % test3.replace(' ', '.'), name)
+								else: name = test3
+								links = client.parseDOM(x, 'a', ret='href')
+								break
+				else:
+					links = client.parseDOM(results, 'a', attrs={'class': 'autohyperlink'}, ret='href')
+
+				for link in links:
+					try:
+						url = client.replaceHTMLCodes(link)
+						try: url = url.encode('utf-8')
+						except: pass
+
+						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
+						if url in str(sources): continue
+
+						valid, host = source_utils.is_host_valid(url, hostDict)
+						if not valid: continue
+
+						host = client.replaceHTMLCodes(host)
+						try: host = host.encode('utf-8')
+						except: pass
+
+						quality, info = source_utils.get_release_quality(name_info, url)
+						try:
+							size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', results)[0]
+							dsize, isize = source_utils._size(size)
+							info.insert(0, isize)
+						except:
+							dsize = 0
+						info = ' | '.join(info)
+
+						sources.append({'provider': 'myvideolink', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
+													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+					except:
+						source_utils.scraper_error('MYVIDEOLINK')
 			except:
 				source_utils.scraper_error('MYVIDEOLINK')
-				pass
 		return sources
 
 
