@@ -107,9 +107,9 @@ class source:
 				stream_url = down_url + quote('/%s/%s/%s%s/%s%s' % (dl_farm, dl_port, post_hash, ext, post_title, ext))
 				file_name = post_title
 				name = source_utils.clean_name(file_name)
+				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
-				if hdlr not in name.upper(): continue # easynews randomly responds with wrong season/episode
 
 				file_dl = stream_url + '|Authorization=%s' % (quote(auth))
 

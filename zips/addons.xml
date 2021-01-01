@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.1.7" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.1.8" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -28,27 +28,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.1.7 - Dec. 30, 2020[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] 7torrents torrent scraper removed due to Cloudflare v2
-    challenge.[/I]
-[COLOR yellow]--[/COLOR][I] Moviemagnet torrent scraper removed, site appears to
-    be dead.[/I]
-[COLOR yellow]--[/COLOR][I] Removed rlsbb and watchseries hosters due to
-    Cloudflare v2 challenge.[/I]
-[COLOR yellow]--[/COLOR][I] Removed ganool, onlineseries, and watchseriestv
-    hosters.  Hosters appear to be dead.[/I]
-[COLOR yellow]--[/COLOR][I] Updated all scrapers to pass "link_name" to
-    be shown by addon.[/I]
-[COLOR yellow]--[/COLOR][I] Item above now allows source select to be shown with
-     "link_name" for all vs. old standard info line.[/I]
-[COLOR yellow]--[/COLOR][I] Removed 5movies, cartoonhd, filmxy, watchepisodes, and
-    watchserieshd.  These sites do not provide the minimum
-    standard of file info for addon display so they are removed.[/I]
-[COLOR yellow]--[/COLOR][I] Added new Heading section groups to "Premium Hosters".
-    Account Required scrapers, and Local Scrapers are now
-    grouped.[/I]
-[COLOR yellow]--[/COLOR][I] Removed unused modules for above changes.[/I]
-[COLOR yellow]--[/COLOR][I] Removed unused functions for above changes.[/I]
+[B][COLOR red]Update - v1.1.8 - Jan. 01, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added "exkinoray" group filter to undesireables.
+    Removes single russian audio trakts.[/I]
+[COLOR yellow]--[/COLOR][I] Updated "easynews" title check for better title matches.[/I]
 		</news>
 	</extension>
 </addon>

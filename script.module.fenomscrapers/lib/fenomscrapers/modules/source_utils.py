@@ -40,7 +40,7 @@ UNDESIREABLES = ['400p.octopus', '720p.octopus', '1080p.octopus', 'alexfilm', 'b
 			  'courage.bambey', '.cbr', '.cbz', 'coldfilm', 'dilnix', 'dlrip', 'dutchreleaseteam', 'e.book.collection', 'empire.minutemen', 'eniahd',
 			  '.exe', 'extras.only', 'gears.media', 'gearsmedia', 'hamsterstudio', 'hdrezka', 'hdtvrip', 'idea.film', 'ideafilm',
 			  'jaskier', 'kb.1080p', 'kb.720p', 'kb.400p', 'kerob', 'kinokopilka', 'kravec', 'kuraj.bambey', 'lakefilm', 'lostfilm',
-			  'megapeer', 'minutemen.empire', 'omskbird', 'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'sample',
+			  'megapeer', 'minutemen.empire', 'omskbird', 'newstudio', 'paravozik', 'profix.media', 'rifftrax', 'exkinoray', 'sample',
 			  'soundtrack', 'subtitle.only', 'teaser', 'trailer', 'tumbler.studio', 'tvshows', 'vostfr', 'webdlrip', 'webhdrip', 'wish666']
 
 season_list = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eigh', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
