@@ -22,8 +22,7 @@ class source:
 	def __init__(self):
 		self.priority = 35
 		self.language = ['en']
-		self.base_link = 'https://filepursuit.p.rapidapi.com'
-		# 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
+		self.base_link = 'https://filepursuit.p.rapidapi.com' # 'https://rapidapi.com/azharxes/api/filepursuit' to obtain key
 		self.search_link = '/?type=video&q=%s'
 
 

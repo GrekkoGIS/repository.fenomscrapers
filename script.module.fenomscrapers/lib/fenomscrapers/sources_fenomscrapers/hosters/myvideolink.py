@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-04-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -142,10 +142,6 @@ class source:
 
 						valid, host = source_utils.is_host_valid(url, hostDict)
 						if not valid: continue
-
-						host = client.replaceHTMLCodes(host)
-						try: host = host.encode('utf-8')
-						except: pass
 
 						quality, info = source_utils.get_release_quality(name_info, url)
 						try:

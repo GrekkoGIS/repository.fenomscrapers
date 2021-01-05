@@ -61,7 +61,8 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			search_id = url + " S" + str(season.zfill(2)) + "E" + str(episode.zfill(2))
+			# search_id = url + " S" + str(season.zfill(2)) + "E" + str(episode.zfill(2))
+			search_id = url + " S" + season.zfill(2) + "E" + episode.zfill(2)
 			return search_id
 		except:
 			source_utils.scraper_error('GDRIVE')
@@ -111,6 +112,7 @@ class source:
 			except:
 				source_utils.scraper_error('GDRIVE')
 		return sources
+
 
 	def resolve(self, url):
 		return url

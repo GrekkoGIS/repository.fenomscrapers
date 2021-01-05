@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-23-2020)
+# created by Venom for Fenomscrapers (updated 1-04-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -76,8 +76,8 @@ class source:
 			else: url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
-
 			r = client.request(url)
+			if not r: return sources
 			r = r.replace('\r', '').replace('\n', '').replace('\t', '')
 			r = client.parseDOM(r, 'div', attrs={'class': 'card'})
 			if not r: return sources
@@ -87,16 +87,19 @@ class source:
 
 		for i in r:
 			try:
+				if 'magnet' not in i: continue
 				url = re.compile('href="(magnet.+?)"').findall(i)[0]
 				try: url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
 				except: url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 				url = url.split('&tr=')[0].replace(' ', '.')
 				hash = re.compile('btih:(.*?)&').findall(url)[0]
 
-				name = url.split('&dn=')[1]
-				name = source_utils.clean_name(name)
+				release_name = url.split('&dn=')[1]
+				release_name = source_utils.clean_name(release_name)
+				name = client.parseDOM(i, 'img', attrs={'class': 'thumbnails'}, ret='alt')[0].replace(u'\xa0', u' ')
+
 				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), year): continue
-				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+				name_info = source_utils.info_from_name(release_name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 
 				seeders = 0 # seeders not available on topnow
@@ -109,7 +112,7 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'topnow', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+				sources.append({'provider': 'topnow', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': release_name, 'name_info': name_info, 'quality': quality,
 										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('TOPNOW')

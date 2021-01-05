@@ -611,7 +611,7 @@ def scraper_error(provider):
 
 def is_host_valid(url, domains):
 	try:
-		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso']):
+		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.', '.sample.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso', '.sample']):
 			return False, ''
 		host = __top_domain(url)
 		hosts = [domain.lower() for domain in domains if host and host in domain.lower()]
@@ -625,11 +625,14 @@ def is_host_valid(url, domains):
 
 
 def __top_domain(url):
-	elements = urlparse(url)
-	domain = elements.netloc or elements.path
-	domain = domain.split('@')[-1].split(':')[0]
-	regex = "(?:www\.)?([\w\-]*\.[\w\-]{2,3}(?:\.[\w\-]{2,3})?)$"
-	res = re.search(regex, domain)
-	if res: domain = res.group(1)
-	domain = domain.lower()
-	return domain
+	try:
+		elements = urlparse(url)
+		domain = elements.netloc or elements.path
+		domain = domain.split('@')[-1].split(':')[0]
+		regex = "(?:www\.)?([\w\-]*\.[\w\-]{2,3}(?:\.[\w\-]{2,3})?)$"
+		res = re.search(regex, domain)
+		if res: domain = res.group(1)
+		domain = domain.lower()
+		return domain
+	except:
+		log_utils.error()

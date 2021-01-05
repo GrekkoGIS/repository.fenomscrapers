@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-04-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -110,28 +110,22 @@ class source:
 						# if not any(value in name for value in [year, str(int(year)+1), str(int(year)-1)]):
 							# continue
 
-				quality, info = source_utils.get_release_quality(name_info, item[1])
+				url = item[1]
+				url = client.replaceHTMLCodes(url)
+				try: url = url.encode('utf-8')
+				except: pass
+				if url in str(sources): continue
+
+				valid, host = source_utils.is_host_valid(url, hostDict)
+				if not valid: continue
+
+				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils._size(item[2])
 					info.insert(0, isize)
 				except:
 					dsize = 0
 				info = ' | '.join(info)
-
-				url = item[1]
-				if any(x in url for x in ['.rar', '.zip', '.iso', '.sample.']): continue
-
-				url = client.replaceHTMLCodes(url)
-				try: url = url.encode('utf-8')
-				except: pass
-				if url in str(sources): continue
-
-				host = re.findall('([\w]+[.][\w]+)$', urlparse(url.strip().lower()).netloc)[0]
-				if not host in hostDict: continue
-
-				host = client.replaceHTMLCodes(host)
-				try: host = host.encode('utf-8')
-				except: pass
 
 				sources.append({'provider': 'scenerls', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
 											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})

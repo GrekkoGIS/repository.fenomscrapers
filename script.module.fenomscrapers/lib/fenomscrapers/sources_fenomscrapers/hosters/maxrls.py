@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-04-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -117,11 +117,14 @@ class source:
 					urls = link[0]
 					results = re.compile('href="(.+?)"', re.DOTALL).findall(urls)
 					for url in results:
-						if url in str(self.sources): return
+						if url in str(self.sources): continue
+						valid, host = source_utils.is_host_valid(url, self.hostDict)
+						if not valid: continue
+
 						name = re.sub(r'(<span.*?>)', '', link[2]).replace('</span>', '')
 						name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-						quality, info = source_utils.get_release_quality(name_info, url)
 
+						quality, info = source_utils.get_release_quality(name_info, url)
 						try:
 							dsize, isize = source_utils._size(link[1])
 							info.insert(0, isize)
@@ -129,11 +132,8 @@ class source:
 							dsize = 0
 						info = ' | '.join(info)
 
-						valid, host = source_utils.is_host_valid(url, self.hostDict)
-						if not valid:
-							continue
-						self.sources.append({'provider': 'maxrls', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
-														'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+						self.sources.append({'provider': 'maxrls', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en',
+															'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('MAXRLS')
 

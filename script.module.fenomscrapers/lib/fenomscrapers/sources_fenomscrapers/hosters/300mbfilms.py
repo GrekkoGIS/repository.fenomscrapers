@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-04-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -109,17 +109,12 @@ class source:
 
 			for item in urls:
 				if 'earn-money' in item[0]: continue
-				if any(x in item[0] for x in ['.rar', '.zip', '.iso', '.sample']): continue
 				url = client.replaceHTMLCodes(item[0])
 				try: url = url.encode('utf-8')
 				except: pass
 
 				valid, host = source_utils.is_host_valid(url, hostDict)
 				if not valid: continue
-				host = client.replaceHTMLCodes(host)
-				try: host = host.encode('utf-8')
-				except: pass
-
 				sources.append({'provider': '300mbfilms', 'source': host, 'name': item[1], 'name_info': item[2], 'quality': item[3], 'language': 'en', 'url': url,
 											'info': item[4], 'direct': False, 'debridonly': True, 'size': item[5]})
 			return sources

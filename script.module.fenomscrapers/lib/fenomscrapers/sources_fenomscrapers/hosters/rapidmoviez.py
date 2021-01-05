@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers  (updated 12-23-2020)
+# modified by Venom for Fenomscrapers  (updated 1-04-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -156,13 +156,14 @@ class source:
 			urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''',
 									i.content, flags=re.MULTILINE | re.DOTALL)
 			urls = [i for i in urls if not i.endswith(('.rar', '.zip', '.iso', '.idx', '.sub', '.srt'))]
-			for url in urls:
+			for link in urls:
+				url = client.replaceHTMLCodes(link)
+				try: url = url.encode('utf-8')
+				except: pass
 				if url in str(self.sources): continue
 
 				valid, host = source_utils.is_host_valid(url, self.hostDict)
 				if not valid: continue
-				host = client.replaceHTMLCodes(host)
-				host = host.encode('utf-8')
 
 				quality, info = source_utils.get_release_quality(name, url)
 				try:
