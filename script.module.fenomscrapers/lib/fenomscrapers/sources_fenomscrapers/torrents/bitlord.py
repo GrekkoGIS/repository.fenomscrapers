@@ -76,7 +76,7 @@ class source:
 			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -117,7 +117,7 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
@@ -166,7 +166,7 @@ class source:
 			self.season_xx = self.season_x.zfill(2)
 			self.headers = cache.get(self._get_token_and_cookies, 24)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						quote_plus(query + ' S%s' % self.season_xx),
 						quote_plus(query + ' Season %s' % self.season_x)
@@ -221,7 +221,7 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				if not self.search_series:
 					if not self.bypass_filter:

@@ -23,7 +23,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 29
+		self.priority = 24
 		self.language = ['en']
 		self.domains = ['rmz.cr', 'rapidmoviez.site']
 		self.base_link = 'http://rmz.cr/'
@@ -68,16 +68,17 @@ class source:
 			url = urljoin(self.base_link, self.search_link % (quote_plus(title)))
 			r = self.scraper.get(url, headers=self.headers).content
 				# switch to client.parseDOM() to rid import
+			if not r: return None
 			r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
 			r = dom_parser.parse_dom(r.content, 'li')
 			r = [(dom_parser.parse_dom(i, 'a', {'class': 'title'})) for i in r]
 			r = [(i[0].attrs['href'], i[0].content) for i in r]
 			r = [(urljoin(self.base_link, i[0])) for i in r if cleantitle.get(title) in cleantitle.get(i[1]) and year in i[1]]
 			if r: return r[0]
-			else: return
+			else: return None
 		except:
 			source_utils.scraper_error('RAPIDMOVIEZ')
-			return
+			return None
 
 
 	def sources(self, url, hostDict):
@@ -153,8 +154,7 @@ class source:
 			for i in l:
 				s += i.content
 
-			urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''',
-									i.content, flags=re.MULTILINE | re.DOTALL)
+			urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''', i.content, flags=re.M | re.S)
 			urls = [i for i in urls if not i.endswith(('.rar', '.zip', '.iso', '.idx', '.sub', '.srt'))]
 			for link in urls:
 				url = client.replaceHTMLCodes(link)
@@ -167,7 +167,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name, url)
 				try:
-					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', name)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

@@ -29,7 +29,7 @@ def get_simple(title):
 	title = title.lower()
 	if "/" in title:
 		title = title.split("/")[-1].replace("'", "").replace("%20", " ")
-	title = re.sub("[^a-zA-Z0-9]", " ", title)
+	title = re.sub(r"[^a-zA-Z0-9]", " ", title)
 	while "  " in title:
 		title = title.replace("  ", " ")
 	title = title.strip()
@@ -46,7 +46,7 @@ def filteredResults(results, simpleQuery):
 
 class source:
 	def __init__(self):
-		self.priority = 0
+		self.priority = 1
 		self.language = ['en']
 
 

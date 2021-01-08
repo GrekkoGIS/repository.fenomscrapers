@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers(updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-08-2020)
 '''
 	Fenomscrapers Project
 '''
@@ -21,15 +21,17 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
-		self.domains = ['thekat.app', 'kat.li', 'thekat.info', 'kickass.cm', 'kickass.ws',
-								'kickasshydra.net', 'kkickass.com', 'kathydra.com', 'kickass.onl',
-								'kickasstorrents.id', 'kickasst.net', 'thekat.cc', 'kkat.net',
-								'thekat.ch', 'kickasstorrents.bz', 'kickass-kat.com']
+		self.domains = ['kick4ss.com', 'thekat.info', 'kickass.cm', 'kickass.ws', 'kickasst.net',
+								'kickasshydra.dev', 'kickasshydra.net', 'kathydra.com', 'kickass.onl',
+								'kickasstorrents.id', 'thekat.cc', 'kkat.net', 'kickasstorrents.bz']
 		self._base_link = None
-		self.search = '/usearch/{0}%20category:movies'
-		self.search2 = '/usearch/{0}%20category:tv'
+		# self.search = '/usearch/{0}%20category:movies'
+		self.search = '/usearch/{0}%20category:movies/?field=size&sorder=desc'
+		# self.search2 = '/usearch/{0}%20category:tv'
+		self.search2 = '/usearch/{0}%20category:tv/?field=size&sorder=desc'
 		self.min_seeders = 0
 		self.pack_capable = True
+
 
 	@property
 	def base_link(self):
@@ -83,15 +85,19 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
 			if 'tvshowtitle' in data: url = self.search2.format(quote_plus(query))
 			else: url = self.search.format(quote_plus(query))
 			url = urljoin(self.base_link, url)
 			urls.append(url)
 
-			# url2 = url + '/2/'
-			# urls.append(url2)
+			if url.endswith('field=size&sorder=desc'):
+				url2 = url.rsplit("/", 1)[0] + '/2/'
+				urls.append(url2)
+			else:
+				url2 = url + '/2/'
+				urls.append(url2)
 
 			threads = []
 			for url in urls:
@@ -117,7 +123,8 @@ class source:
 				link = ref.split('url=')[1]
 
 				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				if url in str(self.sources): continue
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 				name = unquote_plus(url.split('&dn=')[1])
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
@@ -129,14 +136,14 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall('<td class="green center">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'<td class="green center">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -167,7 +174,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search2.format(quote_plus(query + ' S%s' % self.season_xx)),
 						self.search2.format(quote_plus(query + ' Season %s' % self.season_x))
@@ -202,7 +209,7 @@ class source:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
 				link = ref.split('url=')[1]
 				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 				name = unquote_plus(url.split('&dn=')[1])
 				name = source_utils.clean_name(name)
 
@@ -224,14 +231,14 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(re.findall('<td class="green center">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'<td class="green center">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -247,18 +254,18 @@ class source:
 			source_utils.scraper_error('KICKASS2')
 
 
-	def resolve(self, url):
-		return url
-
-
 	def __get_base_url(self, fallback):
 		for domain in self.domains:
 			try:
 				url = 'https://%s' % domain
 				result = client.request(url, limit=1, timeout='5')
-				result = re.findall('<title>(.+?)</title>', result, re.DOTALL)[0]
-				if result and 'Kickass' in result:
-					return url
+				try: result = re.findall('r<title>(.+?)</title>', result, re.DOTALL)[0]
+				except: result = None
+				if result and 'Kickass' in result: return url
 			except:
 				source_utils.scraper_error('KICKASS2')
 		return fallback
+
+
+	def resolve(self, url):
+		return url

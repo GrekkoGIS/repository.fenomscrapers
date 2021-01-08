@@ -358,7 +358,7 @@ def replaceHTMLCodes(txt):
 
 
 def _replaceHTMLCodes(txt):
-	txt = re.sub("(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", txt)
+	txt = re.sub(r"(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", txt)
 	txt = HTMLParser().unescape(txt)
 	txt = txt.replace("&quot;", "\"")
 	txt = txt.replace("&amp;", "&")
@@ -426,8 +426,8 @@ class cfcookie:
 				if encoding == 'gzip':
 					result = gzip.GzipFile(fileobj=StringIO(result)).read()
 
-			jschl = re.findall('name="jschl_vc" value="(.+?)"/>', result)[0]
-			init = re.findall('setTimeout\(function\(\){\s*.*?.*:(.*?)};', result)[-1]
+			jschl = re.findall(r'name="jschl_vc" value="(.+?)"/>', result)[0]
+			init = re.findall(r'setTimeout\(function\(\){\s*.*?.*:(.*?)};', result)[-1]
 			builder = re.findall(r"challenge-form\'\);\s*(.*)a.v", result)[0]
 			decryptVal = self.parseJSString(init)
 			lines = builder.split(';')
@@ -443,7 +443,7 @@ class cfcookie:
 			query = '%s/cdn-cgi/l/chk_jschl?jschl_vc=%s&jschl_answer=%s' % (netloc, jschl, answer)
 
 			if 'type="hidden" name="pass"' in result:
-				passval = re.findall('name="pass" value="(.*?)"', result)[0]
+				passval = re.findall(r'name="pass" value="(.*?)"', result)[0]
 				query = '%s/cdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (
 					netloc, quote_plus(passval), jschl, answer)
 				time.sleep(6)
@@ -483,14 +483,14 @@ class bfcookie:
 			headers = {'User-Agent': ua, 'Referer': netloc}
 			result = _basic_request(netloc, headers=headers, timeout=timeout)
 
-			match = re.findall('xhr\.open\("GET","([^,]+),', result)
+			match = re.findall(r'xhr\.open\("GET","([^,]+),', result)
 			if not match: return False
 
 			url_Parts = match[0].split('"')
 			url_Parts[1] = '1680'
 			url = urljoin(netloc, ''.join(url_Parts))
 
-			match = re.findall('rid=([0-9a-zA-Z]+)', url_Parts[0])
+			match = re.findall(r'rid=([0-9a-zA-Z]+)', url_Parts[0])
 			if not match: return False
 
 			headers['Cookie'] = 'rcksid=%s' % match[0]
@@ -501,7 +501,7 @@ class bfcookie:
 
 	# not very robust but lazieness...
 	def getCookieString(self, content, rcksid):
-		vars = re.findall('toNumbers\("([^"]+)"', content)
+		vars = re.findall(r'toNumbers\("([^"]+)"', content)
 		value = self._decrypt(vars[2], vars[0], vars[1])
 		cookie = "%s=%s;%s" % (self.COOKIE_NAME, value, rcksid)
 		return cookie
@@ -529,20 +529,20 @@ class sucuri:
 
 	def get(self, result):
 		try:
-			s = re.compile("S\s*=\s*'([^']+)").findall(result)[0]
+			s = re.compile(r"S\s*=\s*'([^']+)").findall(result)[0]
 			s = base64.b64decode(s)
 			s = s.replace(' ', '')
-			s = re.sub('String\.fromCharCode\(([^)]+)\)', r'chr(\1)', s)
-			s = re.sub('\.slice\((\d+),(\d+)\)', r'[\1:\2]', s)
-			s = re.sub('\.charAt\(([^)]+)\)', r'[\1]', s)
-			s = re.sub('\.substr\((\d+),(\d+)\)', r'[\1:\1+\2]', s)
-			s = re.sub(';location.reload\(\);', '', s)
+			s = re.sub(r'String\.fromCharCode\(([^)]+)\)', r'chr(\1)', s)
+			s = re.sub(r'\.slice\((\d+),(\d+)\)', r'[\1:\2]', s)
+			s = re.sub(r'\.charAt\(([^)]+)\)', r'[\1]', s)
+			s = re.sub(r'\.substr\((\d+),(\d+)\)', r'[\1:\1+\2]', s)
+			s = re.sub(r';location.reload\(\);', '', s)
 			s = re.sub(r'\n', '', s)
 			s = re.sub(r'document\.cookie', 'cookie', s)
 
 			cookie = '';
 			exec (s)
-			self.cookie = re.compile('([^=]+)=(.*)').findall(cookie)[0]
+			self.cookie = re.compile(r'([^=]+)=(.*)').findall(cookie)[0]
 			self.cookie = '%s=%s' % (self.cookie[0], self.cookie[1])
 
 			return self.cookie

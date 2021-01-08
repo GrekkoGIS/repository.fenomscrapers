@@ -33,7 +33,7 @@ class source:
 			url = urlencode(url)
 			return url
 		except:
-			return
+			source_utils.scraper_error('ETTV')
 
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
@@ -42,7 +42,7 @@ class source:
 			url = urlencode(url)
 			return url
 		except:
-			return
+			source_utils.scraper_error('ETTV')
 
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
@@ -54,7 +54,7 @@ class source:
 			url = urlencode(url)
 			return url
 		except:
-			return
+			source_utils.scraper_error('ETTV')
 
 
 	def sources(self, url, hostDict):
@@ -72,7 +72,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -96,18 +96,18 @@ class source:
 
 	def get_sources(self, link):
 		try:
-			url = re.compile('href="(.+?)"').findall(link)[0]
+			url = re.compile(r'href="(.+?)"').findall(link)[0]
 			url = urljoin(self.base_link, url)
 
 			result = client.request(url)
 			if not result: return
 			if 'magnet' not in result: return
 
-			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
+			url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', result, re.DOTALL)[0])
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&xl=')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
-			hash = re.compile('btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
@@ -127,7 +127,7 @@ class source:
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall(r'<b>Total Size:</b></td><td>(.*?)</td>', result, re.DOTALL)[0].strip()
+				size = re.findall(r'>Total Size:.*>(\d.*?)<', result, re.I)[0].strip()
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except:

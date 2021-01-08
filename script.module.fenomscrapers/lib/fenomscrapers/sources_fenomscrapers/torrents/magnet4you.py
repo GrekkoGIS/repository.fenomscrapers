@@ -72,7 +72,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -95,10 +95,10 @@ class source:
 	def get_sources(self, row):
 		try:
 			if 'magnet' not in row: return
-			url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
+			url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			if url in str(self.sources): return
-			hash = re.compile('btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
@@ -110,14 +110,14 @@ class source:
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			try:
-				seeders = int(re.findall('<span style="color:#008000"><strong>\s*([0-9]+)\s*</strong>', row, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'<span style="color:#008000"><strong>\s*([0-9]+)\s*</strong>', row, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
 			except:
 				seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
+				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except:

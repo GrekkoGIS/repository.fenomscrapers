@@ -20,7 +20,7 @@ from fenomscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 35
+		self.priority = 23
 		self.language = ['en']
 		self.domain = 'furk.net/'
 		self.base_link = 'https://www.furk.net'

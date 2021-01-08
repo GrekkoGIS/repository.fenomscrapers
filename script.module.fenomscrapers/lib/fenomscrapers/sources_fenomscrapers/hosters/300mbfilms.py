@@ -11,7 +11,6 @@ try:
 except ImportError:
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -73,7 +72,7 @@ class source:
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -92,7 +91,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, item[0])
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item)[0]
+						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', item)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
@@ -146,7 +145,7 @@ class source:
 					link = client.request(r1)
 				if '<strong>Single' not in link: continue
 
-				link = re.findall('<strong>Single(.+?)</tr', link, re.DOTALL)[0]
+				link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL)[0]
 				link = client.parseDOM(link, 'a', ret='href')
 				link = [(i.split('=')[-1]) for i in link]
 				for i in link:

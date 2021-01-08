@@ -26,7 +26,7 @@ SEARCH_PARAMS.update(SORT)
 
 class source:
 	def __init__(self):
-		self.priority = 35
+		self.priority = 21
 		self.language = ['en']
 		self.domain = 'easynews.com'
 		self.base_link = 'https://members.easynews.com'

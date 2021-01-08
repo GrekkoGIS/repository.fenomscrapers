@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-04-2021)
+# modified by Venom for Fenomscrapers (updated 1-08-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin, urlparse
-except ImportError: from urllib.parse import parse_qs, urljoin, urlparse
-try: from urllib import urlencode, quote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus
+try:
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode
+except ImportError:
+	from urllib.parse import parse_qs, urlencode, urljoin
 
 from fenomscrapers.modules import cfscrape
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -21,13 +20,8 @@ class source:
 	def __init__(self):
 		self.priority = 26
 		self.language = ['en']
-		self.domains = ['rlsbb.ru','rlsbb.to','rlsbb.com','rlsbb.unblocked.cx']
-		# self.base_link = 'http://rlsbb.ru'
+		self.domains = ['proxybb.com', 'rlsbb.ru', 'rlsbb.to']
 		self.base_link = 'http://proxybb.com'
-		# self.search_base_link = 'http://search.rlsbb.ru'
-		self.search_base_link = 'http://search.proxybb.com'
-		self.search_cookie = 'serach_mode=rlsbb'
-		self.search_link = '/lib/search526049.php?phrase=%s&pindex=1&content=true'
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -78,86 +72,104 @@ class source:
 			year = data['year']
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
+			isSeasonQuery = False
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-			query = query.replace("&", "and")
-			query = re.sub('\s', '-', query)
-			url = self.search_link % quote_plus(query)
-			url = urljoin(self.base_link, url)
-			# url = "http://rlsbb.ru/" + query
-			url = "http://proxybb.com/" + query
-
-			if 'tvshowtitle' not in data: url = url + "-1080p"
-			elif 'tvshowtitle' in data:
-				season = re.search('S(.*?)E', hdlr).group(1)
-				query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', title)
-				query = query + "-S" + season
-				query = query.replace("&", "and").replace("  ", " ").replace(" ", "-")
-				url = "http://rlsbb.ru/" + query
-
+			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'\s', '-', query)
+			url = urljoin(self.base_link, query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+
 			r = scraper.get(url).content
+			if not r or 'nothing was found' in r:
+				if 'tvshowtitle' in data:
+					season = re.search(r'S(.*?)E', hdlr).group(1)
+					query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', title)
+					# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
+					query = re.sub(r'\s', '-', query)
+					query = query + "-S" + season
+					url = urljoin(self.base_link, query)
+					# log_utils.log('Season url = %s' % url, log_utils.LOGDEBUG)
+					r = scraper.get(url).content
+					isSeasonQuery = True
+				else: return sources 
+			if not r or 'nothing was found' in r: return sources
 			posts = client.parseDOM(r, "div", attrs={"class": "content"})
 			if not posts: return sources
 		except:
 			source_utils.scraper_error('RLSBB')
 			return sources
 
-		items = []
-		count = 0
+		release_title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title).replace(' ', '.')
+		items = [] ; count = 0
 		for post in posts:
-			if count == 30: break
-			# log_utils.log('post = %s' % post, log_utils.LOGDEBUG)
-			# size and release_title in post but inconsistent to parse, needs wild regex
+			if count >= 300: break # to limit large link list and slow scrape time
 			try:
-				links = client.parseDOM(post, 'a', ret='href') #grabs all links in each "content" group
-				# log_utils.log('links = %s' % links, log_utils.LOGDEBUG)
-				for i in links:
-					link = i
-					if link.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
+				post_titles = re.findall(r'(?:.*>|>\sRelease Name.*|\s)(%s.*?)<' % release_title, post, re.I) #parse all matching release_title in each post(content) group
+				items = []
+				if len(post_titles) >1:
+					index = 0
+					for name in post_titles:
+						start = post_titles[index].replace('[', '\\[').replace('(', '\\(').replace(')', '\\)').replace('+', '\\+')
+						end = (post_titles[index + 1].replace('[', '\\[').replace('(', '\\(').replace(')', '\\)').replace('+', '\\+')) if index + 1 < len(post_titles) else ''
+						try: container = re.findall(r'(?:%s)([\S\s]+)(?:%s)' % (start, end), post, re.I)[0] #parse all data between release_titles in multi post(content) group
+						except:
+							source_utils.scraper_error('RLSBB')
+							continue
+						try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', container)[0].replace(',', '.')
+						except: size = '0'
+						container = client.parseDOM(container, 'a', ret='href')
+						items.append((name, size, container))
+						index += 1
+				elif len(post_titles) == 1:
+					name = post_titles[0]
+					container = client.parseDOM(post, 'a', ret='href') #parse all links in a single post(content) group
+					try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0].replace(',', '.')
+					except: size = '0'
+					items.append((name, size, container))
+				else: continue
 
-					name = link.rsplit("/", 1)[-1]
-					name = source_utils.strip_non_ascii_and_unprintable(name)
-					# log_utils.log('name = %s' % name, log_utils.LOGDEBUG)
+				for group_name, size, links in items:
+					for i in links:
+						name = group_name
+						# if isSeasonQuery and hdlr not in name.upper():
+							# name = i.rsplit("/", 1)[-1]
+							# if hdlr not in name.upper(): continue
+						if hdlr not in name.upper():
+							name = i.rsplit("/", 1)[-1]
+							if hdlr not in name.upper(): continue
 
-					if not source_utils.check_title(title, aliases, name, hdlr, year): continue
-					name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
-					# if source_utils.remove_lang(name_info): continue
-					items.append((link, name, name_info))
+						name = client.replaceHTMLCodes(name)
+						name = source_utils.strip_non_ascii_and_unprintable(name)
+						# if not source_utils.check_title(title, aliases, name, hdlr, year): continue # name above parses matching title from comments so not needed
+						# if source_utils.remove_lang(name_info): continue # not seen lang BS yet needing this.
+						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+
+						url = client.replaceHTMLCodes(str(i))
+						try: url = url.encode('utf-8')
+						except: pass
+						if url in str(sources): continue
+						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
+
+						valid, host = source_utils.is_host_valid(url, hostDict)
+						if not valid: continue
+
+						quality, info = source_utils.get_release_quality(name, url)
+						try:
+							if size == '0':
+								try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)[0].replace(',', '.')
+								except: raise Exception()
+							dsize, isize = source_utils._size(size)
+							info.insert(0, isize)
+						except:
+							dsize = 0
+						info = ' | '.join(info)
+
+						sources.append({'provider': 'rlsbb','source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
+													'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+						count += 1
 			except:
 				source_utils.scraper_error('RLSBB')
-
-
-			for item in items:
-				if count == 30: break
-				try:
-					url = str(item[0])
-					url = client.replaceHTMLCodes(url)
-					try: url = url.encode('utf-8')
-					except: pass
-					if url in str(sources): continue
-
-					name = str(item[1])
-					name_info = str(item[2])
-
-					valid, host = source_utils.is_host_valid(url, hostDict)
-					if not valid: continue
-
-					quality, info = source_utils.get_release_quality(url)
-# this site is an absolute nightmare to parse size.  Some comment section 16gb but size reflects all links in comment
-					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', name)[0]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-					info = ' | '.join(info)
-
-					sources.append({'provider': 'rlsbb','source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
-												'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-					count += 1
-				except:
-					source_utils.scraper_error('RLSBB')
 		return sources
 
 

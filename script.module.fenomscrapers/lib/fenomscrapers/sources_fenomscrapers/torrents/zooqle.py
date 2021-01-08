@@ -74,7 +74,7 @@ class source:
 			category = '+category%3ATV' if 'tvshowtitle' in data else '+category%3AMovies'
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url) + str(category) + '&v=t&s=sz&sd=d'
@@ -102,7 +102,7 @@ class source:
 			html = html.replace('&nbsp;', ' ')
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
 			except: return
-			rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
+			rows = re.findall(r'<tr(.+?)</tr>', results, re.DOTALL)
 			if not rows: return
 		except:
 			source_utils.scraper_error('ZOOQLE')
@@ -112,14 +112,14 @@ class source:
 			try:
 				try:
 					if 'magnet:' not in entry: continue
-					url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
+					url = 'magnet:%s' % (re.findall(r'href="magnet:(.+?)"', entry, re.DOTALL)[0])
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources): continue
 				except: continue
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 				try:
-					name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
+					name = re.findall(r'<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
 					name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
 					name = unquote_plus(name)
 					name = source_utils.clean_name(name)
@@ -140,14 +140,14 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', entry)[-1]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -179,8 +179,8 @@ class source:
 			self.season_xx = self.season_x.zfill(2)
 			category = '+category%3ATV'
 
-			# query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', self.title)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			# query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
@@ -213,7 +213,7 @@ class source:
 			html = html.replace('&nbsp;', ' ')
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
 			except: return
-			rows = re.findall('<tr(.+?)</tr>', results, re.DOTALL)
+			rows = re.findall(r'<tr(.+?)</tr>', results, re.DOTALL)
 			if not rows: return
 		except:
 			source_utils.scraper_error('ZOOQLE')
@@ -223,14 +223,14 @@ class source:
 			try:
 				try:
 					if 'magnet:' not in entry: continue
-					url = 'magnet:%s' % (re.findall('href="magnet:(.+?)"', entry, re.DOTALL)[0])
+					url = 'magnet:%s' % (re.findall(r'href="magnet:(.+?)"', entry, re.DOTALL)[0])
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources): continue
 				except: continue
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 				try:
-					name = re.findall('<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
+					name = re.findall(r'<a class=".+?>(.+?)</a>', entry, re.DOTALL)[0]
 					name = client.replaceHTMLCodes(name).replace('<hl>', '').replace('</hl>', '')
 					name = unquote_plus(name)
 					name = source_utils.clean_name(name)
@@ -260,14 +260,14 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(re.findall('class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'class="progress prog trans90" title="Seeders: (.+?) \|', entry, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', entry)[-1]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', entry)[-1]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

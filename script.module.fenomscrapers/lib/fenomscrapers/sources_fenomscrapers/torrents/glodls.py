@@ -72,7 +72,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			if 'tvshowtitle' in data: url = self.tvsearch.format(quote_plus(query))
 			else: url = self.moviesearch.format(quote_plus(query))
 			url = urljoin(self.base_link, url)
@@ -88,7 +88,7 @@ class source:
 				name = item[0] ; name_info = item[1]
 				url = unquote_plus(item[2]).replace('&amp;', '&').replace(' ', '.')
 				url = url.split('&tr')[0]
-				hash = re.compile('btih:(.*?)&').findall(url)[0].lower()
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0].lower()
 				quality, info = source_utils.get_release_quality(name_info, url)
 
 				if item[3] != '0':
@@ -127,13 +127,13 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall("<td.*?<font color='green'><b>([0-9]+|[0-9]+,[0-9]+)</b>", post)[0].replace(',', ''))
+					seeders = int(re.findall(r"<td.*?<font color='green'><b>([0-9]+|[0-9]+,[0-9]+)</b>", post)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 				except:
 					isize = '0' ; dsize = 0

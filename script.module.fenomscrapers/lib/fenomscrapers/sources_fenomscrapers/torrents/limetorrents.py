@@ -75,7 +75,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
 			if 'tvshowtitle' in data:
 				url = self.tvsearch.format(quote_plus(query))
@@ -136,7 +136,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -167,7 +167,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.tvsearch.format(quote_plus(query + ' S%s' % self.season_xx)),
 						self.tvsearch.format(quote_plus(query + ' Season %s' % self.season_x))
@@ -237,7 +237,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

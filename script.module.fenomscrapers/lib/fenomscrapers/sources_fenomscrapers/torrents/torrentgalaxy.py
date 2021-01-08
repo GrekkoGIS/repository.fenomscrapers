@@ -75,7 +75,7 @@ class source:
 
 			if 'tvshowtitle' in data:
 				query = '%s %s' % (title, hdlr)
-				query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+				query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 				url = self.search_link % quote_plus(query)
 			else:
 				url = self.search_link % data['imdb']
@@ -89,14 +89,14 @@ class source:
 
 		for post in posts:
 			try:
-				links = zip(re.findall('a href="(magnet:.+?)"', post, re.DOTALL),
+				links = zip(re.findall(r'a href="(magnet:.+?)"', post, re.DOTALL),
 							re.findall(r"<span class='badge badge-secondary' style='border-radius:4px;'>(.*?)</span>", post, re.DOTALL),
 							re.findall(r"<span title='Seeders/Leechers'>\[<font color='green'><b>(.*?)<", post, re.DOTALL))
 
 				for link in links:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
 					url = source_utils.strip_non_ascii_and_unprintable(url)
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
@@ -147,7 +147,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
@@ -183,13 +183,13 @@ class source:
 		for post in posts:
 			try:
 				links = zip(
-							re.findall('a href="(magnet:.+?)"', post, re.DOTALL),
+							re.findall(r'a href="(magnet:.+?)"', post, re.DOTALL),
 							re.findall(r"<span class='badge badge-secondary' style='border-radius:4px;'>(.*?)</span>", post, re.DOTALL),
 							re.findall(r"<span title='Seeders/Leechers'>\[<font color='green'><b>(.*?)<", post, re.DOTALL))
 				for link in links:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
 					url = source_utils.strip_non_ascii_and_unprintable(url)
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)

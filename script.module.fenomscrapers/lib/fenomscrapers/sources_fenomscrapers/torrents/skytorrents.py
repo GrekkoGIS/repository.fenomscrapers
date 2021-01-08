@@ -74,7 +74,7 @@ class source:
 			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -91,13 +91,13 @@ class source:
 			try:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
-				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
+				link = re.findall(r'href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
 
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(sources): return
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
@@ -117,7 +117,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:
@@ -150,7 +150,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
@@ -189,13 +189,13 @@ class source:
 			try:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
-				link = re.findall('href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
+				link = re.findall(r'href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
 
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources): return
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
 
@@ -224,7 +224,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:

@@ -71,7 +71,7 @@ class source:
 			year = data['year']
 
 			query = title
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			if 'tvshowtitle' in data: url = self.show_link % query.replace(' ', '-')
 			else: url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
@@ -88,11 +88,11 @@ class source:
 		for i in r:
 			try:
 				if 'magnet' not in i: continue
-				url = re.compile('href="(magnet.+?)"').findall(i)[0]
+				url = re.compile(r'href="(magnet.+?)"').findall(i)[0]
 				try: url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
 				except: url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
 				url = url.split('&tr=')[0].replace(' ', '.')
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				release_name = url.split('&dn=')[1]
 				release_name = source_utils.clean_name(release_name)
@@ -105,7 +105,7 @@ class source:
 				seeders = 0 # seeders not available on topnow
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|MB|MiB))', i)[-1] # file size is no longer available on topnow's new site
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', i)[-1] # file size is no longer available on topnow's new site
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

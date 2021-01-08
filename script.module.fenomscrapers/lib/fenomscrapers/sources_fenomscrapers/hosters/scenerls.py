@@ -6,13 +6,12 @@
 
 import re
 
-try: from urlparse import parse_qs, urljoin, urlparse
-except ImportError: from urllib.parse import parse_qs, urljoin, urlparse
+try: from urlparse import parse_qs, urljoin
+except ImportError: from urllib.parse import parse_qs, urljoin
 try: from urllib import urlencode, quote_plus
 except ImportError: from urllib.parse import urlencode, quote_plus
 
 from fenomscrapers.modules import cfscrape
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -72,7 +71,7 @@ class source:
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -87,7 +86,7 @@ class source:
 		for post in posts:
 			try:
 				content = client.parseDOM(post, "div", attrs={"class": "postContent"})
-				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', content[0])[0]
+				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', content[0])[0]
 				u = client.parseDOM(content, "h2")
 				u = client.parseDOM(u, 'a', ret='href')
 				u = [(i.strip('/').split('/')[-1], i, size) for i in u]

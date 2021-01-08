@@ -73,7 +73,7 @@ class source:
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url).replace('+', '-')
@@ -81,7 +81,7 @@ class source:
 
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
-			links = re.findall('<a href="(/torrent/.+?)"', r, re.DOTALL)
+			links = re.findall(r'<a href="(/torrent/.+?)"', r, re.DOTALL)
 
 			threads = []
 			for link in links:
@@ -100,10 +100,10 @@ class source:
 			result = client.request(url, timeout='5')
 			if result is None: return
 			if '<kbd>' not in result: return
-			hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
+			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL)[0]
 			url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 
-			name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
+			name = re.findall(r'<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
 			name = unquote_plus(name)
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
@@ -118,15 +118,15 @@ class source:
 			if url in str(self.sources): return
 
 			try:
-				seeders = int(re.findall('<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
 			except:
 				seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall('<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
-				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
+				size = re.findall(r'<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
+				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except:
@@ -157,7 +157,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
@@ -185,17 +185,17 @@ class source:
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-			links = re.findall('<a href="(/torrent/.+?)"', r, re.DOTALL)
+			links = re.findall(r'<a href="(/torrent/.+?)"', r, re.DOTALL)
 
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
 				result = client.request(url, timeout='5')
 				if not result: continue
 				if '<kbd>' not in result: continue
-				hash = re.findall('<kbd>(.+?)<', result, re.DOTALL)[0]
+				hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL)[0]
 				url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 
-				name = re.findall('<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
+				name = re.findall(r'<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
 				name = source_utils.clean_name(unquote_plus(name))
 
 				if not self.search_series:
@@ -219,15 +219,15 @@ class source:
 				if url in str(self.sources): continue
 
 				try:
-					seeders = int(re.findall('<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
+					size = re.findall(r'<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

@@ -73,7 +73,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
@@ -160,8 +160,8 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			# query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', self.title)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			# query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)

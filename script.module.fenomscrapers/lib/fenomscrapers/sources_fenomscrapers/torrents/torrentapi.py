@@ -84,7 +84,7 @@ class source:
 			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			if 'tvshowtitle' in data:
 				search_link = self.tvshowsearch.format(self.key, data['imdb'], hdlr)
 			else:
@@ -103,7 +103,7 @@ class source:
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
@@ -166,7 +166,7 @@ class source:
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 

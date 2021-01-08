@@ -74,7 +74,7 @@ class source:
 			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = urljoin(self.base_link, self.search_link.format(query[0].lower(), cleantitle.geturl(query)))
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 
@@ -102,7 +102,7 @@ class source:
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(sources): continue
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
@@ -123,7 +123,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -156,7 +156,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' S%s' % self.season_xx)),
 						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' Season %s' % self.season_x))
@@ -204,7 +204,7 @@ class source:
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(self.sources): continue
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
@@ -235,7 +235,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

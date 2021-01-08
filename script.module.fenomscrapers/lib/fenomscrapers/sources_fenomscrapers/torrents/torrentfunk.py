@@ -72,7 +72,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -80,7 +80,7 @@ class source:
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
-			links = re.findall('<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
+			links = re.findall(r'<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
 
 			threads = []
 			for link in links:
@@ -119,19 +119,19 @@ class source:
 
 			link = client.request(link, timeout='5')
 			if link is None: 	return
-			hash = re.findall('<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
+			hash = re.findall(r'<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 
 			try:
-				seeders = int(re.findall('<b>Swarm:</b></td><td valign=top><font color=red>([0-9]+)</font>', link, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'<b>Swarm:</b></td><td valign=top><font color=red>([0-9]+)</font>', link, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders: return  # site does not seem to report seeders
 			except:
 				seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', link)[0]
+				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except:
@@ -162,7 +162,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
@@ -191,7 +191,7 @@ class source:
 			r = client.request(url, timeout='5')
 			if not r: return
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
-			links = re.findall('<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
+			links = re.findall(r'<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
 
 			for link in links:
 				try: url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
@@ -227,19 +227,19 @@ class source:
 
 				link = client.request(link, timeout='5')
 				if link is None: 	continue
-				hash = re.findall('<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
+				hash = re.findall(r'<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 				if url in str(self.sources): continue
 
 				try:
-					seeders = int(re.findall('<b>Swarm:</b></td><td valign=top><font color=red>([0-9]+)</font>', link, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'<b>Swarm:</b></td><td valign=top><font color=red>([0-9]+)</font>', link, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue# site does not seem to report seeders
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', link)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

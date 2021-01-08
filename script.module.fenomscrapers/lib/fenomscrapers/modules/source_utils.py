@@ -494,14 +494,14 @@ def info_from_name(release_title, title, year, hdlr=None, episode_title=None, se
 		try: release_title = release_title.encode('utf-8')
 		except: pass
 		release_title = release_title.lower().replace('&', 'and').replace("'", "")
-		release_title = re.sub('[^a-z0-9]+', '.', release_title)
+		release_title = re.sub(r'[^a-z0-9]+', '.', release_title)
 		title = title.lower().replace('&', 'and').replace("'", "")
-		title = re.sub('[^a-z0-9]+', '.', title)
+		title = re.sub(r'[^a-z0-9]+', '.', title)
 		name_info = release_title.replace(title, '').replace(year, '')
 		if hdlr: name_info = name_info.replace(hdlr.lower(), '')
 		if episode_title:
 			episode_title = episode_title.lower().replace('&', 'and')
-			episode_title = re.sub('[^a-z0-9]+', '.', title)
+			episode_title = re.sub(r'[^a-z0-9]+', '.', title)
 			name_info = name_info.replace(episode_title, '')
 		if pack:
 			if pack == 'season':
@@ -522,7 +522,7 @@ def info_from_name(release_title, title, year, hdlr=None, episode_title=None, se
 def release_title_format(release_title):
 	try:
 		release_title = release_title.lower().replace("'", "").lstrip('.').rstrip('.')
-		fmt = re.sub('[^a-z0-9-~]+', '.', release_title)
+		fmt = re.sub(r'[^a-z0-9-~]+', '.', release_title)
 		fmt = fmt.replace('.-.', '-').replace('-.', '-').replace('.-', '-').replace('--', '-')
 		fmt = '.%s.' % fmt
 		return fmt
@@ -564,7 +564,7 @@ def clean_name(release_title):
 		for i in unwanted:
 			if release_title.lower().startswith(i):
 				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else i
-				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.IGNORECASE)
+				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.I)
 		for i in unwanted2:
 			release_title = release_title.lstrip(i)
 		# log_utils.log('final release_title: ' + str(release_title), log_utils.LOGDEBUG)
@@ -580,12 +580,19 @@ def strip_non_ascii_and_unprintable(text):
 
 
 def _size(siz):
-	if siz in ['0', 0, '', None]: return 0, ''
-	div = 1 if siz.lower().endswith(('gb', 'gib')) else 1024
-	float_size = float(re.sub('[^0-9|/.|/,]', '', siz.replace(',', ''))) / div
-	str_size = '%.2f GB' % float_size
-	return float_size, str_size
-
+	try:
+		if siz in ['0', 0, '', None]: return 0, ''
+		div = 1 if siz.lower().endswith(('gb', 'gib')) else 1024
+		# log_utils.log('siz = %s' % siz, log_utils.LOGDEBUG)
+		# if ',' in siz and siz.lower().endswith(('mb', 'mib')): siz = size.replace(',', '')
+		# elif ',' in siz and siz.lower().endswith(('gb', 'gib')): siz = size.replace(',', '.')
+		# float_size = float(re.sub(r'[^0-9|/.|/,]', '', siz.replace(',', '.'))) / div
+		float_size = float(re.sub(r'[^0-9|/.|/,]', '', siz.replace(',', ''))) / div #comma issue where 2,750 MB or 2,75 GB (sometimes replace with "." and sometimes not)
+		str_size = '%.2f GB' % float_size
+		return float_size, str_size
+	except:
+		log_utils.error()
+		return 0, ''
 
 def convert_size(size_bytes, to='GB'):
 	try:
@@ -611,6 +618,7 @@ def scraper_error(provider):
 
 def is_host_valid(url, domains):
 	try:
+		# ('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif') # possibly consider adding
 		if any(x in url.lower() for x in ['.rar.', '.zip.', '.iso.', '.sample.']) or any(url.lower().endswith(x) for x in ['.rar', '.zip', '.iso', '.sample']):
 			return False, ''
 		host = __top_domain(url)

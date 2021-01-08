@@ -73,7 +73,7 @@ class source:
 			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -89,9 +89,9 @@ class source:
 			try:
 				if 'dwn-btn torrent-dwn' not in row: continue
 				link = client.parseDOM(row, 'a', attrs={'class': 'dwn-btn torrent-dwn'}, ret='href')[0]
-				hash = re.search('/torrent/(?:.+?/)(.+?).torrent', link).group(1)
+				hash = re.search(r'/torrent/(?:.+?/)(.+?).torrent', link).group(1)
 
-				name = re.search('\?title=(?:.+?])(.+?).torrent', link).group(1)
+				name = re.search(r'\?title=(?:.+?])(.+?).torrent', link).group(1)
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -104,14 +104,14 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall('<span class="text-success">([0-9]+)</span>', row, re.DOTALL)[0])
+					seeders = int(re.findall(r'<span class="text-success">([0-9]+)</span>', row, re.DOTALL)[0])
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
@@ -144,7 +144,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
@@ -181,9 +181,9 @@ class source:
 			try:
 				if 'dwn-btn torrent-dwn' not in row: continue
 				link = client.parseDOM(row, 'a', attrs={'class': 'dwn-btn torrent-dwn'}, ret='href')[0]
-				hash = re.search('/torrent/(?:.+?/)(.+?).torrent\?', link).group(1)
+				hash = re.search(r'/torrent/(?:.+?/)(.+?).torrent\?', link).group(1)
 
-				name = re.search('\?title=(?:.+?])(.+?).torrent', link).group(1).replace('./.', '.')
+				name = re.search(r'\?title=(?:.+?])(.+?).torrent', link).group(1).replace('./.', '.')
 				name = source_utils.clean_name(name)
 
 				if not self.search_series:
@@ -206,14 +206,14 @@ class source:
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 				try:
-					seeders = int(re.findall('<span class="text-success">([0-9]+)</span>', row, re.DOTALL)[0])
+					seeders = int(re.findall(r'<span class="text-success">([0-9]+)</span>', row, re.DOTALL)[0])
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

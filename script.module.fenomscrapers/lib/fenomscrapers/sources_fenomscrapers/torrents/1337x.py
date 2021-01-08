@@ -73,7 +73,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
 			if 'tvshowtitle' in data:
 				urls.append(self.tvsearch % (quote(query)))
@@ -130,7 +130,7 @@ class source:
 					seeders = 0
 
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GiB|MiB|GB|MB))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 				except:
 					isize = '0'
@@ -156,7 +156,7 @@ class source:
 			url = [i for i in data if 'magnet:' in i][0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
-			hash = re.compile('btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 			self._sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1], 'quality': quality,
 												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})

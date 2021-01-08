@@ -15,7 +15,7 @@ def __get_dom_content(html, name, match):
 	if match.endswith('/>'):
 		return ''
 	# override tag name with tag from match if possible
-	tag = re.match('<([^\s/>]+)', match)
+	tag = re.match(r'<([^\s/>]+)', match)
 	if tag: name = tag.group(1)
 	start_str = '<%s' % name
 	end_str = "</%s" % name
@@ -44,7 +44,7 @@ def __get_dom_content(html, name, match):
 
 def __get_dom_elements(item, name, attrs):
 	if not attrs:
-		pattern = '(<%s(?:\s[^>]*>|/?>))' % name
+		pattern = r'(<%s(?:\s[^>]*>|/?>))' % name
 		this_list = re.findall(pattern, item, re.M | re.S | re.I)
 	else:
 		last_list = None
@@ -53,7 +53,7 @@ def __get_dom_elements(item, name, attrs):
 		for key, value in iter_items:
 			value_is_regex = isinstance(value, re_type)
 			value_is_str = isinstance(value, basestring)
-			pattern = '''(<{tag}[^>]*\s{key}=(?P<delim>['"])(.*?)(?P=delim)[^>]*>)'''.format(tag=name, key=key)
+			pattern = r'''(<{tag}[^>]*\s{key}=(?P<delim>['"])(.*?)(?P=delim)[^>]*>)'''.format(tag=name, key=key)
 			re_list = re.findall(pattern, item, re.M | re.S | re.I)
 
 			if value_is_regex:
@@ -65,7 +65,7 @@ def __get_dom_elements(item, name, attrs):
 			if not this_list:
 				has_space = (value_is_regex and ' ' in value.pattern) or (value_is_str and ' ' in value)
 				if not has_space:
-					pattern = '''(<{tag}[^>]*\s{key}=((?:[^\s>]|/>)*)[^>]*>)'''.format(tag=name, key=key)
+					pattern = r'''(<{tag}[^>]*\s{key}=((?:[^\s>]|/>)*)[^>]*>)'''.format(tag=name, key=key)
 					re_list = re.findall(pattern, item, re.M | re.S | re.I)
 					if value_is_regex:
 						this_list = [r[0] for r in re_list if re.match(value, r[1])]
@@ -121,7 +121,7 @@ def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 		if isinstance(item, DomMatch):
 			item = item.content
 		if exclude_comments:
-			item = re.sub(re.compile('<!--.*?-->', re.DOTALL), '', item)
+			item = re.sub(re.compile(r'<!--.*?-->', re.S), '', item)
 		results = []
 		for element in __get_dom_elements(item, name, attrs):
 			attribs = __get_attribs(element)

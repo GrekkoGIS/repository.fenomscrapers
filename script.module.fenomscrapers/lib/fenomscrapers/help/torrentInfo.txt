@@ -41,3 +41,14 @@ moviemagnet (uses api to fetch their ID, movies only, uses cfscrape,
 torlock
 torrentfunk
 yourbittorrent
+
+The following scrapers sit behind CloudFlare and 
+use the "cloudscraper" module by Venomous:
+--------------------------------------------
+maxrls
+rapidmoviez
+rlsbb
+scenerls
+extratorrent
+limetorrents
+torrentgalaxy

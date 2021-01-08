@@ -19,7 +19,7 @@ from fenomscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 35
+		self.priority = 25
 		self.language = ['en']
 		self.domains = ['ororo.tv']
 		self.base_link = 'https://ororo.tv'
@@ -100,7 +100,7 @@ class source:
 			r = client.request(url, headers=self.headers)
 			r = json.loads(r)['movies']
 			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
-			r = [(i[0], 'tt' + re.sub('[^0-9]', '', i[1])) for i in r]
+			r = [(i[0], 'tt' + re.sub(r'[^0-9]', '', i[1])) for i in r]
 			return r
 		except:
 			source_utils.scraper_error('ORORO')
@@ -113,7 +113,7 @@ class source:
 			r = client.request(url, headers=self.headers)
 			r = json.loads(r)['shows']
 			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
-			r = [(i[0], 'tt' + re.sub('[^0-9]', '', i[1])) for i in r]
+			r = [(i[0], 'tt' + re.sub(r'[^0-9]', '', i[1])) for i in r]
 			return r
 		except:
 			source_utils.scraper_error('ORORO')

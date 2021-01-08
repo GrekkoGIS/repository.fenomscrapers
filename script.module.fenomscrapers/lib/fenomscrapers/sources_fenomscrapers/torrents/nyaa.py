@@ -72,10 +72,10 @@ class source:
 			hdlr2 = 'S%d - %d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 
 			query2 = '%s %s' % (title, hdlr2)
-			query2 = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query2)
+			query2 = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query2)
 
 			urls = []
 			url = self.search_link % quote_plus(query)
@@ -99,11 +99,13 @@ class source:
 				rows = client.parseDOM(tbody, 'tr')
 
 				for row in rows:
-					links = zip(re.findall('href="(magnet:.+?)"', row, re.DOTALL), re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL), [re.findall('<td class="text-center">([0-9]+)</td>', row, re.DOTALL)])
+					links = zip(re.findall(r'href="(magnet:.+?)"', row, re.DOTALL),
+									re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL),
+									[re.findall(r'<td class="text-center">([0-9]+)</td>', row, re.DOTALL)])
 					for link in links:
 						url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 						url = source_utils.strip_non_ascii_and_unprintable(url)
-						hash = re.compile('btih:(.*?)&').findall(url)[0]
+						hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 						name = url.split('&dn=')[1]
 						name = source_utils.clean_name(name)
 
@@ -120,16 +122,14 @@ class source:
 						try:
 							seeders = int(link[2][0])
 							if self.min_seeders > seeders: continue
-						except:
-							seeders = 0
+						except: seeders = 0
 
 						quality, info = source_utils.get_release_quality(name, url)
 						try:
 							size = link[1]
 							dsize, isize = source_utils._size(size)
 							info.insert(0, isize)
-						except:
-							dsize = 0
+						except: dsize = 0
 						info = ' | '.join(info)
 
 						sources.append({'provider': 'nyaa', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'quality': quality,

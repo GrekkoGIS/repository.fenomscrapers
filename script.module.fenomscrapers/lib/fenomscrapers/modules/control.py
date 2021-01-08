@@ -136,7 +136,7 @@ def clean_settings():
 		profile_dir = xbmc.translatePath(addon.getAddonInfo('profile'))
 		active_settings_xml = os.path.join(addon_dir, 'resources', 'settings.xml')
 		root = ET.parse(active_settings_xml).getroot()
-		for item in root.findall('./category/setting'):
+		for item in root.findall(r'./category/setting'):
 			setting_id = item.get('id')
 			if setting_id:
 				active_settings.append(setting_id)

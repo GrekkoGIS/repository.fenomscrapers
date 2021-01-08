@@ -72,7 +72,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
@@ -101,16 +101,16 @@ class source:
 			for post in posts:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
-				links = re.compile('<a href="(/torrent_details/.+?)"><span>(.+?)</span>.*?<td class="size-row">(.+?)</td><td class="sn">([0-9]+)</td>').findall(post)
+				links = re.compile(r'<a href="(/torrent_details/.+?)"><span>(.+?)</span>.*?<td class="size-row">(.+?)</td><td class="sn">([0-9]+)</td>').findall(post)
 				for items in links:
 					# item[1] does not contain full info like the &dn= portion of magnet
 					link = urljoin(self.base_link, items[0])
 					link = client.request(link, timeout='10')
 					if not link: continue
 
-					magnet = re.compile('(magnet.+?)"').findall(link)[0]
+					magnet = re.compile(r'(magnet.+?)"').findall(link)[0]
 					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-					hash = re.compile('btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 					name = unquote_plus(url.split('&dn=')[1])
 					name = source_utils.clean_name(name)
 					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
@@ -129,7 +129,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
-						size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[2])[0]
+						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[2])[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except:

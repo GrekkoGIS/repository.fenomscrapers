@@ -72,7 +72,7 @@ class source:
 			self.year = data['year']
 
 			query = '%s %s' % (self.title, self.hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -80,7 +80,7 @@ class source:
 			try:
 				r = client.request(url, timeout='5')
 				if r is None: return self.sources
-				links = re.findall('<a href=(/torrent/.+?)>', r, re.DOTALL)
+				links = re.findall(r'<a href=(/torrent/.+?)>', r, re.DOTALL)
 				threads = []
 				for link in links:
 					threads.append(workers.Thread(self.get_sources, link))
@@ -102,11 +102,11 @@ class source:
 			if result is None: return
 			if 'magnet' not in result: return
 
-			url = 'magnet:%s' % (re.findall('a href="magnet:(.+?)"', result, re.DOTALL)[0])
+			url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', result, re.DOTALL)[0])
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr=')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
-			hash = re.compile('btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
@@ -118,14 +118,14 @@ class source:
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			try:
-				seeders = int(re.findall('<dt>SWARM</dt><dd>.*?>([0-9]+)</b>', result, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'<dt>SWARM</dt><dd>.*?>([0-9]+)</b>', result, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
 			except:
 				seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall('<dt>SIZE</dt><dd>(.*? [a-zA-Z]{2})', result, re.DOTALL)[0]
+				size = re.findall(r'<dt>SIZE</dt><dd>(.*? [a-zA-Z]{2})', result, re.DOTALL)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
 			except:

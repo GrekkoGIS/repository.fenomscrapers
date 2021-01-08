@@ -11,7 +11,6 @@ except ImportError: from urllib.parse import parse_qs, urljoin
 try: from urllib import urlencode, quote_plus
 except ImportError: from urllib.parse import urlencode, quote_plus
 
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -68,7 +67,7 @@ class source:
 			year = data['year']
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 			query = '%s %s' % (title, hdlr)
-			query = re.sub('(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			url = urljoin(self.base_link, self.search_link)
 			url = url % quote_plus(query)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
@@ -85,7 +84,7 @@ class source:
 		for post in posts:
 			try:
 				name = source_utils.strip_non_ascii_and_unprintable(post[1])
-				if '<' in name: name = re.sub('<.*?>', '', name)
+				if '<' in name: name = re.sub(r'<.*?>', '', name)
 				name = client.replaceHTMLCodes(name)
 				name = source_utils.clean_name(name)
 

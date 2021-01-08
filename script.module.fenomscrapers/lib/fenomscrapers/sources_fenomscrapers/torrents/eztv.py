@@ -63,8 +63,8 @@ class source:
 			year = data['year']
 
 			query = '%s %s' % (title, hdlr)
-			# query = re.sub('[^A-Za-z0-9\s\.-]+', '', query) #eztv has issues with dashes in titles
-			query = re.sub('[^A-Za-z0-9\s\.]+', '', query)
+			# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query) #eztv has issues with dashes in titles
+			query = re.sub(r'[^A-Za-z0-9\s\.]+', '', query)
 			url = self.search_link % (quote_plus(query).replace('+', '-'))
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -79,7 +79,7 @@ class source:
 				source_utils.scraper_error('EZTV')
 				return sources
 
-			rows = re.findall('<tr name="hover" class="forum_header_border">(.+?)</tr>', table, re.DOTALL)
+			rows = re.findall(r'<tr name="hover" class="forum_header_border">(.+?)</tr>', table, re.DOTALL)
 			if not rows: return sources
 		except:
 			source_utils.scraper_error('EZTV')
@@ -88,14 +88,14 @@ class source:
 		for row in rows:
 			try:
 				try:
-					columns = re.findall('<td\s.+?>(.+?)</td>', row, re.DOTALL)
-					link = re.findall('href="(magnet:.+?)".*title="(.+?)"', columns[2], re.DOTALL)[0]
+					columns = re.findall(r'<td\s.+?>(.+?)</td>', row, re.DOTALL)
+					link = re.findall(r'href="(magnet:.+?)".*title="(.+?)"', columns[2], re.DOTALL)[0]
 				except: continue
 
 				url = str(client.replaceHTMLCodes(link[0]).split('&tr')[0])
 				try: url = unquote(url).decode('utf8')
 				except: pass
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				name = link[1].split(' [eztv]')[0].split(' Torrent:')[0]
 				name = source_utils.clean_name(name)
@@ -104,14 +104,14 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(re.findall('<font color=".+?">(\d+|\d+\,\d+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'<font color=".+?">(\d+|\d+\,\d+)</font>', columns[5], re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except:
 					seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall('((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', columns[3])[-1]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', columns[3])[-1]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:

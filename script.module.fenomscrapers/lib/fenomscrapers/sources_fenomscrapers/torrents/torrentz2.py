@@ -82,7 +82,7 @@ class source:
 			year = data['year']
 
 			query = '"^%s" %s' % (title, hdlr)
-			query = re.sub('[^A-Za-z0-9\s\.\-\"\^]+', '', query)
+			query = re.sub(r'[^A-Za-z0-9\s\.\-\"\^]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
@@ -105,7 +105,7 @@ class source:
 				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -158,7 +158,7 @@ class source:
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
 
-			query = re.sub('[^A-Za-z0-9\s\.-]+', '', self.title)
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
@@ -196,10 +196,10 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet' not in row: continue
-				url = re.findall('href="(magnet:.+?)"', row, re.DOTALL)[0]
+				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile('btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
