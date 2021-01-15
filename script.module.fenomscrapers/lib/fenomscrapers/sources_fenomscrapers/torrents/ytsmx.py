@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (12-23-2020)
+# created by Venom for Fenomscrapers (1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
-import json
+from json import loads as jsloads
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode
-except ImportError: from urllib.parse import urlencode
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -53,16 +53,16 @@ class source:
 			api_url = urljoin(self.base_link, url)
 			# log_utils.log('api_url = %s' % api_url, log_utils.LOGDEBUG)
 
-			rjson = client.request(api_url)
+			rjson = client.request(api_url, timeout='5')
 			if not rjson: return sources
-			files = json.loads(rjson)
+			files = jsloads(rjson)
 			if files.get('status') == 'error' or files.get('data').get('movie_count') == 0:
 				return sources
 
 			title_long = files.get('data').get('movies')[0].get('title_long').replace(' ', '.')
 			torrents = files.get('data').get('movies')[0].get('torrents')
 		except:
-			source_utils.scraper_error('YTSWS')
+			source_utils.scraper_error('YTSMX')
 			return sources
 
 		for torrent in torrents:
@@ -91,10 +91,10 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'ytsmx', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				sources.append({'provider': 'ytsmx', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
-				source_utils.scraper_error('YTSWS')
+				source_utils.scraper_error('YTSMX')
 		return sources
 
 

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-23-2020)
+# created by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
@@ -67,9 +67,9 @@ class source:
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
-
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-			hdlr2 = 'S%d - %d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
+			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
+			hdlr2 = 'S%d - %d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
@@ -91,8 +91,8 @@ class source:
 
 		for url in urls:
 			try:
-				r = client.request(url)
-				if 'magnet' not in r: return sources
+				r = client.request(url, timeout='5')
+				if not r or 'magnet' not in r: return sources
 				r = re.sub(r'\n', '', r)
 				r = re.sub(r'\t', '', r)
 				tbody = client.parseDOM(r, 'tbody')
@@ -113,9 +113,9 @@ class source:
 						if source_utils.remove_lang(name): continue
 
 						if hdlr in name:
-							t = name.split(hdlr)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+							t = name.split(hdlr)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 						if hdlr2 in name:
-							t = name.split(hdlr2)[0].replace(data['year'], '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
+							t = name.split(hdlr2)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 
 						# if cleantitle.get(t) != cleantitle.get(title): continue # Anime title matching is a bitch!
 

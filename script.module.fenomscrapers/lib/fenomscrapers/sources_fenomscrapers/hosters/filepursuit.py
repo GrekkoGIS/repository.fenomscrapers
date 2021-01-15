@@ -1,17 +1,17 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-23-2020)
+# (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
+from json import loads as jsloads
 import re
 import requests
-import json
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus
+try:
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus
+except ImportError:
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
 from fenomscrapers.modules import control
 from fenomscrapers.modules import client
@@ -85,7 +85,7 @@ class source:
 
 			r = client.request(url, headers=headers)
 			if not r: return sources
-			r = json.loads(r)
+			r = jsloads(r)
 			if 'not_found' in r['status']: return sources
 			results = r['files_found']
 		except:

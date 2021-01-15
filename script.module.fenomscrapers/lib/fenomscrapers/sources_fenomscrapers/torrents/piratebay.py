@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
-import json
+from json import loads as jsloads
 import re
-try:
+try: #Py2
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote, unquote_plus
-except ImportError:
-	from urllib.parse import parse_qs, urljoin
-	from urllib.parse import urlencode, quote, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote, unquote_plus
 
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
@@ -70,8 +69,8 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -79,10 +78,10 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			rjson = client.request(url, error=True)
+			rjson = client.request(url, error=True, timeout='5')
 			if not rjson or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
 				return sources
-			files = json.loads(rjson)
+			files = jsloads(rjson)
 		except:
 			source_utils.scraper_error('PIRATEBAY')
 			return sources
@@ -116,8 +115,8 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'piratebay', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				sources.append({'provider': 'piratebay', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('PIRATEBAY')
 		return sources
@@ -167,10 +166,10 @@ class source:
 	def get_sources_packs(self, link):
 		try:
 			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
-			rjson = client.request(link, error=True)
+			rjson = client.request(link, error=True, timeout='5')
 			if not rjson or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
 				return
-			files = json.loads(rjson)
+			files = jsloads(rjson)
 		except:
 			source_utils.scraper_error('PIRATEBAY')
 			return

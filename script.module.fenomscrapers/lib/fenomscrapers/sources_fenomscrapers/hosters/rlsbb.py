@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-08-2021)
+# modified by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -105,15 +105,17 @@ class source:
 		for post in posts:
 			if count >= 300: break # to limit large link list and slow scrape time
 			try:
-				post_titles = re.findall(r'(?:.*>|>\sRelease Name.*|\s)(%s.*?)<' % release_title, post, re.I) #parse all matching release_title in each post(content) group
+				post_titles = re.findall(r'(?:.*>|>\sRelease Name.*|\s)(%s.*?)<' % release_title, post, re.I) #parse all matching release_titles in each post(content) group
 				items = []
 				if len(post_titles) >1:
 					index = 0
 					for name in post_titles:
-						start = post_titles[index].replace('[', '\\[').replace('(', '\\(').replace(')', '\\)').replace('+', '\\+')
-						end = (post_titles[index + 1].replace('[', '\\[').replace('(', '\\(').replace(')', '\\)').replace('+', '\\+')) if index + 1 < len(post_titles) else ''
+						start = post_titles[index].replace('[', '\\[').replace('(', '\\(').replace(')', '\\)').replace('+', '\\+').replace(' \\ ', ' \\\\ ')
+						end = (post_titles[index + 1].replace('[', '\\[').replace('(', '\\(').replace(')', '\\)').replace('+', '\\+')).replace(' \\ ', ' \\\\ ') if index + 1 < len(post_titles) else ''
 						try: container = re.findall(r'(?:%s)([\S\s]+)(?:%s)' % (start, end), post, re.I)[0] #parse all data between release_titles in multi post(content) group
 						except:
+							# log_utils.log('start = %s' % start, log_utils.LOGDEBUG)
+							# log_utils.log('end = %s' % end, log_utils.LOGDEBUG)
 							source_utils.scraper_error('RLSBB')
 							continue
 						try: size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', container)[0].replace(',', '.')

@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-23-2020)
+# (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import base64
-import json
+from json import loads as jsloads
 import re
 import requests
 import sys
@@ -84,7 +84,7 @@ class source:
 			headers = {'Authorization': auth}
 			response = requests.get(url, params=params, headers=headers).text
 
-			results = json.loads(response)
+			results = jsloads(response)
 			down_url = results.get('downURL')
 			dl_farm = results.get('dlFarm')
 			dl_port = results.get('dlPort')

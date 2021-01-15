@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-23-2020)
+# created by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
-import json
+from json import loads as jsloads
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
-
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
@@ -72,8 +71,8 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -96,9 +95,9 @@ class source:
 				'filters[adult]': False,
 				'filters[risky]': False}
 
-			rjson = client.request(api_url, post=query_data, headers=headers)
+			rjson = client.request(api_url, post=query_data, headers=headers, timeout='5')
 			if not rjson: return sources
-			files = json.loads(rjson)
+			files = jsloads(rjson)
 			error = files.get('error')
 			if error: return sources
 		except:
@@ -203,9 +202,9 @@ class source:
 				'filters[adult]': False,
 				'filters[risky]': False}
 			api_url = urljoin(self.base_link, self.api_search_link)
-			rjson = client.request(api_url, post=query_data, headers=self.headers)
+			rjson = client.request(api_url, post=query_data, headers=self.headers, timeout='5')
 			if not rjson: return
-			files = json.loads(rjson)
+			files = jsloads(rjson)
 			error = files.get('error')
 			if error: return
 		except:

@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated url 12-23-2020)
+# modified by Venom for Fenomscrapers (updated url 1-13-2020)-proxy site
 '''
 	Fenomscrapers Project
 '''
 
 import re
-try:
+try: #Py2
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote, quote_plus, unquote_plus
-except ImportError:
-	from urllib.parse import parse_qs, urljoin
-	from urllib.parse import urlencode, quote, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote, quote_plus, unquote_plus
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -21,8 +20,9 @@ class source:
 	def __init__(self):
 		self.priority = 15
 		self.language = ['en']
-		self.domains = ['btdb.eu']
-		self.base_link = 'https://btdb.eu'
+		self.domains = ['btdb.unblockit.ltd', 'btdb.eu'] # btdb.eu now v2 challenge
+		# self.base_link = 'https://btdb.eu'
+		self.base_link = 'https://btdb.unblockit.ltd'
 		self.search_link = '/search/%s/0/?sort=popular'
 		self.min_seeders = 0 # to many items with no value but cached links
 		self.pack_capable = True
@@ -69,8 +69,8 @@ class source:
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -94,16 +94,10 @@ class source:
 
 	def get_sources(self, url):
 		try:
-			r = client.request(url)
+			r = client.request(url, timeout='5')
 			if not r: return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
-				try:
-					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
-					if self.min_seeders > seeders: return
-				except:
-					seeders = 0
-
 				url = re.findall(r'<a href="(magnet:.+?)"', post, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
@@ -119,17 +113,21 @@ class source:
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
+				try:
+					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders: return
+				except: seeders = 0
+
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
-				self.sources.append({'provider': 'btdb', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				self.sources.append({'provider': 'btdb', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('BTDB')
 
@@ -178,16 +176,10 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
-			r = client.request(link)
+			r = client.request(link, timeout='5')
 			if not r: return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
-				try:
-					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
-					if self.min_seeders > seeders: return
-				except:
-					seeders = 0
-
 				url = re.findall(r'<a href="(magnet:.+?)"', post, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
@@ -206,20 +198,23 @@ class source:
 					if not self.bypass_filter:
 						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
 						if not valid: continue
-					else:
-						last_season = self.total_seasons
+					else: last_season = self.total_seasons
 					package = 'show'
 
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
+
+				try:
+					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					if self.min_seeders > seeders: return
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'btdb', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

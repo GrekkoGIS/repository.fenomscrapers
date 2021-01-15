@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote, unquote_plus
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote, unquote_plus
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -20,7 +20,7 @@ class source:
 	def __init__(self):
 		self.priority = 1
 		self.language = ['en']
-		self.domains = ['eztv.re', 'eztv.ag', 'eztv.it', 'eztv.ch']
+		self.domains = ['eztv.re', 'eztv.tf', 'eztv.yt']
 		self.base_link = 'https://eztv.re'
 		# eztv has api but it sucks. Site query returns more results vs. api (eztv db seems to be missing the imdb_id for many so they are dopped)
 		self.search_link = '/search/%s'
@@ -59,8 +59,8 @@ class source:
 			title = data['tvshowtitle'].replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
 			episode_title = data['title']
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
 			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode']))
 
 			query = '%s %s' % (title, hdlr)
 			# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query) #eztv has issues with dashes in titles
@@ -68,10 +68,10 @@ class source:
 			url = self.search_link % (quote_plus(query).replace('+', '-'))
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			html = client.request(url)
-
+			html = client.request(url, timeout='5')
 			try:
 				tables = client.parseDOM(html, 'table', attrs={'class': 'forum_header_border'})
+				if not tables: return sources
 				for table in tables:
 					if 'magnet:' not in table: continue
 					else: break
@@ -118,8 +118,8 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'eztv', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				sources.append({'provider': 'eztv', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('EZTV')
 				continue

@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 12-23-2020)
+# created by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -67,9 +67,8 @@ class source:
 			self.title = data['tvshowtitle'].lower() if 'tvshowtitle' in data else data['title'].lower()
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
-
 			self.year = data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
 
 			query = '%s %s' % (self.title, self.hdlr)
@@ -133,8 +132,8 @@ class source:
 				dsize = 0
 			info = ' | '.join(info)
 
-			self.sources.append({'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			self.sources.append({'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 

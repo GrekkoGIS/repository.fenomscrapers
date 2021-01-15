@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.2.0" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.2.1" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -28,13 +28,13 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.2.0 - Jan. 08, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] rlsbb has been completely rewritten to better parse the
-    sites comment section.  This now produces more
-    accurate results.[/I]
-[COLOR yellow]--[/COLOR][I] cfscrape(aka cloudscraper) has been updated to v1.2.52.[/I]
-[COLOR yellow]--[/COLOR][I] kickass2 now uses the query param for file size and
-    sort=desc.  Better quality results are now returned.[/I]
+[B][COLOR red]Update - v1.2.1 - Jan. 15, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] new proxy to fix "btdb" scraper due to new v2 challenge.[/I]
+[COLOR yellow]--[/COLOR][I] new proxy to fix "extratorrent" scraper due to new v2 challenge.[/I]
+[COLOR yellow]--[/COLOR][I] "skytorrents" scraper removed due to new v2 challenge.[/I]
+[COLOR yellow]--[/COLOR][I] new "bt4g" torrent scraper added.[/I]
+[COLOR yellow]--[/COLOR][I] "idope" scraper appears to now be v2 challange as of today.
+    Will remove in next update if proxy not found.[/I]
 		</news>
 	</extension>
 </addon>

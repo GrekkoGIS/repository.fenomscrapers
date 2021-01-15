@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -68,11 +68,10 @@ class source:
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 
 			category = '+category%3ATV' if 'tvshowtitle' in data else '+category%3AMovies'
-
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
@@ -97,7 +96,7 @@ class source:
 		try:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
-			html = client.request(url, ignoreErrors = 404)
+			html = client.request(url, ignoreErrors = 404, timeout='5')
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
@@ -154,8 +153,8 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				self.sources.append({'provider': 'zooqle', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				self.sources.append({'provider': 'zooqle', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('ZOOQLE')
 
@@ -208,7 +207,7 @@ class source:
 		try:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
-			html = client.request(link, ignoreErrors = 404)
+			html = client.request(link, ignoreErrors = 404, timeout='5')
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]

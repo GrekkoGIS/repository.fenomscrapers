@@ -3,10 +3,9 @@
 	Fenomscrapers Module
 """
 
-import json
+from json import loads as jsloads
 import re
 import string
-
 try:
 	from urllib import unquote_plus
 	from urlparse import urlparse
@@ -116,7 +115,7 @@ def aliases_to_array(aliases, filter=None):
 
 def check_title(title, aliases, release_title, hdlr, year):
 	try:
-		aliases = json.loads(aliases)
+		aliases = jsloads(aliases)
 		aliases = aliases_to_array(aliases)
 	except:
 		aliases = None
@@ -168,7 +167,7 @@ def remove_lang(release_info):
 
 def filter_season_pack(show_title, aliases, year, season, release_title):
 	try:
-		aliases = json.loads(aliases)
+		aliases = jsloads(aliases)
 		aliases = aliases_to_array(aliases)
 	except:
 		aliases = None
@@ -245,7 +244,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
 	try:
-		aliases = json.loads(aliases)
+		aliases = jsloads(aliases)
 		aliases = aliases_to_array(aliases, filter=None)
 	except:
 		aliases = None

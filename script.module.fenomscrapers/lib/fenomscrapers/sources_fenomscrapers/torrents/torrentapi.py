@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
-import json
+from json import loads as jsloads
 import re
 import time
-
-try: from urlparse import parse_qs
-except ImportError: from urllib.parse import parse_qs
-try: from urllib import urlencode, quote_plus, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
+try: #Py2
+	from urlparse import parse_qs
+	from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
@@ -34,8 +34,8 @@ class source:
 
 
 	def _get_token(self):
-		token = client.request(self.token)
-		token = json.loads(token)["token"]
+		token = client.request(self.token, timeout='5')
+		token = jsloads(token)["token"]
 		return token
 
 
@@ -80,8 +80,8 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -92,10 +92,9 @@ class source:
 			# log_utils.log('search_link = %s' % search_link, log_utils.LOGDEBUG)
 
 			time.sleep(2.1)
-			rjson = client.request(search_link, error=True)
-			if not rjson or 'torrent_results' not in str(rjson):
-				return sources
-			files = json.loads(rjson)['torrent_results']
+			rjson = client.request(search_link, error=True, timeout='5')
+			if not rjson or 'torrent_results' not in str(rjson): return sources
+			files = jsloads(rjson)['torrent_results']
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources
@@ -128,8 +127,8 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('TORRENTAPI')
 		return sources
@@ -158,7 +157,7 @@ class source:
 			rjson = client.request(search_link, error=True)
 			if not rjson or 'torrent_results' not in str(rjson):
 				return sources
-			files = json.loads(rjson)['torrent_results']
+			files = jsloads(rjson)['torrent_results']
 		except:
 			source_utils.scraper_error('TORRENTAPI')
 			return sources

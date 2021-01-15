@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-04-2020)
+# created by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -67,8 +67,8 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ('(' + data['year'] + ')')
 			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else ('(' + year + ')')
 
 			query = title
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -76,7 +76,7 @@ class source:
 			else: url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
-			r = client.request(url)
+			r = client.request(url, timeout='5')
 			if not r: return sources
 			r = r.replace('\r', '').replace('\n', '').replace('\t', '')
 			r = client.parseDOM(r, 'div', attrs={'class': 'card'})
@@ -88,17 +88,19 @@ class source:
 		for i in r:
 			try:
 				if 'magnet' not in i: continue
-				url = re.compile(r'href="(magnet.+?)"').findall(i)[0]
+				name = client.parseDOM(i, 'img', attrs={'class': 'thumbnails'}, ret='alt')[0].replace(u'\xa0', u' ')
+				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), year): continue
+
+				url = re.search(r'href="(magnet:.+?)"', i, re.DOTALL).group(1)
 				try: url = unquote_plus(url).decode('utf8').replace('&amp;', '&').replace(' ', '.')
 				except: url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.')
+				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on topnow &tr= before &dn=
 				url = url.split('&tr=')[0].replace(' ', '.')
+				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
 				release_name = url.split('&dn=')[1]
 				release_name = source_utils.clean_name(release_name)
-				name = client.parseDOM(i, 'img', attrs={'class': 'thumbnails'}, ret='alt')[0].replace(u'\xa0', u' ')
-
-				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), year): continue
 				name_info = source_utils.info_from_name(release_name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 
@@ -112,8 +114,8 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'topnow', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': release_name, 'name_info': name_info, 'quality': quality,
-										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				sources.append({'provider': 'topnow', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': release_name, 'name_info': name_info,
+										'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('TOPNOW')
 		return sources

@@ -1,11 +1,11 @@
 # -*- coding: UTF-8 -*-
-# (updated 12-23-2020)
+# (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import base64
-import json
+from json import loads as jsloads
 import re
 
 try: from urlparse import urljoin
@@ -82,7 +82,7 @@ class source:
 			if not url: return
 			url = urljoin(self.base_link, url)
 			r = client.request(url, headers=self.headers)
-			r = json.loads(r)['episodes']
+			r = jsloads(r)['episodes']
 			r = [(str(i['id']), str(i['season']), str(i['number']), str(i['airdate'])) for i in r]
 			url = [i for i in r if season == i[1] and episode == i[2]]
 			url += [i for i in r if premiered == i[3]]
@@ -98,7 +98,7 @@ class source:
 		try:
 			url = urljoin(self.base_link, self.moviesearch_link)
 			r = client.request(url, headers=self.headers)
-			r = json.loads(r)['movies']
+			r = jsloads(r)['movies']
 			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
 			r = [(i[0], 'tt' + re.sub(r'[^0-9]', '', i[1])) for i in r]
 			return r
@@ -111,7 +111,7 @@ class source:
 		try:
 			url = urljoin(self.base_link, self.tvsearch_link)
 			r = client.request(url, headers=self.headers)
-			r = json.loads(r)['shows']
+			r = jsloads(r)['shows']
 			r = [(str(i['id']), str(i['imdb_id'])) for i in r]
 			r = [(i[0], 'tt' + re.sub(r'[^0-9]', '', i[1])) for i in r]
 			return r
@@ -128,7 +128,7 @@ class source:
 
 			url = urljoin(self.base_link, url)
 			url = client.request(url, headers=self.headers)
-			url = json.loads(url)['url']
+			url = jsloads(url)['url']
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 
 			name = re.sub(r'(.*?)\/video/file/(.*?)/', '', url).split('.smil')[0].split('-')[0]

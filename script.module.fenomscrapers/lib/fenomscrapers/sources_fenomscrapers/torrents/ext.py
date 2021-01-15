@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (12-23-2020)
+# created by Venom for Fenomscrapers (1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-try:
+try: #Py2
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote_plus, unquote_plus
-except:
-	from urllib.parse import parse_qs, urljoin
-	from urllib.parse import urlencode, quote_plus, unquote_plus
+except: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -69,8 +68,8 @@ class source:
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			aliases = data['aliases']
 			episode_title = data['title'] if 'tvshowtitle' in data else None
-			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			year = data['year']
+			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -78,7 +77,8 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			html = client.request(url)
+			html = client.request(url, timeout='5')
+			if not html or '<tbody' not in html: return sources
 			table = client.parseDOM(html, 'tbody')
 			rows = client.parseDOM(table, 'tr')
 		except:
@@ -118,8 +118,8 @@ class source:
 					dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'ext', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-										'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				sources.append({'provider': 'ext', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('EXT.TO')
 				return sources
@@ -170,12 +170,13 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
-			html = client.request(link)
+			html = client.request(link, timeout='5')
+			if not html or '<tbody' not in html: return self.sources
 			table = client.parseDOM(html, 'tbody')
 			rows = client.parseDOM(table, 'tr')
 		except:
 			source_utils.scraper_error('EXT.TO')
-			return sources
+			return self.sources
 
 		for row in rows:
 			try:

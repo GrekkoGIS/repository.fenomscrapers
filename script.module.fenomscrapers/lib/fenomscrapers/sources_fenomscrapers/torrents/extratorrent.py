@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 12-23-2020)
+# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 1-15-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote_plus, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote_plus, unquote_plus
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote_plus, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
@@ -21,9 +21,9 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
-		self.domains = ['extratorrents.it']
-		self.base_link = 'https://extratorrents.it'
-		self.search_link = '/search/?search=%s&new=1&x=43&y=13'
+		self.domains = ['extratorrent.si', 'extratorrents.it']
+		self.base_link = 'https://extratorrent.si'
+		self.search_link = '/search/?new=1&search=%s&s_cat=4'
 		self.min_seeders = 1
 		self.pack_capable = True
 		self.scraper = cfscrape.create_scraper()
@@ -73,8 +73,8 @@ class source:
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -139,11 +139,10 @@ class source:
 				dsize = 0
 			info = ' | '.join(info)
 
-			self.sources.append({'provider': 'extratorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-											'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			self.sources.append({'provider': 'extratorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 		except:
 			source_utils.scraper_error('EXTRATORRENT')
-
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):

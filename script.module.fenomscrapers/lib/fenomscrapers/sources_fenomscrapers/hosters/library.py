@@ -1,15 +1,15 @@
 # -*- coding: UTF-8 -*-
-#  (updated 12-23-2020)
+#  (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
-import json
-
-try: from urlparse import parse_qs
-except ImportError: from urllib.parse import parse_qs
-try: from urllib import urlencode
-except ImportError: from urllib.parse import urlencode
+from json import loads as jsloads
+try:
+	from urlparse import parse_qs
+	from urllib import urlencode
+except ImportError:
+	from urllib.parse import parse_qs, urlencode
 
 from fenomscrapers.modules import control
 from fenomscrapers.modules import cleantitle
@@ -67,7 +67,7 @@ class source:
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "originaltitle", "file"]}, "id": 1}' % years)
 				r = unicode(r, 'utf-8', errors='ignore')
 				if 'movies' not in r: return sources
-				r = json.loads(r)['result']['movies']
+				r = jsloads(r)['result']['movies']
 				r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get_simple(i['title']), cleantitle.get_simple(i['originaltitle'])]]
 				try: r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')]
 				except: r = [i for i in r if not i['file'].endswith('.strm')]
@@ -75,7 +75,7 @@ class source:
 				r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"properties": ["streamdetails", "file"], "movieid": %s }, "id": 1}' % str(r['movieid']))
 				r = unicode(r, 'utf-8', errors='ignore')
-				r = json.loads(r)['result']['moviedetails']
+				r = jsloads(r)['result']['moviedetails']
 
 			elif content_type == 'episode':
 				title = cleantitle.get_simple(data['tvshowtitle']).lower()
@@ -83,13 +83,13 @@ class source:
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title"]}, "id": 1}' % years)
 				r = unicode(r, 'utf-8', errors='ignore')
 				if 'tvshows' not in r: return sources
-				r = json.loads(r)['result']['tvshows']
+				r = jsloads(r)['result']['tvshows']
 				r = [i for i in r if title in (cleantitle.get_simple(i['title']).lower() if not ' (' in i['title'] else cleantitle.get_simple(i['title']).split(' (')[0])]
 				if not r: return sources
 				else: r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["file"], "tvshowid": %s }, "id": 1}' % (str(season), str(episode), str(r['tvshowid'])))
 				r = unicode(r, 'utf-8', errors='ignore')
-				r = json.loads(r)['result']['episodes']
+				r = jsloads(r)['result']['episodes']
 				if not r: return sources
 				try: r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')]
 				except: r = [i for i in r if not i['file'].endswith('.strm')]
@@ -97,7 +97,7 @@ class source:
 				r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodeDetails", "params": {"properties": ["streamdetails", "file"], "episodeid": %s }, "id": 1}' % str(r['episodeid']))
 				r = unicode(r, 'utf-8', errors='ignore')
-				r = json.loads(r)['result']['episodedetails']
+				r = jsloads(r)['result']['episodedetails']
 
 			try: url = r['file'].encode('utf-8')
 			except: url = r['file']

@@ -5,13 +5,13 @@ api torrents(fast):
 bitlord
 piratebay
 solidtorrents
-torrentapi (uses imdb_id query, rarbg's api)
+torrentapi (uses imdb_id query, RARBG's api)
 ytsmx (uses imdb_id query, movies only site)
 
 single request html parsed sites:
 --------------------------------------------
-7torrents(uses 7torrents.cc(12/2/20) as 7torr.com is mirror of btscene)
-btdb
+7torrents(uses 7torrents.cc(12/2/20) as 7torr.com is mirror of btscene, v2 challenge and now removed)
+btdb (proxy change 1-13-21 for v2 challenge)
 btscene (timeout least twice a week)
 ext.to
 extratorrent (uses cfscrape)
@@ -23,7 +23,7 @@ limetorrents (uses cfscrape)
 magnet4you
 magnetdl
 nyaa (anime)
-skytorrents
+skytorrents (v2 challenge as of 1-12-21, scraper removed)
 topnow
 torrentdownload
 torrentgalaxy (uses cfscrape)
@@ -45,10 +45,10 @@ yourbittorrent
 The following scrapers sit behind CloudFlare and 
 use the "cloudscraper" module by Venomous:
 --------------------------------------------
-maxrls
-rapidmoviez
-rlsbb
-scenerls
-extratorrent
-limetorrents
-torrentgalaxy
+maxrls (hoster)
+rapidmoviez (hoster)
+rlsbb (hoster)
+scenerls (hoster)
+extratorrent (torrent)
+limetorrents (torrent)
+torrentgalaxy (torrent)

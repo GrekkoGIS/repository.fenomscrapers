@@ -10,8 +10,7 @@ try:
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote_plus
 except:
-	from urllib.parse import parse_qs, urljoin
-	from urllib.parse import urlencode, quote_plus
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import cleantitle

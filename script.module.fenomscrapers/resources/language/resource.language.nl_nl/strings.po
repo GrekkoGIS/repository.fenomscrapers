@@ -546,8 +546,8 @@ msgid "EXT.TO (Pack capable)"
 msgstr "EXT.TO (Pack geschikt)"
 
 msgctxt "#32132"
-msgid ""
-msgstr ""
+msgid "BT4G (Pack capable)"
+msgstr "BT4G (Pack geschikt)"
 
 msgctxt "#32133"
 msgid ""

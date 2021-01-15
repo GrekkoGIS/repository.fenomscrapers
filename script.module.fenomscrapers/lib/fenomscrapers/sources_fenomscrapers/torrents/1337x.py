@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 12-23-2020)
+# modified by Venom for Fenomscrapers (updated 1-09-2021)
 '''
 	Fenomscrapers Project
 '''
 
 import re
-try: from urlparse import parse_qs, urljoin
-except ImportError: from urllib.parse import parse_qs, urljoin
-try: from urllib import urlencode, quote, unquote_plus
-except ImportError: from urllib.parse import urlencode, quote, unquote_plus
+try: #Py2
+	from urlparse import parse_qs, urljoin
+	from urllib import urlencode, quote, unquote_plus
+except ImportError: #Py3
+	from urllib.parse import parse_qs, urljoin, urlencode, quote, unquote_plus
 
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
@@ -69,8 +70,8 @@ class source:
 			self.title = self.title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
 			self.aliases = data['aliases']
 			self.episode_title = data['title'] if 'tvshowtitle' in data else None
-			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else data['year']
 			self.year = data['year']
+			self.hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else self.year
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
@@ -103,8 +104,8 @@ class source:
 	def _get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers)
-			if '<tbody' not in r: return self.items
+			r = client.request(url, headers=headers, timeout='5')
+			if not r or '<tbody' not in r: return self.items
 			posts = client.parseDOM(r, 'tbody')[0]
 			posts = client.parseDOM(posts, 'tr')
 
@@ -150,7 +151,7 @@ class source:
 				info.insert(0, item[3])
 			info = ' | '.join(info)
 
-			data = client.request(item[2])
+			data = client.request(item[2], timeout='5')
 			data = client.parseDOM(data, 'a', ret='href')
 
 			url = [i for i in data if 'magnet:' in i][0]
@@ -158,8 +159,8 @@ class source:
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
-			self._sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1], 'quality': quality,
-												'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})
+			self._sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
+												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})
 		except:
 			source_utils.scraper_error('1337X')
 
