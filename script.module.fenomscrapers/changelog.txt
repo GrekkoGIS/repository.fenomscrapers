@@ -1,3 +1,6 @@
+[B][COLOR red]Update - v1.2.2 - Jan. 15, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] fixed typo in "bt4g" scraper.[/I]
+
 [B][COLOR red]Update - v1.2.1 - Jan. 15, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] new proxy to fix "btdb" scraper due to new v2 challenge.[/I]
 [COLOR yellow]--[/COLOR][I] new proxy to fix "extratorrent" scraper due to new v2 challenge.[/I]

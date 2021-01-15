@@ -77,7 +77,9 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 
-			r = client.request(url, timeout='5').replace('&nbsp;', ' ')
+			r = client.request(url, timeout='5')
+			if not r or 'did not match any documents' in r: return sources
+			r = r.replace('&nbsp;', ' ')
 			r = client.parseDOM(r, 'div', attrs={'class': 'col s12'})
 			posts = client.parseDOM(r, 'div')[1:]
 			posts = [i for i in posts if 'magnet/' in i]
@@ -93,7 +95,7 @@ class source:
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 
-				hash = client.parseDOM(post, 'a', ret='href')[0].lstrip('magnet/')
+				hash = client.parseDOM(post, 'a', ret='href')[0].split('magnet/')[1]
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
@@ -164,7 +166,9 @@ class source:
 
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
-		r = client.request(link, timeout='5').replace('&nbsp;', ' ')
+		r = client.request(link, timeout='5')
+		if not r or 'did not match any documents' in r: return sources
+		r = r.replace('&nbsp;', ' ')
 		r = client.parseDOM(r, 'div', attrs={'class': 'col s12'})
 		posts = client.parseDOM(r, 'div')[1:]
 		posts = [i for i in posts if 'magnet/' in i]
@@ -190,7 +194,7 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 
-				hash = client.parseDOM(post, 'a', ret='href')[0].lstrip('magnet/')
+				hash = client.parseDOM(post, 'a', ret='href')[0].split('magnet/')[1]
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 				try:
