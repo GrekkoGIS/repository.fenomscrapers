@@ -11,7 +11,9 @@ ytsmx (uses imdb_id query, movies only site)
 single request html parsed sites:
 --------------------------------------------
 7torrents(uses 7torrents.cc(12/2/20) as 7torr.com is mirror of btscene, v2 challenge and now removed)
+bt4g
 btdb (proxy change 1-13-21 for v2 challenge)
+btdig
 btscene (timeout least twice a week)
 ext.to
 extratorrent (uses cfscrape)
@@ -47,7 +49,7 @@ use the "cloudscraper" module by Venomous:
 --------------------------------------------
 maxrls (hoster)
 rapidmoviez (hoster)
-rlsbb (hoster)
+rlsbb (hoster)-1-16-21 new proxy now v2 challenge so down.
 scenerls (hoster)
 extratorrent (torrent)
 limetorrents (torrent)

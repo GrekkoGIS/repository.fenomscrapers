@@ -6,10 +6,10 @@
 from json import loads as jsloads
 import re
 import string
-try:
+try: #Py2
 	from urllib import unquote_plus
 	from urlparse import urlparse
-except ImportError:
+except ImportError: #Py3
 	from urllib.parse import urlparse, unquote_plus
 
 from fenomscrapers.modules import cleantitle
@@ -113,18 +113,19 @@ def aliases_to_array(aliases, filter=None):
 		return []
 
 
-def check_title(title, aliases, release_title, hdlr, year):
-	try:
-		aliases = jsloads(aliases)
-		aliases = aliases_to_array(aliases)
-	except:
-		aliases = None
+def check_title(title, aliases, release_title, hdlr, year, years=None):
+	# years = [str(year), str(int(year)+1), str(int(year)-1)]
+	try: aliases = aliases_to_array(jsloads(aliases))
+	except: aliases = None
 	title_list = []
 	if aliases:
 		for item in aliases:
 			try:
 				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
+				if years:
+					for i in years:
+						alias = alias.replace(i, '')
 				if alias in title_list: continue
 				title_list.append(alias)
 			except:
@@ -137,9 +138,16 @@ def check_title(title, aliases, release_title, hdlr, year):
 		release_title = release_title_format(release_title) # converts to .lower()
 		h = hdlr.lower()
 		t = release_title.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
+		if years:
+			for i in years:
+				t = t.split(i)[0]
 		t = t.split('2160p')[0].split('4k')[0].split('1080p')[0].split('720p')[0]
+		# log_utils.log('t = %s' % t, log_utils.LOGDEBUG)
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): match = False
-		if h not in release_title: match = False
+		if years:
+			if not any(value in release_title for value in years): match = False
+		else:
+			if h not in release_title: match = False
 		return match
 	except:
 		log_utils.error()
@@ -166,12 +174,8 @@ def remove_lang(release_info):
 
 
 def filter_season_pack(show_title, aliases, year, season, release_title):
-	try:
-		aliases = jsloads(aliases)
-		aliases = aliases_to_array(aliases)
-	except:
-		aliases = None
-
+	try: aliases = aliases_to_array(jsloads(aliases))
+	except: aliases = None
 	title_list = []
 	if aliases:
 		for item in aliases:
@@ -204,7 +208,6 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 			t = t.split(i)[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
 			return False
-
 
 # remove episode ranges
 		episode_list = [
@@ -243,12 +246,8 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
-	try:
-		aliases = jsloads(aliases)
-		aliases = aliases_to_array(aliases, filter=None)
-	except:
-		aliases = None
-
+	try: aliases = aliases_to_array(jsloads(aliases))
+	except: aliases = None
 	title_list = []
 	if aliases:
 		for item in aliases:
@@ -521,9 +520,7 @@ def info_from_name(release_title, title, year, hdlr=None, episode_title=None, se
 def release_title_format(release_title):
 	try:
 		release_title = release_title.lower().replace("'", "").lstrip('.').rstrip('.')
-		fmt = re.sub(r'[^a-z0-9-~]+', '.', release_title)
-		fmt = fmt.replace('.-.', '-').replace('-.', '-').replace('.-', '-').replace('--', '-')
-		fmt = '.%s.' % fmt
+		fmt = '.%s.' % re.sub(r'[^a-z0-9-~]+', '.', release_title).replace('.-.', '-').replace('-.', '-').replace('.-', '-').replace('--', '-')
 		return fmt
 	except:
 		log_utils.error()
@@ -552,14 +549,14 @@ def clean_name(release_title):
 							'www.2movierulz.ac', 'www.2movierulz.ms',
 							'www.3movierulz.com', 'www.3movierulz.tv',
 							'[zooqle.com]', '[horriblesubs]', '[gktorrent.com]', '[.www.omgtorrent.com.]', '[3d.hentai]', '[dark.media]', '[devil-torrents.pl]',
-							'[filetracker.pl]', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]', '[.www.speed.cd.]',
+							'[filetracker.pl]', 'www.bludv.tv', 'ramin.djawadi', '[prof]', '[reup]', '[.www.speed.cd.]', '[-bde4.com]',
 							'[ah]', '[ul]', '+13.+', 'taht.oyunlar', 'crazy4tv.com', '[tv]', '[noobsubs]', '[.freecourseweb.com.]',
 							'best-torrents-net', '[.www.torrentday.com.]', '1-3-3-8.com', 'ssrmovies.club', 'www.tamilmv.bid']
 		unwanted2 = ['().-.', '()--', '[..].', '[..]', '.[.].', '[.].','[.]-', '[]', '[.', '.]', ' ]-', '].', '{..}.', '{..}', '.{.}.', '{.}.', '{.}-', '{}', '{.', '.}', ' }-', '}.', '+-+-', '.-.', '-.-', '.-', '-.', '--', '-', '...', '..', '.', '4..', '4.', '4].']
 
 		if release_title.lower().startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
-		release_title = strip_non_ascii_and_unprintable(release_title)
-		release_title = release_title.lstrip('/ ').replace(' ', '.')
+		release_title = strip_non_ascii_and_unprintable(release_title).lstrip('/ ').replace(' ', '.')
+		# release_title = release_title.lstrip('/ ').replace(' ', '.')
 		for i in unwanted:
 			if release_title.lower().startswith(i):
 				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else i
@@ -636,7 +633,7 @@ def __top_domain(url):
 		elements = urlparse(url)
 		domain = elements.netloc or elements.path
 		domain = domain.split('@')[-1].split(':')[0]
-		regex = "(?:www\.)?([\w\-]*\.[\w\-]{2,3}(?:\.[\w\-]{2,3})?)$"
+		regex = r"(?:www\.)?([\w\-]*\.[\w\-]{2,3}(?:\.[\w\-]{2,3})?)$"
 		res = re.search(regex, domain)
 		if res: domain = res.group(1)
 		domain = domain.lower()

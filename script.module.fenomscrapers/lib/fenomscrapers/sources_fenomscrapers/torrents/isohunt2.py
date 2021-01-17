@@ -93,7 +93,7 @@ class source:
 
 	def get_sources(self, url):
 		try:
-			r = client.request(url, timeout='5')
+			r = client.request(url, timeout='10')
 			if not r or '<tbody' not in r: return
 			posts = client.parseDOM(r, 'tbody')[0]
 			posts = client.parseDOM(posts, 'tr')
@@ -105,7 +105,7 @@ class source:
 				for items in links:
 					# item[1] does not contain full info like the &dn= portion of magnet
 					link = urljoin(self.base_link, items[0])
-					link = client.request(link, timeout='5')
+					link = client.request(link, timeout='10')
 					if not link: continue
 
 					magnet = re.compile(r'(magnet.+?)"').findall(link)[0]

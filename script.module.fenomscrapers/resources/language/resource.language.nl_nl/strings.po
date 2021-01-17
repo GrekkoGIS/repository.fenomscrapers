@@ -550,7 +550,7 @@ msgid "BT4G (Pack capable)"
 msgstr "BT4G (Pack geschikt)"
 
 msgctxt "#32133"
-msgid ""
+msgid "BTDIG"
 msgstr ""
 
 msgctxt "#32134"

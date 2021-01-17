@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# (updated 1-09-2021)
+# (updated 1-16-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -9,10 +9,10 @@ from json import loads as jsloads
 import re
 import requests
 import sys
-try:
+try: #Py2
 	from urllib import urlencode, quote
 	from urlparse import parse_qs
-except ImportError:
+except ImportError: #Py3
 	from urllib.parse import urlencode, quote, parse_qs
 
 from fenomscrapers.modules import cleantitle
@@ -77,6 +77,7 @@ class source:
 			aliases = data['aliases'] # not used
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
+			years = [str(year), str(int(year)+1), str(int(year)-1)]
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = self._query(data)
@@ -107,7 +108,9 @@ class source:
 				stream_url = down_url + quote('/%s/%s/%s%s/%s%s' % (dl_farm, dl_port, post_hash, ext, post_title, ext))
 				file_name = post_title
 				name = source_utils.clean_name(file_name)
-				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+
+				# if not source_utils.check_title(title, aliases, name, hdlr, year): continue
+				if not source_utils.check_title(title, aliases, name, hdlr, year, years): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-16-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -20,9 +20,9 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
-		self.domains = ['idope.se, idope.today']
-		self.base_link = 'http://idope.se'
-		self.search_link = '/torrent-list/%s/'
+		self.domains = ['idope.org'] # "idope.se" is v2 challange now and different html to parse
+		self.base_link = 'http://idope.org'
+		self.search_link = '/search?q=%s'
 		self.min_seeders = 1
 		self.pack_capable = True
 
@@ -77,7 +77,7 @@ class source:
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			urls.append(url)
-			urls.append(url + '?p=2')
+			# urls.append(url + '?p=2')
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			threads = []
@@ -95,47 +95,46 @@ class source:
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-			div = client.parseDOM(r, 'div', attrs={'id': 'div2child'})
-
-			for row in div:
-				row = client.parseDOM(r, 'div', attrs={'class': 'resultdivbotton'})
-				if not row: return
-
-				for post in row:
-					hash = re.findall(r'<div id="hideinfohash.+?" class="hideinfohash">(.+?)<', post, re.DOTALL)[0]
-					name = re.findall(r'<div id="hidename.+?" class="hideinfohash">(.+?)<', post, re.DOTALL)[0]
-					name = unquote_plus(name)
-					name = source_utils.clean_name(name)
-					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
-					name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-					if source_utils.remove_lang(name_info): continue
-
-					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-					if url in str(self.sources): continue
-
-					if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-						if any(re.search(item, name.lower()) for item in ep_strings): continue
-
-					try:
-						seeders = int(re.findall(r'<div class="resultdivbottonseed">([0-9]+|[0-9]+,[0-9]+)<', post, re.DOTALL)[0].replace(',', ''))
-						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
-
-					quality, info = source_utils.get_release_quality(name_info, url)
-					try:
-						size = re.findall(r'<div class="resultdivbottonlength">(.+?)<', post)[0]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-					info = ' | '.join(info)
-
-					self.sources.append({'provider': 'idope', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			rows = client.parseDOM(r, 'tr', attrs={'class': 'row'})
+			if not rows: return
 		except:
 			source_utils.scraper_error('IDOPE')
+
+		for row in rows:
+			try:
+				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
+				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+
+				name = url.split('&dn=')[1]
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+				if source_utils.remove_lang(name_info): continue
+
+				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
+
+				try:
+					seeders = int(re.findall(r'<td class="seeds is-hidden-sm-mobile">([0-9]+|[0-9]+,[0-9]+)<', row, re.S)[0].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except: seeders = 0
+
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					# size = re.findall(r'<td class="is-hidden-touch">(.+? (?:GB|MB))<', row)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except:
+					dsize = 0
+				info = ' | '.join(info)
+
+				self.sources.append({'provider': 'idope', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('IDOPE')
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -184,60 +183,58 @@ class source:
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
-			div = client.parseDOM(r, 'div', attrs={'id': 'div2child'})
-
-			for row in div:
-				row = client.parseDOM(r, 'div', attrs={'class': 'resultdivbotton'})
-				if not row: return
-
-				for post in row:
-					hash = re.findall(r'<div id="hideinfohash.+?" class="hideinfohash">(.+?)<', post, re.DOTALL)[0]
-					name = re.findall(r'<div id="hidename.+?" class="hideinfohash">(.+?)<', post, re.DOTALL)[0]
-					name = unquote_plus(name)
-					name = source_utils.clean_name(name)
-
-					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-					if url in str(self.sources): continue
-
-					if not self.search_series:
-						if not self.bypass_filter:
-							if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-								continue
-						package = 'season'
-
-					elif self.search_series:
-						if not self.bypass_filter:
-							valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
-							if not valid: continue
-						else:
-							last_season = self.total_seasons
-						package = 'show'
-
-					name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
-					if source_utils.remove_lang(name_info): continue
-
-					try:
-						seeders = int(re.findall(r'<div class="resultdivbottonseed">([0-9]+|[0-9]+,[0-9]+)<', post, re.DOTALL)[0].replace(',', ''))
-						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
-
-					quality, info = source_utils.get_release_quality(name_info, url)
-					try:
-						size = re.findall(r'<div class="resultdivbottonlength">(.+?)<', post)[0]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-					info = ' | '.join(info)
-
-					item = {'provider': 'idope', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-					if self.search_series:
-						item.update({'last_season': last_season})
-					self.sources.append(item)
+			rows = client.parseDOM(r, 'tr', attrs={'class': 'row'})
+			if not rows: return
 		except:
 			source_utils.scraper_error('IDOPE')
+
+		for row in rows:
+			try:
+				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
+				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+
+				name = url.split('&dn=')[1]
+				name = source_utils.clean_name(name)
+				if not self.search_series:
+					if not self.bypass_filter:
+						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
+							continue
+					package = 'season'
+
+				elif self.search_series:
+					if not self.bypass_filter:
+						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
+						if not valid: continue
+					else:
+						last_season = self.total_seasons
+					package = 'show'
+
+				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
+				if source_utils.remove_lang(name_info): continue
+
+				try:
+					seeders = int(re.findall(r'<td class="seeds is-hidden-sm-mobile">([0-9]+|[0-9]+,[0-9]+)<', row, re.S)[0].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except: seeders = 0
+
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					# size = re.findall(r'<td class="is-hidden-touch">(.+? (?:GB|MB))<', row)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except:
+					dsize = 0
+				info = ' | '.join(info)
+
+				item = {'provider': 'idope', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
+				if self.search_series:
+					item.update({'last_season': last_season})
+				self.sources.append(item)
+			except:
+				source_utils.scraper_error('IDOPE')
 
 
 	def resolve(self, url):

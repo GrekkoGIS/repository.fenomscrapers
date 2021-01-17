@@ -78,7 +78,7 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			try:
-				r = client.request(url, timeout='5')
+				r = client.request(url, timeout='10')
 				links = client.parseDOM(r, "td", attrs={"nowrap": "nowrap"})
 				threads = []
 				for link in links:
@@ -98,7 +98,7 @@ class source:
 		try:
 			url = re.compile(r'href="(.+?)"').findall(link)[0]
 			url = urljoin(self.base_link, url)
-			result = client.request(url, timeout='5')
+			result = client.request(url, timeout='10')
 			if not result or 'magnet' not in result: return
 
 			url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', result, re.DOTALL)[0])

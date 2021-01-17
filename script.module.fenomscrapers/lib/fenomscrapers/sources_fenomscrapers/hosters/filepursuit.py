@@ -7,10 +7,10 @@
 from json import loads as jsloads
 import re
 import requests
-try:
+try: #Py2
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote_plus
-except ImportError:
+except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
 from fenomscrapers.modules import control

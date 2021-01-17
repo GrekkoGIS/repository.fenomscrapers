@@ -104,7 +104,7 @@ class source:
 	def _get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers, timeout='5')
+			r = client.request(url, headers=headers, timeout='10')
 			if not r or '<tbody' not in r: return self.items
 			posts = client.parseDOM(r, 'tbody')[0]
 			posts = client.parseDOM(posts, 'tr')
@@ -151,7 +151,7 @@ class source:
 				info.insert(0, item[3])
 			info = ' | '.join(info)
 
-			data = client.request(item[2], timeout='5')
+			data = client.request(item[2], timeout='10')
 			data = client.parseDOM(data, 'a', ret='href')
 
 			url = [i for i in data if 'magnet:' in i][0]

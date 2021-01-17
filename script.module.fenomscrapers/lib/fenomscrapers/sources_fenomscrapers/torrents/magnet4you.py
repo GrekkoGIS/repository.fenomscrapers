@@ -94,7 +94,7 @@ class source:
 
 	def get_sources(self, row):
 		try:
-			if 'magnet' not in row: return
+			if 'magnet:' not in row: return
 			url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			if url in str(self.sources): return

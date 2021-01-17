@@ -87,7 +87,7 @@ class source:
 
 		for i in r:
 			try:
-				if 'magnet' not in i: continue
+				if 'magnet:' not in i: continue
 				name = client.parseDOM(i, 'img', attrs={'class': 'thumbnails'}, ret='alt')[0].replace(u'\xa0', u' ')
 				if not source_utils.check_title(title, aliases, name, hdlr.replace('(', '').replace(')', ''), year): continue
 

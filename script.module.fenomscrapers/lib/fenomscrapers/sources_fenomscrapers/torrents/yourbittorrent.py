@@ -78,7 +78,7 @@ class source:
 			url = urljoin(self.base_link, url).replace('+', '-')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = client.request(url, timeout='5')
+			r = client.request(url, timeout='10')
 			if not r: return self.sources
 			links = re.findall(r'<a href="(/torrent/.+?)"', r, re.DOTALL)
 
@@ -96,7 +96,7 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
-			result = client.request(url, timeout='5')
+			result = client.request(url, timeout='10')
 			if result is None: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL)[0]

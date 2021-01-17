@@ -7,9 +7,10 @@
 import base64
 from json import loads as jsloads
 import re
-
-try: from urlparse import urljoin
-except ImportError: from urllib.parse import urljoin
+try: #Py2
+	from urlparse import urljoin
+except ImportError: #Py3
+	from urllib.parse import urljoin
 
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client

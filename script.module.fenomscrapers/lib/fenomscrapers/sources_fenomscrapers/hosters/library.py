@@ -5,10 +5,10 @@
 '''
 
 from json import loads as jsloads
-try:
+try: #Py2
 	from urlparse import parse_qs
 	from urllib import urlencode
-except ImportError:
+except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode
 
 from fenomscrapers.modules import control

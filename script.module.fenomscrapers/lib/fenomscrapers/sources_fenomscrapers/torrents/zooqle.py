@@ -96,7 +96,7 @@ class source:
 		try:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
-			html = client.request(url, ignoreErrors = 404, timeout='5')
+			html = client.request(url, ignoreErrors=404, timeout='5')
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]
@@ -207,7 +207,7 @@ class source:
 		try:
 			# For some reason Zooqle returns 404 even though the response has a body.
 			# This is probably a bug on Zooqle's server and the error should just be ignored.
-			html = client.request(link, ignoreErrors = 404, timeout='5')
+			html = client.request(link, ignoreErrors=404, timeout='5')
 			if not html: return
 			html = html.replace('&nbsp;', ' ')
 			try: results = client.parseDOM(html, 'table', attrs={'class': 'table table-condensed table-torrents vmiddle'})[0]

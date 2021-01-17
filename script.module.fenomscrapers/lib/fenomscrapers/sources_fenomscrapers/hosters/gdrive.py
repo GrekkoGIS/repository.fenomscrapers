@@ -6,9 +6,9 @@
 
 import re
 import requests
-try:
+try: #Py2
 	from urllib import unquote
-except ImportError:
+except ImportError: #Py3
 	from urllib.parse import unquote
 
 from fenomscrapers.modules import cleantitle

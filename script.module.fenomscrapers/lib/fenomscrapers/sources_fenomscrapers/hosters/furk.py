@@ -4,13 +4,13 @@
 	Fenomscrapers Project
 '''
 
-import json
+from json import dumps as jsdumps, loads as jsloads
 import requests
 import sys
-try:
+try: #Py2
 	from urlparse import parse_qs
 	from urllib import urlencode
-except ImportError:
+except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode
 
 from fenomscrapers.modules import control
@@ -41,7 +41,7 @@ class source:
 				s = requests.Session()
 				link = (self.base_link + self.login_link % (user_name, user_pass))
 				p = s.post(link)
-				p = json.loads(p.text)
+				p = jsloads(p.text)
 				if p['status'] == 'ok':
 					api_key = p['api_key']
 					control.setSetting('furk.api', api_key)
@@ -103,7 +103,8 @@ class source:
 			search_in = ''
 
 			if content_type == 'movie':
-				query = '@name+%s+%s+@files+%s+%s' % (title, year, title, year)
+				years = '%s+|+%s+|+%s' % (str(int(year) - 1), year, str(int(year) + 1))
+				query = '@name+%s+%s' % (title, years)
 
 			elif content_type == 'episode':
 				season = int(data['season'])
@@ -115,7 +116,7 @@ class source:
 			link = self.base_link + self.search_link % (api_key, query, match, moderated, search_in)
 
 			p = s.get(link)
-			p = json.loads(p.text)
+			p = jsloads(p.text)
 			if p.get('status') != 'ok': return
 
 			files = p.get('files')
@@ -134,9 +135,9 @@ class source:
 						file_dl = i['url_dl']
 
 						if content_type == 'episode':
-							url = json.dumps({'content': 'episode', 'file_id': file_id, 'season': season, 'episode': episode})
+							url = jsdumps({'content': 'episode', 'file_id': file_id, 'season': season, 'episode': episode})
 						else:
-							url = json.dumps({'content': 'movie', 'file_id': file_id, 'title': title, 'year': year})
+							url = jsdumps({'content': 'movie', 'file_id': file_id, 'title': title, 'year': year})
 
 						quality, info = source_utils.get_release_quality(name_info, file_dl)
 						try:
@@ -166,14 +167,14 @@ class source:
 			api_key = self.get_api()
 			if not api_key: return
 
-			url = json.loads(url)
+			url = jsloads(url)
 			file_id = url.get('file_id')
 			self.content_type = 'movie' if url.get('content') == 'movie' else 'episode'
 			if self.content_type == 'episode': self.filtering_list = self._seas_ep_resolve_list(url.get('season'), url.get('episode'))
 			link = (self.base_link + self.tfile_link % (api_key, file_id))
 			s = requests.Session()
 			p = s.get(link)
-			p = json.loads(p.text)
+			p = jsloads(p.text)
 			if p['status'] != 'ok' or p['found_files'] != '1': return
 
 			files = p['files'][0]

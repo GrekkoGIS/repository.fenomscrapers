@@ -5,10 +5,10 @@
 '''
 
 import re
-try:
+try: #Py2
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode
-except ImportError:
+except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode, urljoin
 
 from fenomscrapers.modules import cfscrape

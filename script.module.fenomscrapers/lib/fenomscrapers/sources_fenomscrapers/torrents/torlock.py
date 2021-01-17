@@ -78,7 +78,7 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
 			try:
-				r = client.request(url, timeout='5')
+				r = client.request(url, timeout='10')
 				if r is None: return self.sources
 				links = re.findall(r'<a href=(/torrent/.+?)>', r, re.DOTALL)
 				threads = []
@@ -98,9 +98,9 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = urljoin(self.base_link, link)
-			result = client.request(url, timeout='5')
+			result = client.request(url, timeout='10')
 			if result is None: return
-			if 'magnet' not in result: return
+			if 'magnet:' not in result: return
 
 			url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', result, re.DOTALL)[0])
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr=')[0]

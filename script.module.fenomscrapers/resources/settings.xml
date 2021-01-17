@@ -24,7 +24,7 @@
 		<setting id="provider.maxrls" type="bool" label="32071" default="false" />
 		<setting id="provider.myvideolink" type="bool" label="32072" default="false" />
 		<setting id="provider.rapidmoviez" type="bool" label="32082" default="false" />
-		<setting id="provider.rlsbb" type="bool" label="32075" default="false" /> <!-- new proxy for v2 -->
+		<setting id="provider.rlsbb" type="bool" label="32075" default="false" /> <!-- 1-16-21 now new proxy gone v2 -->
 		<setting id="provider.scenerls" type="bool" label="32076" default="false" />
 
 		<setting label="32044" type="lsep" />
@@ -56,6 +56,7 @@
 		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
 		<setting id="provider.bt4g" type="bool" label="32132" default="true" />
 		<setting id="provider.btdb" type="bool" label="32129" default="true" />
+		<setting id="provider.btdig" type="bool" label="32133" default="false" />
 		<setting id="provider.btscene" type="bool" label="32104" default="true" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.ext" type="bool" label="32131" default="true" />

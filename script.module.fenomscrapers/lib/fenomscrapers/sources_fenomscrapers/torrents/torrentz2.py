@@ -100,7 +100,7 @@ class source:
 
 		for row in rows:
 			try:
-				if 'magnet' not in row: continue
+				if 'magnet:' not in row: continue
 				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
@@ -194,7 +194,7 @@ class source:
 
 		for row in rows:
 			try:
-				if 'magnet' not in row: continue
+				if 'magnet:' not in row: continue
 				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (1-16-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -7,22 +7,25 @@
 import re
 try: #Py2
 	from urlparse import parse_qs, urljoin
-	from urllib import urlencode, quote_plus
+	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
 
-from fenomscrapers.modules import cfscrape
+from fenomscrapers.modules import cfscrape # client.request causes strange 429 error
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
 
 class source:
 	def __init__(self):
-		self.priority = 21
+		self.priority = 15
 		self.language = ['en']
-		self.domains = ['scene-rls.com', 'scene-rls.net']
-		self.base_link = 'http://scene-rls.net'
-		self.search_link = '/?s=%s'
+		self.domains = ['www.digbt.org']
+		self.base_link = 'https://www.btdig.com'
+		self.search_link = '/search?q=%s'
+		self.scraper = cfscrape.create_scraper()
+		self.min_seeders = 0
+		self.pack_capable = True
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -59,7 +62,6 @@ class source:
 		sources = []
 		if not url: return sources
 		try:
-			scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -71,65 +73,52 @@ class source:
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = '%s %s' % (title, hdlr)
-			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
+			query = re.sub('[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			r = scraper.get(url).content
-			posts = client.parseDOM(r, 'div', attrs={'class': 'post'})
-			if not posts: return sources
+			r = self.scraper.get(url).content
+			# r = client.request(url)
+			if not r: return sources
+			rows = client.parseDOM(r, "div", attrs={"class": "one_result"})
+			if not rows: return sources
 		except:
-			source_utils.scraper_error('SCENERLS')
+			source_utils.scraper_error('BTDIG')
 			return sources
 
-		items = []
-		for post in posts:
+		for row in rows:
 			try:
-				content = client.parseDOM(post, "div", attrs={"class": "postContent"})
-				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', content[0])[0]
-				u = client.parseDOM(content, "h2")
-				u = client.parseDOM(u, 'a', ret='href')
-				u = [(i.strip('/').split('/')[-1], i, size) for i in u]
-				items += u
-			except:
-				source_utils.scraper_error('SCENERLS')
-				return sources
+				url = re.findall('<a href="(magnet:.+?)"', row, re.DOTALL)[0]
+				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
 
-		for item in items:
-			try:
-				name = item[0]
-				name = client.replaceHTMLCodes(name)
+				name = url.split('&dn=')[1]
+				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 
-				# check year for reboot/remake show issues if year is available-crap shoot
-				# if 'tvshowtitle' in data:
-					# if re.search(r'([1-3][0-9]{3})', name):
-						# if not any(value in name for value in [year, str(int(year)+1), str(int(year)-1)]):
-							# continue
+				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
-				url = item[1]
-				url = client.replaceHTMLCodes(url)
-				try: url = url.encode('utf-8')
-				except: pass
-				if url in str(sources): continue
-
-				valid, host = source_utils.is_host_valid(url, hostDict)
-				if not valid: continue
-
-				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					dsize, isize = source_utils._size(item[2])
+					seeders = 1 # seeders not available on "btdig", set to 1 to satisfy addon caching of torrent
+					if self.min_seeders > seeders: return
+				except: seeders = 0
+
+				quality, info = source_utils.get_release_quality(url)
+				try:
+					size = client.parseDOM(row, "span", attrs={"class": "torrent_size"})[0]
+					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
-				sources.append({'provider': 'scenerls', 'source': host, 'name': name, 'name_info': name_info, 'quality': quality, 'language': 'en', 'url': url,
-											'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+				sources.append({'provider': 'btdig', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
-				source_utils.scraper_error('SCENERLS')
+				source_utils.scraper_error('BTDIG')
 		return sources
 
 
