@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.2.3" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.2.4" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -27,14 +27,8 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.2.3 - Jan. 17, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Added "btdig" torrent scraper.[/I]
-[COLOR yellow]--[/COLOR][I] "easynews" scraper update.[/I]
-[COLOR yellow]--[/COLOR][I] "furk" scraper update.[/I]
-[COLOR yellow]--[/COLOR][I] "idope" scraper rewritten for new proxy site. Works once again.[/I]
-[COLOR yellow]--[/COLOR][I] "rlsbb" proxy now v2 challenge.  Will remove in next update if
-    proxy not found.[/I]
-[COLOR yellow]--[/COLOR][I] "source_utils" module update to support year range checks of titles.[/I]
+[B][COLOR red]Update - v1.2.4 - Jan. 17, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] new proxy for "skytorrents". Works once again.[/I]
 		</news>
 	</extension>
 </addon>

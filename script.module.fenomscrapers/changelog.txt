@@ -1,3 +1,6 @@
+[B][COLOR red]Update - v1.2.4 - Jan. 17, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] new proxy for "skytorrents". Works once again.[/I]
+
 [B][COLOR red]Update - v1.2.3 - Jan. 17, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Added "btdig" torrent scraper.[/I]
 [COLOR yellow]--[/COLOR][I] "easynews" scraper update.[/I]

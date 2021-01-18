@@ -25,7 +25,7 @@ limetorrents (uses cfscrape)
 magnet4you
 magnetdl
 nyaa (anime)
-skytorrents (v2 challenge as of 1-12-21, scraper removed)
+skytorrents (.org v2 challenge, switched to .net 1-17-21)
 topnow
 torrentdownload
 torrentgalaxy (uses cfscrape)

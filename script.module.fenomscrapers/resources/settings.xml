@@ -72,7 +72,7 @@
 <!-- 		<setting id="provider.moviemagnet" type="bool" label="32115" default="false" /> --> <!-- Looks to be dead and gone -->
 		<setting id="provider.nyaa" type="bool" label="32116" default="false" />
 		<setting id="provider.piratebay" type="bool" label="32117" default="true" />
-<!-- 		<setting id="provider.skytorrents" type="bool" label="32118" default="false" /> --> <!-- v2 challenge -->
+		<setting id="provider.skytorrents" type="bool" label="32118" default="true" /> <!-- .org v2 challenge uses .net now-->
 		<setting id="provider.solidtorrents" type="bool" label="32119" default="true" />
 		<setting id="provider.topnow" type="bool" label="32120" default="false" />
 		<setting id="provider.torlock" type="bool" label="32121" default="false" />
