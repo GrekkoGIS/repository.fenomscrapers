@@ -22,9 +22,9 @@ class source:
 		self.language = ['en']
 		self.domains = ['bt4g.org']
 		self.base_link = 'https://bt4g.org'
-		self.search_link = '/movie/search/%s/bysize/1'
+		self.search_link = '/movie/search/%s/byseeders/1'
 		self.min_seeders = 0
-		self.pack_capable = False
+		self.pack_capable = True
 
 
 	def movie(self, imdb, title, aliases, year):

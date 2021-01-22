@@ -142,11 +142,10 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 			for i in years:
 				t = t.split(i)[0]
 		t = t.split('2160p')[0].split('4k')[0].split('1080p')[0].split('720p')[0]
-		# log_utils.log('t = %s' % t, log_utils.LOGDEBUG)
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): match = False
-		if years:
-			if not any(value in release_title for value in years): match = False
-		else:
+		if years: # for movies only, scraper to pass None for episodes
+				if not any(value in release_title for value in years): match = False
+		else: 
 			if h not in release_title: match = False
 		return match
 	except:

@@ -1,3 +1,7 @@
+[B][COLOR red]Update - v1.2.5 - Jan. 22, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] fixed "btdb" for changes to html elements. Working once again.[/I]
+[COLOR yellow]--[/COLOR][I] fixed "easynews" filter for episodes failed.[/I]
+
 [B][COLOR red]Update - v1.2.4 - Jan. 17, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] new proxy for "skytorrents". Works once again.[/I]
 

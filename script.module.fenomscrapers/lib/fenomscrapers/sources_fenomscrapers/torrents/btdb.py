@@ -98,7 +98,8 @@ class source:
 			if not r: return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
-				url = re.findall(r'<a href="(magnet:.+?)"', post, re.DOTALL)[0]
+				if 'magnet:' not in post: continue
+				url = re.findall(r"href.*=.*'(magnet:.+?)'", post, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
@@ -114,7 +115,7 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'Seeders(?:.*?>)([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: return
 				except: seeders = 0
 
@@ -180,7 +181,8 @@ class source:
 			if not r: return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
-				url = re.findall(r'<a href="(magnet:.+?)"', post, re.DOTALL)[0]
+				if 'magnet:' not in post: continue
+				url = re.findall(r"href.*=.*'(magnet:.+?)'", post, re.DOTALL)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				if url in str(self.sources): return
@@ -205,7 +207,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(re.findall(r'Seeders\s+:\s+<strong class="text-success">([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'Seeders(?:.*?>)([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
 					if self.min_seeders > seeders: return
 				except: seeders = 0
 

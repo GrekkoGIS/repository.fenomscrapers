@@ -17,7 +17,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import control
-from fenomscrapers.modules import source_utils
+from fenomscrapers.modules import source_utils, log_utils
 
 SORT = {'s1': 'relevance', 's1d': '-', 's2': 'dsize', 's2d': '-', 's3': 'dtime', 's3d': '-'}
 SEARCH_PARAMS = {'st': 'adv', 'sb': 1, 'fex': 'mkv, mp4, avi, mpg, wemb', 'fty[]': 'VIDEO', 'spamf': 1, 'u': '1', 'gx': 1, 'pno': 1, 'sS': 3}
@@ -77,7 +77,7 @@ class source:
 			aliases = data['aliases'] # not used
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
-			years = [str(year), str(int(year)+1), str(int(year)-1)]
+			years = [str(year), str(int(year)+1), str(int(year)-1)] if 'tvshowtitle' not in data else None
 			hdlr = 'S%02dE%02d' % (int(data['season']), int(data['episode'])) if 'tvshowtitle' in data else year
 
 			query = self._query(data)
@@ -108,8 +108,6 @@ class source:
 				stream_url = down_url + quote('/%s/%s/%s%s/%s%s' % (dl_farm, dl_port, post_hash, ext, post_title, ext))
 				file_name = post_title
 				name = source_utils.clean_name(file_name)
-
-				# if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				if not source_utils.check_title(title, aliases, name, hdlr, year, years): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
