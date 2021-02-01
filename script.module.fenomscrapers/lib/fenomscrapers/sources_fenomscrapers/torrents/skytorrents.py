@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -91,13 +91,12 @@ class source:
 			try:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
-				link = re.findall(r'href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
-
+				link = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\'].+<td\s*style\s*=\s*["\']text-align:\s*center;color:green;["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL | re.I)
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(sources): return
-					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
@@ -112,16 +111,14 @@ class source:
 					try:
 						seeders = int(seeders)
 						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
+					except: seeders = 0
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
-					except:
-						dsize = 0
+					except: dsize = 0
 					info = ' | '.join(info)
 
 					sources.append({'provider': 'skytorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -188,13 +185,12 @@ class source:
 			try:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
-				link = re.findall(r'href="(magnet:.+?)".+<td style="text-align: center;color:green;">([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL)
-
+				link = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\'].+<td\s*style\s*=\s*["\']text-align:\s*center;color:green;["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL | re.I)
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources): return
-					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
 
@@ -218,16 +214,14 @@ class source:
 					try:
 						seeders = int(seeders)
 						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
+					except: seeders = 0
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
-					except:
-						dsize = 0
+					except: dsize = 0
 					info = ' | '.join(info)
 
 					item = {'provider': 'skytorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated url 1-09-2021)
+# created by Venom for Fenomscrapers (updated url 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -101,10 +101,10 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
-				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
+				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -117,17 +117,22 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Seeds'})[0])
+					# seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Seeds'})[0])
+					seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Last Updated'})[0]) #keep an eye on this, looks like they gaffed their col's (seeders and size)
+
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = client.parseDOM(row, 'td', attrs={'data-title': 'Size'})[0]
+					# size = client.parseDOM(row, 'td', attrs={'data-title': 'Size'})[0]
+					# size = client.parseDOM(row, 'td', attrs={'class': 'description-data'})[0].replace(u'&nbsp;', u' ').replace(u'\xa0', u' ')
+					# size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' '))[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except:
+					source_utils.scraper_error('TORRENTZ2')
 					dsize = 0
 				info = ' | '.join(info)
 
@@ -195,10 +200,10 @@ class source:
 		for row in rows:
 			try:
 				if 'magnet:' not in row: continue
-				url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
+				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -221,18 +226,20 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Seeds'})[0])
+					# seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Seeds'})[0])
+					seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Last Updated'})[0]) #keep an eye on this, looks like they gaffed their col's (seeders and size)
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = client.parseDOM(row, 'td', attrs={'data-title': 'Size'})[0]
+					# size = client.parseDOM(row, 'td', attrs={'data-title': 'Size'})[0]
+					# size = client.parseDOM(row, 'td', attrs={'class': 'description-data'})[0].replace(u'&nbsp;', u' ').replace(u'\xa0', u' ')
+					# size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' '))[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'torrentz2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

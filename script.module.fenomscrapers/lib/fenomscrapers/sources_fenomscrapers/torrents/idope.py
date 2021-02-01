@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-16-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -104,7 +104,7 @@ class source:
 			try:
 				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -117,7 +117,7 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall(r'<td class="seeds is-hidden-sm-mobile">([0-9]+|[0-9]+,[0-9]+)<', row, re.S)[0].replace(',', ''))
+					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.S | re.I)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
@@ -127,8 +127,7 @@ class source:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				self.sources.append({'provider': 'idope', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -192,7 +191,7 @@ class source:
 			try:
 				url = client.parseDOM(row, 'a', attrs={'title': 'Download Torrent Magnet'}, ret='href')[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -214,7 +213,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(re.findall(r'<td class="seeds is-hidden-sm-mobile">([0-9]+|[0-9]+,[0-9]+)<', row, re.S)[0].replace(',', ''))
+					seeders = int(re.findall(r'<td\s*class\s*=\s*["\']seeds\s*is-hidden-sm-mobile["\']>([0-9]+|[0-9]+,[0-9]+)<', row, re.S | re.I)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
@@ -224,8 +223,7 @@ class source:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'idope', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

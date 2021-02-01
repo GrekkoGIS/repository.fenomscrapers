@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (1-09-2021)
+# created by Venom for Fenomscrapers (1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -89,9 +89,9 @@ class source:
 			try:
 				if 'dwn-btn torrent-dwn' not in row: continue
 				link = client.parseDOM(row, 'a', attrs={'class': 'dwn-btn torrent-dwn'}, ret='href')[0]
-				hash = re.search(r'/torrent/(?:.+?/)(.+?).torrent', link).group(1)
+				hash = re.search(r'/torrent/(?:.+?/)(.+?).torrent', link, re.I).group(1)
 
-				name = re.search(r'\?title=(?:.+?])(.+?).torrent', link).group(1)
+				name = re.search(r'\?title=(?:.+?])(.+?).torrent', link, re.I).group(1)
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -104,18 +104,17 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall(r'<span class="text-success">([0-9]+)</span>', row, re.DOTALL)[0])
+					seeders = int(re.findall(r'<span\s*class\s*=\s*["\']text-success["\']>([0-9]+)</span>', row, re.DOTALL | re.I)[0])
+					log_utils.log('seeders = %s' % seeders, log_utils.LOGDEBUG)
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'ext', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -207,18 +206,16 @@ class source:
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 				try:
-					seeders = int(re.findall(r'<span class="text-success">([0-9]+)</span>', row, re.DOTALL)[0])
+					seeders = int(re.findall(r'<span\s*class\s*=\s*["\']text-success["\']>([0-9]+)</span>', row, re.DOTALL | re.I)[0])
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'ext', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

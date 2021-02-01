@@ -62,7 +62,7 @@ from .user_agent import User_Agent
 
 # ------------------------------------------------------------------------------- #
 
-__version__ = '1.2.52'
+__version__ = '1.2.56'
 
 # ------------------------------------------------------------------------------- #
 
@@ -363,7 +363,7 @@ class CloudScraper(Session):
                     resp.text,
                     re.M | re.S
                 )
-                and re.search(r'window._cf_chl_enter\(', resp.text, re.M | re.S)
+                and re.search(r'window._cf_chl_enter\s*[\(=]', resp.text, re.M | re.S)
             )
         except AttributeError:
             pass
@@ -384,7 +384,7 @@ class CloudScraper(Session):
                     resp.text,
                     re.M | re.S
                 )
-                and re.search(r'window._cf_chl_enter\(', resp.text, re.M | re.S)
+                and re.search(r'\s*id="trk_captcha_js"', resp.text, re.M | re.S)
             )
         except AttributeError:
             pass

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -82,6 +82,7 @@ class source:
 			api_url = urljoin(self.base_link, self.api_search_link)
 
 			headers = cache.get(self._get_token_and_cookies, 1)
+			if not headers: return sources
 			headers.update({'Referer': url})
 
 			query_data = {
@@ -116,7 +117,7 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
@@ -125,8 +126,7 @@ class source:
 				try:
 					seeders = file.get('seeds')
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
@@ -134,8 +134,7 @@ class source:
 					size = str(size) + ' GB' if len(str(size)) == 1 else str(size) + ' MB'
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
@@ -163,7 +162,7 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
-			self.headers = cache.get(self._get_token_and_cookies, 24)
+			self.headers = cache.get(self._get_token_and_cookies, 1)
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
@@ -220,7 +219,7 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				if not self.search_series:
 					if not self.bypass_filter:
@@ -242,8 +241,7 @@ class source:
 				try:
 					seeders = file.get('seeds')
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
@@ -251,8 +249,7 @@ class source:
 					size = str(size) + ' GB' if len(str(size)) == 1 else str(size) + ' MB'
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
@@ -268,6 +265,8 @@ class source:
 		headers = None
 		try:
 			post = client.request(self.base_link, output='extended', timeout='10')
+			# log_utils.log('post = %s' % post, log_utils.LOGDEBUG)
+			if not post: return headers
 			token_id = re.findall(r'token\: (.*)\n', post[0])[0]
 			token = ''.join(re.findall(token_id + r" ?\+?\= ?'(.*)'", post[0]))
 			headers = post[3]

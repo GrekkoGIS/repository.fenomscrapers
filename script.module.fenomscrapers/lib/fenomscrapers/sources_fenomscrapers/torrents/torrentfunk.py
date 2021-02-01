@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -80,8 +80,7 @@ class source:
 			r = client.request(url, timeout='5')
 			if not r: return self.sources
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
-			links = re.findall(r'<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
-
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', r, re.DOTALL | re.I)
 			threads = []
 			for link in links:
 				threads.append(workers.Thread(self.get_sources, link))
@@ -119,23 +118,21 @@ class source:
 
 			link = client.request(link, timeout='5')
 			if link is None: 	return
-			hash = re.findall(r'<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
+			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 
 			try:
-				seeders = int(re.findall(r'<b>Swarm:</b></td><td valign=top><font color=red>([0-9]+)</font>', link, re.DOTALL)[0].replace(',', ''))
-				if self.min_seeders > seeders: return  # site does not seem to report seeders
-			except:
-				seeders = 0
+				seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
+				if self.min_seeders > seeders: return
+			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
 				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
-			except:
-				dsize = 0
+			except: dsize = 0
 			info = ' | '.join(info)
 
 			self.sources.append({'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -191,7 +188,7 @@ class source:
 			r = client.request(url, timeout='5')
 			if not r: return
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
-			links = re.findall(r'<a href="(/torrent/.+?)">(.+?)</a>', r, re.DOTALL)
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', r, re.DOTALL | re.I)
 
 			for link in links:
 				try: url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
@@ -227,23 +224,21 @@ class source:
 
 				link = client.request(link, timeout='5')
 				if link is None: 	continue
-				hash = re.findall(r'<b>Infohash</b></td><td valign=top>(.+?)</td>', link, re.DOTALL)[0]
+				hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 				if url in str(self.sources): continue
 
 				try:
-					seeders = int(re.findall(r'<b>Swarm:</b></td><td valign=top><font color=red>([0-9]+)</font>', link, re.DOTALL)[0].replace(',', ''))
-					if self.min_seeders > seeders: continue# site does not seem to report seeders
-				except:
-					seeders = 0
+					seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

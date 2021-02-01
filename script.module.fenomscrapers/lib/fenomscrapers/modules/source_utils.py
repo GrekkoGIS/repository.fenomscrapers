@@ -30,7 +30,8 @@ CODEC_H265 = ['hevc', 'h265', 'h.265', 'x265', 'x.265']
 
 LANG = ['arabic', 'bgaudio', 'castellano', 'chinese', 'dutch', 'finnish', 'french', 'german', 'greek', 'italian', 'latino', 'polish', 'portuguese',
 			  'russian', 'spanish', 'tamil', 'telugu', 'truefrench', 'truespanish', 'turkish', 'hebrew']
-ABV_LANG = ['.chi.', '.chs.', '.dut.', '.fin.', '.fre.', '.ger.', '.gre.', '.heb.', '.ita.', '.jpn.', '.pol.', '.por.', '.rus.', '.spa.', '.tur.', '.ukr.']
+ABV_LANG = ['.zh.', '.zho.', '.chi.', '.chs.', '.nl.', '.nld.', '.dut,', '.fi.', '.fin.', '.fr.', '.fra.', '.fre.', '.de.', '.deu.', '.ger.', '.he.', '.heb.', '.hi.', '.hin.', '.it.', '.ita.',
+						'.ja.', '.jpn.', '.ko.', '.kor.', '.pl.', '.pol.', '.pt.', '.por.', '.ru.', '.rus.', '.es.', '.spa.', '.sv.', '.swe.', '.tr.', '.tur.', '.uk.', '.ukr.', '.vi.', '.vie.']
 DUBBED = ['dublado', 'dubbed', 'pldub']
 SUBS = ['subita', 'subfrench', 'subspanish', 'subtitula', 'swesub', 'nl.subs']
 ADDS = ['1xbet', 'betwin']
@@ -114,7 +115,6 @@ def aliases_to_array(aliases, filter=None):
 
 
 def check_title(title, aliases, release_title, hdlr, year, years=None):
-	# years = [str(year), str(int(year)+1), str(int(year)-1)]
 	try: aliases = aliases_to_array(jsloads(aliases))
 	except: aliases = None
 	title_list = []
@@ -205,17 +205,17 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
-		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
+		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list):
 			return False
 
-# remove episode ranges
-		episode_list = [
-				r's\d{1,3}(?:\.|-)e\d{1,3}',
-				r's\d{1,3}(?:\.|-)\d{1,3}e\d{1,3}',
-				r's[0-3]{1}[0-9]{1}e\d{1,2}',
-				r'season(?:\.|-)\d{1,2}(?:\.{0,1}|-{0,1})episode(?:\.|-)\d{1,2}',
-				r'season(?:\.|-)\d{1,3}(?:\.|-)ep(?:\.|-)\d{1,3}']
-		for item in episode_list:
+# remove single episodes(returned in single ep scrape)
+		episode_regex = [
+				r's\d{1,3}e\d{1,3}',
+				r's[0-3]{1}[0-9]{1}[.-]e\d{1,2}',
+				r's\d{1,3}[.-]\d{1,3}e\d{1,3}',
+				r'season[.-]?\d{1,3}[.-]?ep[.-]?\d{1,3}',
+				r'season[.-]?\d{1,3}[.-]?episode[.-]?\d{1,3}']
+		for item in episode_regex:
 			if bool(re.search(item, release_title)):
 				return False
 
@@ -223,26 +223,25 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 		rt = release_title.replace('-', '.')
 		if any(i in rt for i in string_list):
 			for item in [
-				season_check.rstrip('.') + r'(?:\.|-)s\d{1}(?:$|\.|-)', # ex. ".s1-s9"
-				season_fill_check.rstrip('.') + r'(?:\.|-)s\d{2}(?:$|\.|-)', # ".s01-s09."
-				season_fill_check.rstrip('.') + r'(?:\.|-)\d{2}(?:$|\.|-)', # ".s01.09."
+				season_check.rstrip('.') + r'[.-]s([2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]|$)', # ex. ".s1-s9.", .s1-s39.
+				season_fill_check.rstrip('.') + r'[.-]s\d{2}(?:[.-]|$)', # ".s01-s09.", .s01-s39.
+				season_fill_check.rstrip('.') + r'[.-]\d{2}(?:[.-]|$)', # ".s01.09."
 				r'\Ws\d{2}\W%s' % season_fill_check.lstrip('.'), # may need more reverse ranges
-				season_full_check.rstrip('.') + r'(?:\.|-)to(?:\.|-)\d{1}(?:$|\.|-)', # "season.1.to.9."
-				season_full_check.rstrip('.') + r'(?:\.|-)season(?:\.|-)\d{1}(?:$|\.|-)', # "season.1.season.9."
-				season_full_check.rstrip('.') + r'(?:\.|-)\d{1}(?:$|\.|-)', # "season.1.9."
-				season_full_check.rstrip('.') + r'(?:\.|-)\d{1}(?:\.|-)\d{1,2}(?:$|\.|-)',
-				season_full_check.rstrip('.') + r'(?:\.|-)\d{3}(?:\.|-)(?:19|20)[0-9]{2}(?:$|\.|-)',# single season followed by 3 digit followed by 4 digit year ex."season.1.004.1971"
-				season_full_fill_check.rstrip('.') + r'(?:\.|-)\d{3}(?:\.|-)\d{3}(?:$|\.|-)',# 2 digit season followed by 3 digit dash range ex."season.10.001-025."
-				season_full_fill_check.rstrip('.') + r'(?:\.|-)season(?:\.|-)\d{2}(?:$|\.|-)' # 2 digit season followed by 2 digit season range ex."season.01-season.09."
+				season_full_check.rstrip('.') + r'[.-]to[.-]([2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]|$)', # ".season.1.to.9.", ".season.1.to.39"
+				season_full_check.rstrip('.') + r'[.-]season[.-]([2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]|$)', # ".season.1.season.9.", ".season.1.season.39"
+				season_full_check.rstrip('.') + r'[.-]([2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]|$)', # "season.1.9.", "season.1.39.
+				season_full_check.rstrip('.') + r'[.-]\d{1}[.-]\d{1,2}(?:[.-]|$)', #  "season.1.9.09."
+				season_full_check.rstrip('.') + r'[.-]\d{3}[.-](?:19|20)[0-9]{2}(?:[.-]|$)',# single season followed by 3 digit followed by 4 digit year ex."season.1.004.1971"
+				season_full_fill_check.rstrip('.') + r'[.-]\d{3}[.-]\d{3}(?:[.-]|$)',# 2 digit season followed by 3 digit dash range ex."season.10.001-025."
+				season_full_fill_check.rstrip('.') + r'[.-]season[.-]\d{2}(?:[.-]|$)' # 2 digit season followed by 2 digit season range ex."season.01-season.09."
 					]:
 				if bool(re.search(item, release_title)):
 					return False
 			return True
 		return False
 	except:
-		# return True
 		log_utils.error()
-
+		return True
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
 	try: aliases = aliases_to_array(jsloads(aliases))
@@ -267,41 +266,40 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 		t = release_title.replace('-', '.')
 		for i in split_list:
 			t = t.split(i)[0]
-		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list):
+		if all(cleantitle.get(x) != cleantitle.get(t) for x in title_list):
 			return False, 0
 
-# remove episode ranges
+# remove single episodes(returned in single ep scrape)
 		episode_regex = [
-				r's[0-3]{1}[0-9]{1}(?:\.|-)e\d{1,2}',
-				r's[0-3]{1}[0-9]{1}(?:\.|-)\d{1,2}e\d{1,2}',
-				r's[0-3]{1}[0-9]{1}e\d{1,2}',
-				r'season(?:\.|-)\d{1,2}(?:\.{0,1}|-{0,1})episode(?:\.|-)\d{1,2}',
-				r'season(?:\.|-)\d{1,2}(?:\.|-)ep(?:\.|-)\d{1,2}']
+				r's\d{1,3}e\d{1,3}',
+				r's[0-3]{1}[0-9]{1}[.-]e\d{1,2}',
+				r's\d{1,3}[.-]\d{1,3}e\d{1,3}',
+				r'season[.-]?\d{1,3}[.-]?ep[.-]?\d{1,3}',
+				r'season[.-]?\d{1,3}[.-]?episode[.-]?\d{1,3}']
 		for item in episode_regex:
 			if bool(re.search(item, release_title)):
 				return False, 0
 
 # remove season ranges that do not begin at 1
 		season_range_regex = [
-				r'(?:season|seasons)(?:\.|-|)(?:[2-9]|1[0-9]|2[0-9])(?:\.|-|)(?:to|thru|\.|-)(?:\.|-|)(?:[3-9]|1[0-9]|2[0-9])(?:$|\.|-)' # "seasons.5-6", seasons5.to.6, seasons.5.thru.6
-				]
+				r'(?:season|seasons|s)[.-]?(?:0?[2-9]{1}|[1-3]{1}[0-9]{1})(?:[.-]?to[.-]?|[.-]?thru[.-]?|[.-])(?:season|seasons|s|)[.-]?(?:0?[2-9]{1}|[1-3]{1}[0-9]{1})'] # "seasons.5-6", seasons5.to.6, seasons.5.thru.6
 		for item in season_range_regex:
 			if bool(re.search(item, release_title)):
 				return False, 0
 
 # remove single seasons - returned in seasonPack scrape
 		season_regex = [
-				r'season(?:\.{0,1}|-)([2-9]{1}).(?:0{1})\1.complete',		 # "season.2.02.complete" when first number is >1 matches 2nd after a zero
-				r'season(?:\.{0,1}|-)([2-9]{1}).(?:[0-9]+).complete',		 # "season.9.10.complete" when first number is >1 followed by 2 digit number
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)s\d{1,2}',		 # season.02.s02
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)complete',		 # season.02.complete
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)\d{3,4}p{0,1}',		  # "season.02.1080p" and no seperator "season02.1080p"
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?!thru|to|\d{1,2}\.)',		  # "season.02." or "season.1" not followed by "to", "thru", or another single, or 2 digit number, then a dot(which would be a range)
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.{0,1})(?:$)',		 # end of line ex."season.1",  "season.01", "season01" can also have trailing dot only
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)(?:19|20)[0-9]{2}',		 # single season followed by 4 digit year ex."season.1.1971", "season.01.1971", or "season01.1971"
-				r'season(?:\.{0,1}|-)\d{1,2}(?:\.|-)\d{3}(?:\.{1,2}|-{1,2})(?:19|20)[0-9]{2}',		 # single season followed by 4 digits then 4 digit year ex."season.1.004.1971" or "season.01.004.1971" (comic book format)
-				r'(?<!thru)(?<!to)(?<!\d{2})(?:\.|-)s\d{2}(?:\.|-)complete',		 # ".s01.complete" not preceded by "thru", "to", or 2 digit number
-				r'(?<!thru)(?<!to)(?<!s\d{2})(?:\.|-)s\d{2}(?!\.thru|\.to|\.s\d{0,2}\.|-s\d{0,2}\.|\.\d{0,2}\.|-\d{0,2}\.)'		 # .s01. not preceded by "thru", "to", or "s02". Not followed by ".thru", ".to", ".s02", "-s02", ".02.", or "-02."
+				r'season[.-]?([1-9]{1})[.-]0{1}\1[.-]?complete', # "season.1.01.complete" when 2nd number matches the fiirst group with leading 0
+				r'season[.-]?([2-9]{1})[.-](?:[0-9]+)[.-]?complete', # "season.9.10.complete" when first number is >1 followed by 2 digit number
+				r'season[.-]?\d{1,2}[.-]s\d{1,2}', # season.02.s02
+				r'season[.-]?\d{1,2}[.-]complete', # season.02.complete
+				r'season[.-]?\d{1,2}[.-]\d{3,4}p{0,1}', # "season.02.1080p" and no seperator "season02.1080p"
+				r'season[.-]?\d{1,2}[.-](?!thru|to|\d{1,2}[.-])', # "season.02." or "season.1" not followed by "to", "thru", or another single or 2 digit number then a dot(which would be a range)
+				r'season[.-]?\d{1,2}[.]?$', # end of line ex."season.1", "season.01", "season01" can also have trailing dot or end of line(dash would be a range)
+				r'season[.-]?\d{1,2}[.-](?:19|20)[0-9]{2}', # single season followed by 4 digit year ex."season.1.1971", "season.01.1971", or "season01.1971"
+				r'season[.-]?\d{1,2}[.-]\d{3}[.-]{1,2}(?:19|20)[0-9]{2}', # single season followed by 3 digits then 4 digit year ex."season.1.004.1971" or "season.01.004.1971" (comic book format)
+				r'(?<!thru)(?<!to)(?<!\d{2})[.-]s\d{2}[.-]complete', # ".s01.complete" not preceded by "thru", "to", or 2 digit number
+				r'(?<!thru)(?<!to)(?<!s\d{2})[.-]s\d{2}(?![.-]thru)(?![.-]to)(?![.-]s\d{0,2})(?![.-]\d{0,2})(?!-)' # .s01. not preceded by "thru", "to", or "s02". Not followed by ".thru", ".to", ".s02", "-s02", ".02.", or "-02."
 				]
 		for item in season_regex:
 			if bool(re.search(item, release_title)):
@@ -309,9 +307,9 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 # remove spelled out single seasons
 		season_regex = []
-		[season_regex.append(r'(complete(?:\.|-)%s(?:\.|-)season)' % x) for x in season_ordinal_list]
-		[season_regex.append(r'(complete(?:\.|-)%s(?:\.|-)season)' % x) for x in season_ordinal2_list]
-		[season_regex.append(r'(season(?:\.|-)%s)' % x) for x in season_list] 
+		[season_regex.append(r'(complete[.-]%s[.-]season)' % x) for x in season_ordinal_list]
+		[season_regex.append(r'(complete[.-]%s[.-]season)' % x) for x in season_ordinal2_list]
+		[season_regex.append(r'(season[.-]%s)' % x) for x in season_list] 
 		for item in season_regex:
 			if bool(re.search(item, release_title)):
 				return False, 0
@@ -505,7 +503,7 @@ def info_from_name(release_title, title, year, hdlr=None, episode_title=None, se
 				season_fill = season.zfill(2)
 				str1_replace = ['.s%s' % season, '.s%s' % season_fill, '.season.%s' % season, '.season%s' % season, '.season.%s' % season_fill, '.season%s' % season_fill, 'complete']
 				for i in str1_replace: name_info = name_info.replace(i, '')
-			if pack == 'show':
+			elif pack == 'show':
 				str2_replace = ['.all.seasons', 'seasons', 'season', 'the.complete', 'complete', 'all.torrent', 'total.series', 'tv.series', 'series', 'edited', 's1', 's01']
 				for i in str2_replace: name_info = name_info.replace(i, '')
 		name_info = name_info.lstrip('.').rstrip('.')
@@ -555,10 +553,9 @@ def clean_name(release_title):
 
 		if release_title.lower().startswith('rifftrax'): return release_title # removed by "undesirables" anyway so exit
 		release_title = strip_non_ascii_and_unprintable(release_title).lstrip('/ ').replace(' ', '.')
-		# release_title = release_title.lstrip('/ ').replace(' ', '.')
 		for i in unwanted:
 			if release_title.lower().startswith(i):
-				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else i
+				pattern = r'\%s' % i if i.startswith('[') or i.startswith('+') else r'%s' % i
 				release_title = re.sub(r'^%s' % pattern, '', release_title, 1, re.I)
 		for i in unwanted2:
 			release_title = release_title.lstrip(i)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -104,15 +104,13 @@ class source:
 				try:
 					seeders= int(file['seeders'])
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils.convert_size(float(file["size"]), to='GB')
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'piratebay', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -202,15 +200,13 @@ class source:
 				try:
 					seeders= int(file['seeders'])
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils.convert_size(float(file["size"]), to='GB')
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'piratebay', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -88,11 +88,10 @@ class source:
 				name = item[0] ; name_info = item[1]
 				url = unquote_plus(item[2]).replace('&amp;', '&').replace(' ', '.')
 				url = url.split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0].lower()
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0].lower()
 				quality, info = source_utils.get_release_quality(name_info, url)
 
-				if item[3] != '0':
-					info.insert(0, item[3])
+				if item[3] != '0': info.insert(0, item[3])
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'glodls', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': name, 'name_info': name_info,
@@ -127,10 +126,9 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall(r"<td.*?<font color='green'><b>([0-9]+|[0-9]+,[0-9]+)</b>", post)[0].replace(',', ''))
+					seeders = int(re.findall(r'<td.*?<font color\s*=\s*["\'].+?["\']><b>([0-9]+|[0-9]+,[0-9]+)</b>', post)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]

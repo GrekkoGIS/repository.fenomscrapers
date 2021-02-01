@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (1-16-2021)
+# created by Venom for Fenomscrapers (1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -88,9 +88,9 @@ class source:
 
 		for row in rows:
 			try:
-				url = re.findall('<a href="(magnet:.+?)"', row, re.DOTALL)[0]
+				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)

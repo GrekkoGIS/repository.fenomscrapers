@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
+
 
 from json import loads as jsloads
 import re
@@ -14,7 +15,7 @@ except ImportError: #Py3
 	from urllib.parse import parse_qs, urlencode, quote_plus, unquote_plus
 
 from fenomscrapers.modules import cache
-from fenomscrapers.modules import client
+from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -28,15 +29,20 @@ class source:
 		self.tvshowsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&search_string={2}&ranked=0&limit=100&format=json_extended' # imdb_id + string query
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&ranked=0&limit=100&format=json_extended'
 		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
+		self.scraper = cfscrape.create_scraper()
 		self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
 		self.min_seeders = 0
 		self.pack_capable = True
 
 
+
 	def _get_token(self):
-		token = client.request(self.token, timeout='5')
-		token = jsloads(token)["token"]
-		return token
+		try:
+			token = self.scraper.get(self.token).content
+			token = jsloads(token)["token"]
+			return token
+		except:
+			source_utils.scraper_error('TORRENTAPI')
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -92,7 +98,8 @@ class source:
 			# log_utils.log('search_link = %s' % search_link, log_utils.LOGDEBUG)
 
 			time.sleep(2.1)
-			rjson = client.request(search_link, error=True, timeout='5')
+			# rjson = client.request(search_link, error=True, timeout='5')
+			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources
 			files = jsloads(rjson)['torrent_results']
 		except:
@@ -102,7 +109,7 @@ class source:
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
@@ -116,15 +123,13 @@ class source:
 				try:
 					seeders = int(file["seeders"])
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils.convert_size(file["size"], to='GB')
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -154,7 +159,8 @@ class source:
 			# log_utils.log('search_link = %s' % str(search_link), log_utils.LOGDEBUG)
 
 			time.sleep(2.1)
-			rjson = client.request(search_link, error=True)
+			# rjson = client.request(search_link, error=True)
+			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson):
 				return sources
 			files = jsloads(rjson)['torrent_results']
@@ -165,7 +171,7 @@ class source:
 		for file in files:
 			try:
 				url = file["download"].split('&tr')[0]
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 
@@ -180,15 +186,13 @@ class source:
 				try:
 					seeders = int(file["seeders"])
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils.convert_size(file["size"], to='GB')
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'torrentapi', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

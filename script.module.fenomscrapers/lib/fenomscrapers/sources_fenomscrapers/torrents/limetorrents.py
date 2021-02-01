@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -115,8 +115,8 @@ class source:
 				data = client.parseDOM(post, 'a', ret='href')[0]
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
-				hash = re.compile(r'/torrent/(.+?).torrent').findall(data)[0]
-				name = re.findall(r'title=(.+?)$', data, re.DOTALL)[0]
+				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
+				name = re.findall(r'title\s*=\s*(.+?)$', data, re.DOTALL | re.I)[0]
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
@@ -131,16 +131,14 @@ class source:
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				self.sources.append({'provider': 'limetorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -207,8 +205,8 @@ class source:
 				data = client.parseDOM(post, 'a', ret='href')[0]
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
-				hash = re.compile(r'/torrent/(.+?).torrent').findall(data)[0]
-				name = re.findall(r'title=(.+?)$', data, re.DOTALL)[0]
+				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
+				name = re.findall(r'title\s*=\s*(.+?)$', data, re.DOTALL | re.I)[0]
 				name = source_utils.clean_name(name)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
@@ -232,16 +230,14 @@ class source:
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'limetorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

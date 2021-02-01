@@ -1,3 +1,16 @@
+[B][COLOR red]Update - v1.2.6 - Jan. 31, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed "torrentapi". Site is now behind cloudflare so cfscrape has
+    been added.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed "isohunt2".  This is a 2 request scraper and has now been
+    converted to threaded second request of result links.  Now
+    significantly faster.[/I]
+[COLOR yellow]--[/COLOR][I] Updated cfscrape(aka cloudscraper) to v1.2.56.  Note Venomous
+    removed py2 support so this is a modified version to keep
+    py2 support.[/I]
+[COLOR yellow]--[/COLOR][I] Significant changes to regex patterns for efficiency, step
+    reducing and to minimize backtracking.[/I]
+[COLOR yellow]--[/COLOR][I] Improvements to filtering out single foreign audio only sources.[/I]
+
 [B][COLOR red]Update - v1.2.5 - Jan. 22, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] fixed "btdb" for changes to html elements. Working once again.[/I]
 [COLOR yellow]--[/COLOR][I] fixed "easynews" filter for episodes failed.[/I]

@@ -320,6 +320,11 @@ def _replaceHTMLCodes(txt):
 	return txt
 
 
+def cleanHTML(txt):
+	txt = re.sub(r'<.+?>|</.+?>|\n', '', txt)
+	return _replaceHTMLCodes(_replaceHTMLCodes(txt))
+
+
 def randomagent():
 	BR_VERS = [
 		['%s.0' % i for i in range(18, 50)],
@@ -374,9 +379,9 @@ class cfcookie:
 				except: encoding = None
 				if encoding == 'gzip': result = gzip.GzipFile(fileobj=StringIO(result)).read()
 
-			jschl = re.findall(r'name="jschl_vc" value="(.+?)"/>', result)[0]
-			init = re.findall(r'setTimeout\(function\(\){\s*.*?.*:(.*?)};', result)[-1]
-			builder = re.findall(r"challenge-form\'\);\s*(.*)a.v", result)[0]
+			jschl = re.findall(r'name\s*=\s*["\']jschl_vc["\']\s*value\s*=\s*["\'](.+?)["\']/>', result, re.I)[0]
+			init = re.findall(r'setTimeout\(function\(\){\s*.*?.*:(.*?)};', result, re.I)[-1]
+			builder = re.findall(r"challenge-form\'\);\s*(.*)a.v", result, re.I)[0]
 			decryptVal = self.parseJSString(init)
 			lines = builder.split(';')
 
@@ -390,7 +395,7 @@ class cfcookie:
 			query = '%s/cdn-cgi/l/chk_jschl?jschl_vc=%s&jschl_answer=%s' % (netloc, jschl, answer)
 
 			if 'type="hidden" name="pass"' in result:
-				passval = re.findall(r'name="pass" value="(.*?)"', result)[0]
+				passval = re.findall(r'name\s*=\s*["\']pass["\']\s*value\s*=\s*["\'](.*?)["\']', result, re.I)[0]
 				query = '%s/cdn-cgi/l/chk_jschl?pass=%s&jschl_vc=%s&jschl_answer=%s' % (netloc, quote_plus(passval), jschl, answer)
 				time.sleep(6)
 
@@ -429,12 +434,12 @@ class bfcookie:
 		try:
 			headers = {'User-Agent': ua, 'Referer': netloc}
 			result = _basic_request(netloc, headers=headers, timeout=timeout)
-			match = re.findall(r'xhr\.open\("GET","([^,]+),', result)
+			match = re.findall(r'xhr\.open\("GET","([^,]+),', result, re.I)
 			if not match: return False
 			url_Parts = match[0].split('"')
 			url_Parts[1] = '1680'
 			url = urljoin(netloc, ''.join(url_Parts))
-			match = re.findall(r'rid=([0-9a-zA-Z]+)', url_Parts[0])
+			match = re.findall(r'rid\s*?=\s*?([0-9a-zA-Z]+)', url_Parts[0])
 			if not match: return False
 			headers['Cookie'] = 'rcksid=%s' % match[0]
 			result = _basic_request(url, headers=headers, timeout=timeout)

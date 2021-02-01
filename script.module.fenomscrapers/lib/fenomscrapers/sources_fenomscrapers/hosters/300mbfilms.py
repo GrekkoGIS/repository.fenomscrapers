@@ -145,7 +145,7 @@ class source:
 					link = client.request(r1)
 				if '<strong>Single' not in link: continue
 
-				link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL)[0]
+				link = re.findall(r'<strong>Single(.+?)</tr', link, re.DOTALL | re.I)[0]
 				link = client.parseDOM(link, 'a', ret='href')
 				link = [(i.split('=')[-1]) for i in link]
 				for i in link:

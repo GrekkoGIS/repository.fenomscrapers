@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -97,13 +97,12 @@ class source:
 			if not r: return
 			r = re.sub(r'\n', '', r)
 			r = re.sub(r'\t', '', r)
-			posts = re.compile(r'<table class="table2" cellspacing="0">(.*?)</table>').findall(r)
+			posts = re.compile(r'<table\s*class\s*=\s*["\']table2["\']\s*cellspacing\s*=\s*["\']\d+["\']>(.*?)</table>', re.I).findall(r)
 			posts = client.parseDOM(posts, 'tr')
 
 			for post in posts:
 				if '<th' in post: continue
-				links = re.compile(r'<a href="(.+?)">.*?<td class="tdnormal">((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class="tdseed">([0-9]+|[0-9]+,[0-9]+)</td>').findall(post)
-
+				links = re.compile(r'<a\s*href\s*=\s*["\'](.+?)["\']>.*?<td class\s*=\s*["\']tdnormal["\']>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class\s*=\s*["\']tdseed["\']>([0-9]+|[0-9]+,[0-9]+)</td>', re.I).findall(post)
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
@@ -123,16 +122,14 @@ class source:
 					try:
 						seeders = int(items[2].replace(',', ''))
 						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
+					except: seeders = 0
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1])[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
-					except:
-						dsize = 0
+					except: dsize = 0
 					info = ' | '.join(info)
 
 					self.sources.append({'provider': 'torrentdownload', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -189,7 +186,7 @@ class source:
 			if not r: return
 			r = re.sub(r'\n', '', r)
 			r = re.sub(r'\t', '', r)
-			posts = re.compile(r'<table class="table2" cellspacing="0">(.*?)</table>').findall(r)
+			posts = re.compile(r'<table\s*class\s*=\s*["\']table2["\']\s*cellspacing\s*=\s*["\']\d+["\']>(.*?)</table>', re.I).findall(r)
 			posts = client.parseDOM(posts, 'tr')
 		except:
 			source_utils.scraper_error('TORRENTDOWNLOAD')
@@ -198,8 +195,7 @@ class source:
 		for post in posts:
 			try:
 				if '<th' in post: continue
-				links = re.compile(r'<a href="(.+?)">.*?<td class="tdnormal">((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class="tdseed">([0-9]+|[0-9]+,[0-9]+)</td>').findall(post)
-
+				links = re.compile(r'<a\s*href\s*=\s*["\'](.+?)["\']>.*?<td class\s*=\s*["\']tdnormal["\']>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class\s*=\s*["\']tdseed["\']>([0-9]+|[0-9]+,[0-9]+)</td>', re.I).findall(post)
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
@@ -229,16 +225,14 @@ class source:
 					try:
 						seeders = int(items[2].replace(',', ''))
 						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
+					except: seeders = 0
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[1])[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
-					except:
-						dsize = 0
+					except: dsize = 0
 					info = ' | '.join(info)
 
 					item = {'provider': 'torrentdownload', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -95,10 +95,10 @@ class source:
 	def get_sources(self, row):
 		try:
 			if 'magnet:' not in row: return
-			url = re.findall(r'href="(magnet:.+?)"', row, re.DOTALL)[0]
+			url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			if url in str(self.sources): return
-			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
@@ -110,18 +110,16 @@ class source:
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			try:
-				seeders = int(re.findall(r'<span style="color:#008000"><strong>\s*([0-9]+)\s*</strong>', row, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'<span\s*style\s*=\s*["\']color:#008000["\']><strong>\s*([0-9]+)\s*</strong>', row, re.DOTALL)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
-			except:
-				seeders = 0
+			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
 				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
-			except:
-				dsize = 0
+			except: dsize = 0
 			info = ' | '.join(info)
 
 			self.sources.append({'provider': 'magnet4you', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,

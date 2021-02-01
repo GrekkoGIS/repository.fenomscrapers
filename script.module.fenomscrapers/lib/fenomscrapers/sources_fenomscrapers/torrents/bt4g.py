@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (1-14-2021)
+# created by Venom for Fenomscrapers (1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -110,7 +110,7 @@ class source:
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0] #lot of combo S01E01-E08 so parse episode item for size instead, it's closer
-					# size = re.findall(r'<b class="cpill .+?-pill">(.+?)</b>', post)[0]
+					# size = re.findall(r'<b class\s*=\s*["\']cpill .+?-pill["\']>(.+?)</b>', post, re.I)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -204,7 +204,7 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'<b class="cpill .+?-pill">(.+?)</b>', post)[0] #pack size calc will re-evalute this
+					size = re.findall(r'<b class\s*=\s*["\']cpill .+?-pill["\']>(.+?)</b>', post, re.I)[0] #pack size calc will re-evalute this
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

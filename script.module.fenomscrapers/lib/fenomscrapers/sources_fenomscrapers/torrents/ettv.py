@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -77,18 +77,15 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			try:
-				r = client.request(url, timeout='10')
-				links = client.parseDOM(r, "td", attrs={"nowrap": "nowrap"})
-				threads = []
-				for link in links:
-					threads.append(workers.Thread(self.get_sources, link))
-				[i.start() for i in threads]
-				[i.join() for i in threads]
-				return self.sources
-			except:
-				source_utils.scraper_error('ETTV')
-				return self.sources
+			r = client.request(url, timeout='10')
+			if not r: return self.sources
+			links = client.parseDOM(r, "td", attrs={"nowrap": "nowrap"})
+			threads = []
+			for link in links:
+				threads.append(workers.Thread(self.get_sources, link))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
+			return self.sources
 		except:
 			source_utils.scraper_error('ETTV')
 			return self.sources
@@ -96,16 +93,15 @@ class source:
 
 	def get_sources(self, link):
 		try:
-			url = re.compile(r'href="(.+?)"').findall(link)[0]
+			url = re.compile(r'href\s*=\s*["\'](.+?)["\']', re.I).findall(link)[0]
 			url = urljoin(self.base_link, url)
 			result = client.request(url, timeout='10')
 			if not result or 'magnet' not in result: return
-
-			url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', result, re.DOTALL)[0])
+			url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', result, re.DOTALL | re.I)[0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&xl=')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
-			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
@@ -118,18 +114,16 @@ class source:
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			try:
-				seeders = int(re.findall(r'<b>Seeds: </b>.*?>([0-9]+|[0-9]+,[0-9]+)</font>', result, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'>Seeds:.*?["\']>([0-9]+|[0-9]+,[0-9]+)</', result, re.DOTALL | re.I)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
-			except:
-				seeders = 0
+			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
 				size = re.findall(r'>Total Size:.*>(\d.*?)<', result, re.I)[0].strip()
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
-			except:
-				dsize = 0
+			except: dsize = 0
 			info = ' | '.join(info)
 
 			self.sources.append({'provider': 'ettv', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,

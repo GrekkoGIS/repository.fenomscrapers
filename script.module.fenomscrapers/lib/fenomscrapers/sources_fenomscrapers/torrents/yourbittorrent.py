@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -80,8 +80,7 @@ class source:
 
 			r = client.request(url, timeout='10')
 			if not r: return self.sources
-			links = re.findall(r'<a href="(/torrent/.+?)"', r, re.DOTALL)
-
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
 			threads = []
 			for link in links:
 				threads.append(workers.Thread(self.get_sources, link))
@@ -99,10 +98,10 @@ class source:
 			result = client.request(url, timeout='10')
 			if result is None: return
 			if '<kbd>' not in result: return
-			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL)[0]
+			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
 			url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 
-			name = re.findall(r'<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
+			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
 			name = unquote_plus(name)
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
@@ -117,19 +116,19 @@ class source:
 			if url in str(self.sources): return
 
 			try:
-				seeders = int(re.findall(r'<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.DOTALL | re.I)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
 			except:
+				source_utils.scraper_error('YOURBITTORRENT')
 				seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall(r'<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
+				size = re.findall(r'File size:.*?["\']>(.+?)<', result, re.DOTALL | re.I)[0]
 				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
-			except:
-				dsize = 0
+			except: dsize = 0
 			info = ' | '.join(info)
 
 			self.sources.append({'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -184,17 +183,17 @@ class source:
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-			links = re.findall(r'<a href="(/torrent/.+?)"', r, re.DOTALL)
+			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
 
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
 				result = client.request(url, timeout='5')
 				if not result: continue
 				if '<kbd>' not in result: continue
-				hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL)[0]
+				hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
 				url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 
-				name = re.findall(r'<h3 class="card-title">(.+?)<', result, re.DOTALL)[0].replace('Original Name: ', '')
+				name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
 				name = source_utils.clean_name(unquote_plus(name))
 
 				if not self.search_series:
@@ -218,19 +217,17 @@ class source:
 				if url in str(self.sources): continue
 
 				try:
-					seeders = int(re.findall(r'<div class="col-3">Seeders:</div><div class="col"><span style="color:green">([0-9]+|[0-9]+,[0-9]+)<', result, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.DOTALL | re.I)[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'<div class="col-3">File size:</div><div class="col">(.+?)<', result, re.DOTALL)[0]
+					size = re.findall(r'File size:.*?["\']>(.+?)<', result, re.DOTALL | re.I)[0]
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

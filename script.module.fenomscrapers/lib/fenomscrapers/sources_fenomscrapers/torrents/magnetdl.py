@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -99,7 +99,7 @@ class source:
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(sources): continue
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
@@ -115,16 +115,14 @@ class source:
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 's'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'magnetdl', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -200,7 +198,7 @@ class source:
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(self.sources): continue
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
@@ -226,16 +224,14 @@ class source:
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 's'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'magnetdl', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

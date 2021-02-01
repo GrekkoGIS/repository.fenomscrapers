@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -99,13 +99,14 @@ class source:
 				rows = client.parseDOM(tbody, 'tr')
 
 				for row in rows:
-					links = zip(re.findall(r'href="(magnet:.+?)"', row, re.DOTALL),
+					links = zip(
+									re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I),
 									re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row, re.DOTALL),
-									[re.findall(r'<td class="text-center">([0-9]+)</td>', row, re.DOTALL)])
+									[re.findall(r'<td class\s*=\s*["\']text-center["\']>([0-9]+)</td>', row, re.DOTALL)])
 					for link in links:
 						url = unquote_plus(link[0]).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 						url = source_utils.strip_non_ascii_and_unprintable(url)
-						hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+						hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 						name = url.split('&dn=')[1]
 						name = source_utils.clean_name(name)
 
@@ -116,7 +117,6 @@ class source:
 							t = name.split(hdlr)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
 						if hdlr2 in name:
 							t = name.split(hdlr2)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and').replace('.US.', '.').replace('.us.', '.')
-
 						# if cleantitle.get(t) != cleantitle.get(title): continue # Anime title matching is a bitch!
 
 						try:

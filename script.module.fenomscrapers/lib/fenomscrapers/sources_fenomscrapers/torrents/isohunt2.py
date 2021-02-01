@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -20,7 +20,7 @@ class source:
 	def __init__(self):
 		self.priority = 10
 		self.language = ['en']
-		self.domains = ['isohunt.nz']
+		self.domains = ['isohunt2.nz']
 		self.base_link = 'https://isohunt.nz'
 		self.search_link = '/torrent/?ihq=%s&fiht=2&age=0&Torrent_sort=seeders&Torrent_page=0'
 		self.min_seeders = 0
@@ -73,16 +73,17 @@ class source:
 
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
-			urls = []
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			urls.append(url)
-			# urls.append(url.replace('page=0', 'page=40')) # server response time WAY to slow to parse 2 pages deep, site sucks.
-			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
+			result = client.request(url, timeout='5')
+			if not result or '<tbody' not in result: return
+			table = client.parseDOM(result, 'tbody')[0]
+			rows = client.parseDOM(table, 'tr')
 			threads = []
-			for url in urls:
-				threads.append(workers.Thread(self.get_sources, url))
+			for row in rows:
+				threads.append(workers.Thread(self.get_sources, row))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 			return self.sources
@@ -91,55 +92,51 @@ class source:
 			return self.sources
 
 
-	def get_sources(self, url):
-		try:
-			r = client.request(url, timeout='10')
-			if not r or '<tbody' not in r: return
-			posts = client.parseDOM(r, 'tbody')[0]
-			posts = client.parseDOM(posts, 'tr')
+	def get_sources(self, row):
+		row = re.sub(r'\n', '', row)
+		row = re.sub(r'\t', '', row)
+		data = re.compile(r'<a\s*href\s*=\s*["\'](/torrent_details/.+?)["\']><span>(.+?)</span>.*?<td\s*class\s*=\s*["\']size-row["\']>(.+?)</td><td\s*class\s*=\s*["\']sn["\']>([0-9]+)</td>').findall(row)
+		if not data: return
 
-			for post in posts:
-				post = re.sub(r'\n', '', post)
-				post = re.sub(r'\t', '', post)
-				links = re.compile(r'<a href="(/torrent_details/.+?)"><span>(.+?)</span>.*?<td class="size-row">(.+?)</td><td class="sn">([0-9]+)</td>').findall(post)
-				for items in links:
-					# item[1] does not contain full info like the &dn= portion of magnet
-					link = urljoin(self.base_link, items[0])
-					link = client.request(link, timeout='10')
-					if not link: continue
+		for items in data:
+			try:
+				# item[1] does not contain full info like the &dn= portion of magnet
+				link = urljoin(self.base_link, items[0])
+				link = client.request(link, timeout='5')
+				link = unquote_plus(client.parseDOM(link, 'a', attrs={'title': 'Download Magnet link'}, ret='href')[0])
+				if not link: continue
 
-					magnet = re.compile(r'(magnet.+?)"').findall(link)[0]
-					url = unquote_plus(magnet).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
-					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
-					name = unquote_plus(url.split('&dn=')[1])
-					name = source_utils.clean_name(name)
-					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
-					name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-					if source_utils.remove_lang(name_info): continue
+				url = re.compile(r'(magnet:.*)').findall(link)[0].replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
+				url = source_utils.strip_non_ascii_and_unprintable(unquote_plus(url)) # many links dbl quoted so we must unquote again
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
-					if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-						if any(re.search(item, name.lower()) for item in ep_strings): continue
+				name = unquote_plus(url.split('&dn=')[1])
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+				if source_utils.remove_lang(name_info): continue
 
-					try:
-						seeders = int(items[3].replace(',', ''))
-						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
+				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
-					quality, info = source_utils.get_release_quality(name_info, url)
-					try:
-						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[2])[0]
-						dsize, isize = source_utils._size(size)
-						info.insert(0, isize)
-					except:
-						dsize = 0
-					info = ' | '.join(info)
+				try:
+					seeders = int(items[3].replace(',', ''))
+					if self.min_seeders > seeders: continue
+				except: seeders = 0
 
-					self.sources.append({'provider': 'isohunt2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-														'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-		except:
-			source_utils.scraper_error('ISOHUNT2')
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', items[2])[0]
+					dsize, isize = source_utils._size(size)
+					info.insert(0, isize)
+				except: dsize = 0
+				info = ' | '.join(info)
+
+				self.sources.append({'provider': 'isohunt2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('ISOHUNT2')
 
 
 	def resolve(self, url):

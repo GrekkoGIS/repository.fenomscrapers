@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -79,8 +79,8 @@ class source:
 
 			try:
 				r = client.request(url, timeout='10')
-				if r is None: return self.sources
-				links = re.findall(r'<a href=(/torrent/.+?)>', r, re.DOTALL)
+				if not r: return self.sources
+				links = re.findall(r'<a\s*href\s*=\s*(/torrent/.+?)>', r, re.DOTALL | re.I)
 				threads = []
 				for link in links:
 					threads.append(workers.Thread(self.get_sources, link))
@@ -102,11 +102,11 @@ class source:
 			if result is None: return
 			if 'magnet:' not in result: return
 
-			url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', result, re.DOTALL)[0])
+			url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', result, re.DOTALL | re.I)[0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr=')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
-			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
@@ -118,18 +118,16 @@ class source:
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			try:
-				seeders = int(re.findall(r'<dt>SWARM</dt><dd>.*?>([0-9]+)</b>', result, re.DOTALL)[0].replace(',', ''))
+				seeders = int(re.findall(r'>SWARM.*?>\s*([0-9]+?)\s*<', result, re.DOTALL | re.I)[0].replace(',', ''))
 				if self.min_seeders > seeders: return
-			except:
-				seeders = 0
+			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
-				size = re.findall(r'<dt>SIZE</dt><dd>(.*? [a-zA-Z]{2})', result, re.DOTALL)[0]
+				size = re.findall(r'>\s*SIZE.*?>\s*(\d.*?[a-z]{2})', result, re.DOTALL | re.I)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
-			except:
-				dsize = 0
+			except: dsize = 0
 			info = ' | '.join(info)
 
 			self.sources.append({'provider': 'torlock', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,

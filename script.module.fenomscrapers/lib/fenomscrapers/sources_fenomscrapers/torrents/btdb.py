@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated url 1-13-2020)-proxy site
+# modified by Venom for Fenomscrapers (updated url 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -99,10 +99,10 @@ class source:
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
 				if 'magnet:' not in post: continue
-				url = re.findall(r"href.*=.*'(magnet:.+?)'", post, re.DOTALL)[0]
+				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -115,7 +115,7 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(re.findall(r'Seeders(?:.*?>)([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'Seeders.*?["\']>([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL | re.I)[0].replace(',', ''))
 					if self.min_seeders > seeders: return
 				except: seeders = 0
 
@@ -182,11 +182,11 @@ class source:
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
 			for post in posts:
 				if 'magnet:' not in post: continue
-				url = re.findall(r"href.*=.*'(magnet:.+?)'", post, re.DOTALL)[0]
+				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				if url in str(self.sources): return
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
 
@@ -207,7 +207,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(re.findall(r'Seeders(?:.*?>)([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL)[0].replace(',', ''))
+					seeders = int(re.findall(r'Seeders.*?["\']>([0-9]+|[0-9]+,[0-9]+)</strong>', post, re.DOTALL | re.I)[0].replace(',', ''))
 					if self.min_seeders > seeders: return
 				except: seeders = 0
 

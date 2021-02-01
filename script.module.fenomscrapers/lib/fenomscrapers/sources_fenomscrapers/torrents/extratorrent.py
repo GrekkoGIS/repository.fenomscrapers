@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 1-15-2021)
+# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -108,11 +108,11 @@ class source:
 
 	def get_sources(self, link):
 		try:
-			url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', link, re.DOTALL)[0])
+			url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', link, re.DOTALL | re.I)[0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
-			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
@@ -127,16 +127,14 @@ class source:
 			try:
 				seeders = int(client.parseDOM(link, 'td', attrs={'class': 'sy'})[0].replace(',', ''))
 				if self.min_seeders > seeders: return
-			except:
-				seeders = 0
+			except: seeders = 0
 
 			quality, info = source_utils.get_release_quality(name_info, url)
 			try:
 				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
 				dsize, isize = source_utils._size(size)
 				info.insert(0, isize)
-			except:
-				dsize = 0
+			except: dsize = 0
 			info = ' | '.join(info)
 
 			self.sources.append({'provider': 'extratorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
@@ -201,12 +199,11 @@ class source:
 			try:
 				post = re.sub(r'\n', '', post)
 				post = re.sub(r'\t', '', post)
-
-				url = 'magnet:%s' % (re.findall(r'a href="magnet:(.+?)"', post, re.DOTALL)[0])
+				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				if url in str(self.sources): continue
-				hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
@@ -231,16 +228,14 @@ class source:
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'sy'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'extratorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

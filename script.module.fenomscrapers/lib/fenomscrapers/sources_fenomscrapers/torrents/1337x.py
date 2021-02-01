@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -127,15 +127,13 @@ class source:
 				try:
 					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'coll-2 seeds'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
 				except:
-					isize = '0'
-					dsize = 0
+					isize = '0' ; dsize = 0
 
 				self.items.append((name, name_info, link, isize, dsize, seeders))
 			return self.items
@@ -147,8 +145,7 @@ class source:
 	def _get_sources(self, item):
 		try:
 			quality, info = source_utils.get_release_quality(item[1], item[2])
-			if item[3] != '0':
-				info.insert(0, item[3])
+			if item[3] != '0': info.insert(0, item[3])
 			info = ' | '.join(info)
 
 			data = client.request(item[2], timeout='10')
@@ -157,7 +154,7 @@ class source:
 			url = [i for i in data if 'magnet:' in i][0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
-			hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 			self._sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})

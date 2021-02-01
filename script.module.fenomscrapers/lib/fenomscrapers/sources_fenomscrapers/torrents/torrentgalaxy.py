@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
+# created by Venom for Fenomscrapers (updated 1-28-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -89,14 +89,14 @@ class source:
 
 		for post in posts:
 			try:
-				links = zip(re.findall(r'a href="(magnet:.+?)"', post, re.DOTALL),
-							re.findall(r"<span class='badge badge-secondary' style='border-radius:4px;'>(.*?)</span>", post, re.DOTALL),
-							re.findall(r"<span title='Seeders/Leechers'>\[<font color='green'><b>(.*?)<", post, re.DOTALL))
-
+				links = zip(
+							re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I),
+							re.findall(r'<span\s*class\s*=\s*["\']badge\s*badge-secondary["\']\s*style\s*=\s*["\']border-radius:4px;["\']>(.*?)</span>', post, re.DOTALL | re.I),
+							re.findall(r'<span\s*title\s*=\s*["\']Seeders/Leechers["\']>\[<font\s*color\s*=\s*["\']green["\']><b>(.*?)<', post, re.DOTALL | re.I))
 				for link in links:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
 					url = source_utils.strip_non_ascii_and_unprintable(url)
-					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
@@ -111,15 +111,13 @@ class source:
 					try:
 						seeders = int(link[2])
 						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
+					except: seeders = 0
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						dsize, isize = source_utils._size(link[1])
 						info.insert(0, isize)
-					except:
-						dsize = 0
+					except: dsize = 0
 					info = ' | '.join(info)
 
 					sources.append({'provider': 'torrentgalaxy', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
@@ -183,13 +181,13 @@ class source:
 		for post in posts:
 			try:
 				links = zip(
-							re.findall(r'a href="(magnet:.+?)"', post, re.DOTALL),
-							re.findall(r"<span class='badge badge-secondary' style='border-radius:4px;'>(.*?)</span>", post, re.DOTALL),
-							re.findall(r"<span title='Seeders/Leechers'>\[<font color='green'><b>(.*?)<", post, re.DOTALL))
+							re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I),
+							re.findall(r'<span\s*class\s*=\s*["\']badge\s*badge-secondary["\']\s*style\s*=\s*["\']border-radius:4px;["\']>(.*?)</span>', post, re.DOTALL | re.I),
+							re.findall(r'<span\s*title\s*=\s*["\']Seeders/Leechers["\']>\[<font\s*color\s*=\s*["\']green["\']><b>(.*?)<', post, re.DOTALL | re.I))
 				for link in links:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
 					url = source_utils.strip_non_ascii_and_unprintable(url)
-					hash = re.compile(r'btih:(.*?)&').findall(url)[0]
+					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
@@ -214,15 +212,13 @@ class source:
 					try:
 						seeders = int(link[2])
 						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
+					except: seeders = 0
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
 						dsize, isize = source_utils._size(link[1])
 						info.insert(0, isize)
-					except:
-						dsize = 0
+					except: dsize = 0
 					info = ' | '.join(info)
 
 					item = {'provider': 'torrentgalaxy', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
