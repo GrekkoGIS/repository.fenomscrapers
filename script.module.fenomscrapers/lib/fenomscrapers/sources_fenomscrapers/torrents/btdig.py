@@ -18,7 +18,7 @@ from fenomscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 15
+		self.priority = 3
 		self.language = ['en']
 		self.domains = ['www.digbt.org']
 		self.base_link = 'https://www.btdig.com'

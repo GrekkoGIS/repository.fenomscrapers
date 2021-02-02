@@ -20,7 +20,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 2
 		self.language = ['en']
 		self.domain = ['bitlordsearch.com']
 		self.base_link = 'http://www.bitlordsearch.com'

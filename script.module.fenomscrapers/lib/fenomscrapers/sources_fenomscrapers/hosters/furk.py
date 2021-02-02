@@ -20,7 +20,7 @@ from fenomscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 23
+		self.priority = 21
 		self.language = ['en']
 		self.domain = 'furk.net/'
 		self.base_link = 'https://www.furk.net'
@@ -171,6 +171,7 @@ class source:
 			file_id = url.get('file_id')
 			self.content_type = 'movie' if url.get('content') == 'movie' else 'episode'
 			if self.content_type == 'episode': self.filtering_list = self._seas_ep_resolve_list(url.get('season'), url.get('episode'))
+
 			link = (self.base_link + self.tfile_link % (api_key, file_id))
 			s = requests.Session()
 			p = s.get(link)

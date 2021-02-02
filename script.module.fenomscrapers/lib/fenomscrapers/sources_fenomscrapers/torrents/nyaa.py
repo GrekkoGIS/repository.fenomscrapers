@@ -18,7 +18,7 @@ from fenomscrapers.modules import source_utils
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 5
 		self.language = ['en']
 		self.domains = ['nyaa.si']
 		self.base_link = 'https://nyaa.si'

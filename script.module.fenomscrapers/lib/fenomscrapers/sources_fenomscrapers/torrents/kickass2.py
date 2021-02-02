@@ -19,7 +19,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 2
+		self.priority = 4
 		self.language = ['en']
 		self.domains = ['kick4ss.com', 'thekat.info', 'kickass.cm', 'kickass.ws', 'kickasst.net',
 								'kickasshydra.dev', 'kickasshydra.net', 'kathydra.com', 'kickass.onl',

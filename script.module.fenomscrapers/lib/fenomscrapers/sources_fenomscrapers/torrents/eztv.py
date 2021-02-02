@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 6
 		self.language = ['en']
 		self.domains = ['eztv.re', 'eztv.tf', 'eztv.yt']
 		self.base_link = 'https://eztv.re'

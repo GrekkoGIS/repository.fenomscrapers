@@ -19,7 +19,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 2
+		self.priority = 4
 		self.language = ['en']
 		self.domains = ['extratorrent.si', 'extratorrents.it']
 		self.base_link = 'https://extratorrent.si'

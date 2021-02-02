@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 3
 		self.language = ['en']
 		self.domains = ['ext.io']
 		self.base_link = 'https://ext.to'

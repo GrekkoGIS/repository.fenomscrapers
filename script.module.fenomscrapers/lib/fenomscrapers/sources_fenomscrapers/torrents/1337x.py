@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 5
+		self.priority = 8
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = ['1337x.to', '1337x.st', '1337x.ws', '1337x.eu', '1337x.se', '1337x.is'] # all are behind cloudflare except .to
 		self.base_link = 'https://1337x.to/'

@@ -17,7 +17,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import control
-from fenomscrapers.modules import source_utils, log_utils
+from fenomscrapers.modules import source_utils
 
 SORT = {'s1': 'relevance', 's1d': '-', 's2': 'dsize', 's2d': '-', 's3': 'dtime', 's3d': '-'}
 SEARCH_PARAMS = {'st': 'adv', 'sb': 1, 'fex': 'mkv, mp4, avi, mpg, wemb', 'fty[]': 'VIDEO', 'spamf': 1, 'u': '1', 'gx': 1, 'pno': 1, 'sS': 3}
@@ -83,7 +83,7 @@ class source:
 			query = self._query(data)
 			url, params = self._translate_search(query)
 			headers = {'Authorization': auth}
-			response = requests.get(url, params=params, headers=headers).text
+			response = requests.get(url, params=params, headers=headers, timeout=10).text
 
 			results = jsloads(response)
 			down_url = results.get('downURL')

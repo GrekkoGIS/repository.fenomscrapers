@@ -81,10 +81,11 @@ def get_qual(term):
 
 def get_release_quality(release_info, release_link=None):
 	try:
-		quality = None
-		fmt = release_info
-		if fmt is not None:
-			quality = get_qual(fmt)
+		quality = None ; info = []
+		if release_info:
+			quality = get_qual(release_info)
+			if any(value in release_info for value in VIDEO_3D): info.append('3D')
+			if any(value in release_info for value in CODEC_H265): info.append('HEVC')
 		if not quality:
 			if release_link:
 				release_link = release_link.lower()
@@ -93,10 +94,6 @@ def get_release_quality(release_info, release_link=None):
 				quality = get_qual(release_link)
 				if not quality: quality = 'SD'
 			else: quality = 'SD'
-		info = []
-		if fmt is not None:
-			if any(value in fmt for value in VIDEO_3D): info.append('3D')
-			if any(value in fmt for value in CODEC_H265): info.append('HEVC')
 		return quality, info
 	except:
 		log_utils.error()
@@ -242,6 +239,7 @@ def filter_season_pack(show_title, aliases, year, season, release_title):
 	except:
 		log_utils.error()
 		return True
+
 
 def filter_show_pack(show_title, aliases, imdb, year, season, release_title, total_seasons):
 	try: aliases = aliases_to_array(jsloads(aliases))
@@ -585,6 +583,7 @@ def _size(siz):
 	except:
 		log_utils.error()
 		return 0, ''
+
 
 def convert_size(size_bytes, to='GB'):
 	try:

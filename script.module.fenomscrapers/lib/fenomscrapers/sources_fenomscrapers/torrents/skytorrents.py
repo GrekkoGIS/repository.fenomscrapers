@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 3
 		self.language = ['en']
 		self.domains = ['skytorrents.net', 'skytorrents.org', 'skytorrents.to'] # v2 challenge now for ".org" and ".to"
 		# self.base_link = 'https://www.skytorrents.lol/' # .lol behind cloudflare

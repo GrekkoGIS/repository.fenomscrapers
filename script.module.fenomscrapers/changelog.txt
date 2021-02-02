@@ -1,3 +1,9 @@
+[B][COLOR red]Update - v1.2.7 - Feb. 02, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Added threading to "torrentfunk" and yourbittorent" for pack
+    file scaping performance increase.[/I]
+[COLOR yellow]--[/COLOR][I] Added priority to "torrentInfo" help file.[/I]
+[COLOR yellow]--[/COLOR][I] Modules cleanup of unused functions.[/I]
+
 [B][COLOR red]Update - v1.2.6 - Jan. 31, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Fixed "torrentapi". Site is now behind cloudflare so cfscrape has
     been added.[/I]

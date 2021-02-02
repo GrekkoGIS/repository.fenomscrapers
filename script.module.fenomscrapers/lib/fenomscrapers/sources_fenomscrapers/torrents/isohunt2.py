@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 10
+		self.priority = 7
 		self.language = ['en']
 		self.domains = ['isohunt2.nz']
 		self.base_link = 'https://isohunt.nz'

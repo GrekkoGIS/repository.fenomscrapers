@@ -19,7 +19,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 2
+		self.priority = 3
 		self.language = ['en']
 		self.domains = ['magnetdl.com', 'torrentquest.com'] # torrentquest is mirror of magnetdl
 		self.base_link = 'https://www.magnetdl.com'

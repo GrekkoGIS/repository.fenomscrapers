@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 3
+		self.priority = 8
 		self.language = ['en']
 		self.domains = ['torrentfunk.com', 'torrentfunk2.com']
 		self.base_link = 'https://www.torrentfunk.com'
@@ -143,6 +143,7 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		self.items = []
 		if not url: return self.sources
 		try:
 			self.search_series = search_series
@@ -164,7 +165,6 @@ class source:
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
 						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
 							]
-
 			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
@@ -174,16 +174,23 @@ class source:
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				threads.append(workers.Thread(self.get_pack_items, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
+
+			threads2 = []
+			for i in self.items:
+				threads2.append(workers.Thread(self.get_pack_sources, i))
+			[i.start() for i in threads2]
+			[i.join() for i in threads2]
 			return self.sources
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
 			return self.sources
 
 
-	def get_sources_packs(self, url):
+	def get_pack_items(self, url):
+		# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
@@ -219,33 +226,40 @@ class source:
 				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 				if source_utils.remove_lang(name_info): continue
 
-				if not url.startswith('http'): 
-					link = urljoin(self.base_link, url)
+				if not url.startswith('http'): url = urljoin(self.base_link, url)
+				if self.search_series: self.items.append((name, name_info, url, package, last_season))
+				else: self.items.append((name, name_info, url, package))
+			return self.items
+		except:
+			source_utils.scraper_error('TORRENTFUNK')
 
-				link = client.request(link, timeout='5')
-				if link is None: 	continue
-				hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
-				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
-				if url in str(self.sources): continue
 
-				try:
-					seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
-					if self.min_seeders > seeders: continue
-				except: seeders = 0
+	def get_pack_sources(self, items):
+		try:
+			link = client.request(items[2], timeout='5')
+			if link is None: 	return
+			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
+			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, items[0])
+			if url in str(self.sources): return
 
-				quality, info = source_utils.get_release_quality(name_info, url)
-				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
-					dsize, isize = source_utils._size(size)
-					info.insert(0, isize)
-				except: dsize = 0
-				info = ' | '.join(info)
+			try:
+				seeders = int(re.findall(r'Swarm.*?>(?!<)([0-9]+)</', link, re.DOTALL | re.I)[0].replace(',', ''))
+				if self.min_seeders > seeders: return
+			except: seeders = 0
 
-				item = {'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
-				self.sources.append(item)
+			quality, info = source_utils.get_release_quality(items[1], url)
+			try:
+				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', link)[0]
+				dsize, isize = source_utils._size(size)
+				info.insert(0, isize)
+			except: dsize = 0
+			info = ' | '.join(info)
+
+			item = {'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': items[0], 'name_info': items[1], 'quality': quality,
+						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': items[3]}
+			if self.search_series:
+				item.update({'last_season': items[4]})
+			self.sources.append(item)
 		except:
 			source_utils.scraper_error('TORRENTFUNK')
 

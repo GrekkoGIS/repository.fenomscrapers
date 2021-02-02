@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 5
 		self.language = ['en', 'de', 'fr', 'ko', 'pl', 'pt', 'ru']
 		self.domains = ['zooqle.com', 'zooqle.unblocked.win', 'zooqle.unblocked.llc', 'zooqle.unblocked.krd']
 		self.base_link = 'https://zooqle.com'

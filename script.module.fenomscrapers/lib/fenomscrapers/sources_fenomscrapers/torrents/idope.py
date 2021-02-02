@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 2
+		self.priority = 5
 		self.language = ['en']
 		self.domains = ['idope.org'] # "idope.se" is v2 challange now and different html to parse
 		self.base_link = 'http://idope.org'

@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 1
+		self.priority = 4
 		self.language = ['en']
 		self.domains = ['torrentzeu.org']
 		self.base_link = 'https://torrentzeu.org'

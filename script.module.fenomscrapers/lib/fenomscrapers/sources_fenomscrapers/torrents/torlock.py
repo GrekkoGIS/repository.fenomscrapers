@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 4
+		self.priority = 7
 		self.language = ['en']
 		self.domain = ['torlock.com', 'torlock.unblockit.pro', 'torlock.cc']
 		self.base_link = 'https://torlock.com'
@@ -77,19 +77,15 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			try:
-				r = client.request(url, timeout='10')
-				if not r: return self.sources
-				links = re.findall(r'<a\s*href\s*=\s*(/torrent/.+?)>', r, re.DOTALL | re.I)
-				threads = []
-				for link in links:
-					threads.append(workers.Thread(self.get_sources, link))
-				[i.start() for i in threads]
-				[i.join() for i in threads]
-				return self.sources
-			except:
-				source_utils.scraper_error('TORLOCK')
-				return self.sources
+			r = client.request(url, timeout='10')
+			if not r: return self.sources
+			links = re.findall(r'<a\s*href\s*=\s*(/torrent/.+?)>', r, re.DOTALL | re.I)
+			threads = []
+			for link in links:
+				threads.append(workers.Thread(self.get_sources, link))
+			[i.start() for i in threads]
+			[i.join() for i in threads]
+			return self.sources
 		except:
 			source_utils.scraper_error('TORLOCK')
 			return self.sources
@@ -99,8 +95,7 @@ class source:
 		try:
 			url = urljoin(self.base_link, link)
 			result = client.request(url, timeout='10')
-			if result is None: return
-			if 'magnet:' not in result: return
+			if not result or 'magnet:' not in result: return
 
 			url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', result, re.DOTALL | re.I)[0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr=')[0]

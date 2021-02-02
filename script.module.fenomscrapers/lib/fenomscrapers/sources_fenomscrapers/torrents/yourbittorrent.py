@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 2
+		self.priority = 9
 		self.language = ['en']
 		self.domain = ['yourbittorrent2.com', 'yourbittorrent.com']
 		self.base_link = 'https://yourbittorrent2.com'
@@ -78,7 +78,7 @@ class source:
 			url = urljoin(self.base_link, url).replace('+', '-')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = client.request(url, timeout='10')
+			r = client.request(url, timeout='5')
 			if not r: return self.sources
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
 			threads = []
@@ -95,7 +95,7 @@ class source:
 	def get_sources(self, link):
 		try:
 			url = '%s%s' % (self.base_link, link)
-			result = client.request(url, timeout='10')
+			result = client.request(url, timeout='5')
 			if result is None: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
@@ -139,6 +139,7 @@ class source:
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
 		self.sources = []
+		self.items = []
 		if not url: return self.sources
 		try:
 			self.search_series = search_series
@@ -169,72 +170,85 @@ class source:
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url).replace('+', '-')
-				threads.append(workers.Thread(self.get_sources_packs, link))
+				threads.append(workers.Thread(self.get_pack_items, link))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
+
+			threads2 = []
+			for i in self.items:
+				threads2.append(workers.Thread(self.get_pack_sources, i))
+			[i.start() for i in threads2]
+			[i.join() for i in threads2]
 			return self.sources
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 			return self.sources
 
 
-	def get_sources_packs(self, url):
-		# log_utils.log('url = %s' % str(url), __name__, log_utils.LOGDEBUG)
+	def get_pack_items(self, url):
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']', r, re.DOTALL | re.I)
-
 			for link in links:
 				url = '%s%s' % (self.base_link, link)
-				result = client.request(url, timeout='5')
-				if not result: continue
-				if '<kbd>' not in result: continue
-				hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
-				url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
+				self.items.append((url))
+			return self.items
+		except:
+			source_utils.scraper_error('YOURBITTORRENT')
 
-				name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
-				name = source_utils.clean_name(unquote_plus(name))
 
-				if not self.search_series:
-					if not self.bypass_filter:
-						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
-							continue
-					package = 'season'
+	def get_pack_sources(self, url):
+		try:
+			# log_utils.log('url = %s' % str(url), __name__, log_utils.LOGDEBUG)
+			result = client.request(url, timeout='5')
+			if not result: return
+			if '<kbd>' not in result: return
+			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
+			url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
 
-				elif self.search_series:
-					if not self.bypass_filter:
-						valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
-						if not valid: continue
-					else:
-						last_season = self.total_seasons
-					package = 'show'
+			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
+			name = source_utils.clean_name(unquote_plus(name))
 
-				name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
-				if source_utils.remove_lang(name_info): continue
+			if not self.search_series:
+				if not self.bypass_filter:
+					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):
+						return
+				package = 'season'
 
-				url = '%s%s%s' % (url, '&dn=', str(name))
-				if url in str(self.sources): continue
+			elif self.search_series:
+				if not self.bypass_filter:
+					valid, last_season = source_utils.filter_show_pack(self.title, self.aliases, self.imdb, self.year, self.season_x, name, self.total_seasons)
+					if not valid: return
+				else:
+					last_season = self.total_seasons
+				package = 'show'
 
-				try:
-					seeders = int(re.findall(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.DOTALL | re.I)[0].replace(',', ''))
-					if self.min_seeders > seeders: continue
-				except: seeders = 0
+			name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
+			if source_utils.remove_lang(name_info): return
 
-				quality, info = source_utils.get_release_quality(name_info, url)
-				try:
-					size = re.findall(r'File size:.*?["\']>(.+?)<', result, re.DOTALL | re.I)[0]
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
-					dsize, isize = source_utils._size(size)
-					info.insert(0, isize)
-				except: dsize = 0
-				info = ' | '.join(info)
+			url = '%s%s%s' % (url, '&dn=', str(name))
+			if url in str(self.sources): return
 
-				item = {'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
-							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
-				self.sources.append(item)
+			try:
+				seeders = int(re.findall(r'>Seeders:.*?>\s*([0-9]+|[0-9]+,[0-9]+)\s*</', result, re.DOTALL | re.I)[0].replace(',', ''))
+				if self.min_seeders > seeders: return
+			except: seeders = 0
+
+			quality, info = source_utils.get_release_quality(name_info, url)
+			try:
+				size = re.findall(r'File size:.*?["\']>(.+?)<', result, re.DOTALL | re.I)[0]
+				size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
+				dsize, isize = source_utils._size(size)
+				info.insert(0, isize)
+			except: dsize = 0
+			info = ' | '.join(info)
+
+			item = {'provider': 'yourbittorrent', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
+						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
+			if self.search_series:
+				item.update({'last_season': last_season})
+			self.sources.append(item)
 		except:
 			source_utils.scraper_error('YOURBITTORRENT')
 

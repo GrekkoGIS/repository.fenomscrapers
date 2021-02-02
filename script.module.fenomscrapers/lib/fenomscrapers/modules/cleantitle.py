@@ -10,20 +10,30 @@ def get(title):
 	if not title: return
 	try: title = title.encode('utf-8')
 	except: pass
+	title = re.sub(r'&#(\d+);', '', title).lower()
+	title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
+	title = title.replace(r'&quot;', '\"').replace('&amp;', '&')
+	# title = re.sub(r'\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\~|\s', '', title).lower()
+	title = re.sub(r'\n|([\[({].+?[})\]])|\s(vs[.]?|v[.])\s|([:;–\-"\',!_\.\?~])|\s', '', title) # removes bracketed content
+	return title
+
+
+def get_simple(title):
+	if not title: return
+	title = re.sub(r'(\d{4})', '', title).lower()
 	title = re.sub(r'&#(\d+);', '', title)
 	title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
 	title = title.replace(r'&quot;', '\"').replace('&amp;', '&')
-	title = re.sub(r'\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\~|\s', '', title).lower()
+	# title = re.sub(r'\n|\(|\)|\[|\]|\{|\}|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\~|\s', '', title).lower()
+	title = re.sub(r'\n|[()[\]{}]|\s(vs[.]?|v[.])\s|[:;–\-",\'!_.?~]|\s', '', title) # keeps bracketed content unlike .get()
+	title = re.sub(r'<.*?>', '', title) # removes tags?
 	return title
 
 
 def geturl(title):
 	if not title: return
 	title = title.lower()
-	# title = title.translate(None, ':*?"\'\.<>|&!,')
-	try:
-		# This gives a weird error saying that translate only takes 1 argument, not 2. However, the Python 2 documentation states 2, but 1 for Python 3.
-		# This has most likley to do with titles being unicode (foreign titles)
+	try: 
 		title = title.translate(None, ':*?"\'\.<>|&!,')
 	except:
 		for c in ':*?"\'\.<>|&!,':
@@ -34,60 +44,10 @@ def geturl(title):
 	return title
 
 
-def get_url(title):
-	if not title: return
-	title = title.replace(' ', '%20')
-	return title
-
-
-def get_gan_url(title):
-	if not title: return
-	title = title.lower()
-	title = title.replace('-', '+')
-	title = title.replace(' + ', '+-+')
-	title = title.replace(' ', '%20')
-	return title
-
-
-def get_simple(title):
-	if not title: return
-	title = title.lower()
-	title = re.sub(r'(\d{4})', '', title)
-	title = re.sub(r'&#(\d+);', '', title)
-	title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-	title = title.replace(r'&quot;', '\"').replace('&amp;', '&')
-	title = re.sub(r'\n|\(|\)|\[|\]|\{|\}|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\~|\s', '', title).lower()
-	title = re.sub(r'<.*?>', '', title, count=0)
-	return title
-
-
-def getsearch(title):
-	if not title: return
-	title = title.lower()
-	title = re.sub(r'&#(\d+);', '', title)
-	title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
-	title = title.replace(r'&quot;', '\"').replace('&amp;', '&')
-	title = re.sub(r'\\\|/|-|–|:|;|\*|\?|"|\'|<|>|\|', '', title).lower()
-	return title
-
-
-def query(title):
-	if not title: return
-	title = title.replace('\'', '').rsplit(':', 1)[0].rsplit(' -', 1)[0].replace('-', ' ')
-	return title
-
-
-def get_query(title):
-	if not title: return
-	title = title.replace(' ', '.').replace(':', '').replace('.-.', '.').replace('\'', '')
-	return title
-
-
 def normalize(title):
 	try:
 		try: return title.decode('ascii').encode("utf-8")
 		except: pass
-		return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if
-		                   unicodedata.category(c) != 'Mn'))
+		return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if unicodedata.category(c) != 'Mn'))
 	except:
 		return title

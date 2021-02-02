@@ -18,7 +18,7 @@ from fenomscrapers.modules import workers
 
 class source:
 	def __init__(self):
-		self.priority = 15
+		self.priority = 3
 		self.language = ['en']
 		self.domains = ['btdb.unblockit.ltd', 'btdb.eu'] # btdb.eu now v2 challenge
 		# self.base_link = 'https://btdb.eu'

@@ -1,48 +1,49 @@
 Below is a list of supplied torrent scrapers grouped by request method, with additional info.
+Priority rating=postion it takes in scraper order, fastest to slowest.
 
-api torrents(fast):
+api torrents(fast, priority=1-2)
 --------------------------------------------
-bitlord
-piratebay
-solidtorrents
-torrentapi (uses imdb_id query, RARBG's api)
-ytsmx (uses imdb_id query, movies only site)
+bitlord (priority=1)
+piratebay (priority=2)
+solidtorrents(priority=1)
+torrentapi (priority=1, uses imdb_id query, uses cfscrape as of 1-28-21, RARBG's api)
+ytsmx (priority=2, uses imdb_id query, movies only site)
 
-single request html parsed sites:
+single request html parsed sites(medium speed, priority=3-5):
 --------------------------------------------
 7torrents(uses 7torrents.cc(12/2/20) as 7torr.com is mirror of btscene, v2 challenge and now removed)
-bt4g
-btdb (proxy change 1-13-21 for v2 challenge)
-btdig
-btscene (timeout least twice a week)
-ext.to
-extratorrent (uses cfscrape)
-eztv (shows only, site does not do pack files)
-glodls
-idope
-kickass2 (timeout least twice a week)
-limetorrents (uses cfscrape)
-magnet4you
-magnetdl
-nyaa (anime)
-skytorrents (.org v2 challenge, switched to .net 1-17-21)
-topnow
-torrentdownload
-torrentgalaxy (uses cfscrape)
+bt4g (priority=3)
+btdb (priority=3, proxy change 1-13-21 for v2 challenge)
+btdig (priority=3)
+btscene (priority=3, timeout least twice a week)
+ext.to (priority=3)
+extratorrent (priority=4, uses cfscrape)
+eztv (priority=4, shows only, site does not do pack files)
+glodls (priority=3)
+idope (priority=5)
+kickass2 (priority=4, timeout least twice a week)
+limetorrents (priority=3, uses cfscrape)
+magnet4you (priority=4)
+magnetdl (priority=3
+nyaa (priority=5, anime)
+skytorrents (priority=3)
+topnow (priority=5)
+torrentdownload (priority=3)
+torrentgalaxy (priority=4, uses cfscrape)
 torrentquest (removed, mirror of magnetdl)
-torrentz2 (12/2/20 new domain, was 2 request before)
-zooqle
+torrentz2 (priority=4)
+zooqle (priority=5)
 
-2 request html parsed sites (slow):
+2 request html parsed sites (slow, priority=6-9):
 --------------------------------------------
-1337x
-ettv
-isohunt2
+1337x (priority=8)
+ettv (priority=6
+isohunt2 (priority=7)
 moviemagnet (uses api to fetch their ID, movies only, uses cfscrape,
     site down as of 12/1/220-scraper removed)
-torlock
-torrentfunk
-yourbittorrent
+torlock(priority=7)
+torrentfunk(priority=7)
+yourbittorrent(priority=9)
 
 The following scrapers sit behind CloudFlare and 
 use the "cloudscraper" module by Venomous:
