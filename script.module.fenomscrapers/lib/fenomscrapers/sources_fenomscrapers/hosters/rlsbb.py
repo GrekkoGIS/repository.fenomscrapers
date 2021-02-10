@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-09-2021)
+# modified by Venom for Fenomscrapers (updated 2-9-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -21,7 +21,9 @@ class source:
 		self.priority = 26
 		self.language = ['en']
 		self.domains = ['proxybb.com', 'rlsbb.ru', 'rlsbb.to']
-		self.base_link = 'http://proxybb.com'
+		self.base_new = 'http://proxybb.com'
+		self.base_old = 'http://old3.proxybb.com'
+		self.search_link = 'http://search.proxybb.com/?s=%s' #may use in future but adds a request to do so.
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -77,6 +79,10 @@ class source:
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
 			# query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			query = re.sub(r'\s', '-', query)
+
+			if int(year) >= 2021: self.base_link = self.base_new
+			else: self.base_link = self.base_old
+
 			url = urljoin(self.base_link, query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
@@ -94,6 +100,7 @@ class source:
 					isSeasonQuery = True
 				else: return sources 
 			if not r or 'nothing was found' in r: return sources
+			# may need to add fallback to use self.search_link if nothing found
 			posts = client.parseDOM(r, "div", attrs={"class": "content"})
 			if not posts: return sources
 		except:

@@ -99,11 +99,9 @@ class source:
 			if result is None: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
-			url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
-
 			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
-			name = unquote_plus(name)
-			name = source_utils.clean_name(name)
+			name = source_utils.clean_name(unquote_plus(name))
+
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info): return
@@ -112,7 +110,7 @@ class source:
 				ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
-			url = '%s%s%s' % (url, '&dn=', str(name))
+			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 
 			try:
@@ -205,8 +203,6 @@ class source:
 			if not result: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
-			url = '%s%s' % ('magnet:?xt=urn:btih:', hash)
-
 			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
 			name = source_utils.clean_name(unquote_plus(name))
 
@@ -227,7 +223,7 @@ class source:
 			name_info = source_utils.info_from_name(name, self.title, self.year, season=self.season_x, pack=package)
 			if source_utils.remove_lang(name_info): return
 
-			url = '%s%s%s' % (url, '&dn=', str(name))
+			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 
 			try:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-28-2021)
+# created by Venom for Fenomscrapers (updated 2-9-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -103,6 +103,7 @@ class source:
 				# item[1] does not contain full info like the &dn= portion of magnet
 				link = urljoin(self.base_link, items[0])
 				link = client.request(link, timeout='5')
+				if not link or 'Download Magnet link' not in link: continue
 				link = unquote_plus(client.parseDOM(link, 'a', attrs={'title': 'Download Magnet link'}, ret='href')[0])
 				if not link: continue
 

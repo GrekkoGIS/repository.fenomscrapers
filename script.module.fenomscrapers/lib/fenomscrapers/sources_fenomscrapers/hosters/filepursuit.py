@@ -99,6 +99,8 @@ class source:
 				except: size = 0
 				try: name = item['file_name']
 				except: name = item['file_link'].split('/')[-1]
+				name = source_utils.clean_name(name)
+
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -111,8 +113,7 @@ class source:
 				try:
 					dsize, isize = source_utils.convert_size(size, to='GB')
 					if isize: info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'filepursuit', 'source': 'direct', 'quality': quality, 'name': name, 'name_info': name_info, 'language': "en",

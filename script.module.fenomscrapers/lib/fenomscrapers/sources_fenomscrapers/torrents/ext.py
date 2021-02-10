@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (1-28-2021)
+# created by Venom for Fenomscrapers (2-9-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -20,8 +20,8 @@ class source:
 	def __init__(self):
 		self.priority = 3
 		self.language = ['en']
-		self.domains = ['ext.io']
-		self.base_link = 'https://ext.to'
+		self.domains = ['torrent.extto.com', 'ext.to'] # ext.to V2 challenge as of 2-9-21
+		self.base_link = 'https://torrent.extto.com'
 		self.search_link = '/search/?q=%s'
 		self.min_seeders = 1
 		self.pack_capable = True

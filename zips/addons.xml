@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.2.7" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.2.8" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -28,11 +28,11 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.2.7 - Feb. 02, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Added threading to "torrentfunk" and yourbittorent" for pack
-    file scaping performance increase.[/I]
-[COLOR yellow]--[/COLOR][I] Added priority to "torrentInfo" help file.[/I]
-[COLOR yellow]--[/COLOR][I] Modules cleanup of unused functions.[/I]
+[B][COLOR red]Update - v1.2.8 - Feb. 10, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] RLSBB works once again.  Few tweaks for query of older titles.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed EXT torrent scraper.  Site was switched to cloudflare v2
+    challenge now but proxy found.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed bogus log errors in BT4G and ISOHUNT2.[/I]
 		</news>
 	</extension>
 </addon>

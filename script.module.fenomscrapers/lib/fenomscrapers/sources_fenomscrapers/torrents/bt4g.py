@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (1-28-2021)
+# created by Venom for Fenomscrapers (2-9-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -167,7 +167,7 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		r = client.request(link, timeout='5')
-		if not r or 'did not match any documents' in r: return sources
+		if not r or 'did not match any documents' in r: return
 		r = r.replace('&nbsp;', ' ')
 		r = client.parseDOM(r, 'div', attrs={'class': 'col s12'})
 		posts = client.parseDOM(r, 'div')[1:]
