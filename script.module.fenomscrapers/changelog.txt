@@ -1,3 +1,11 @@
+[B][COLOR red]Update - v1.2.9 - Feb. 14, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] EXT torrent scraper appears down and has be set to off by default.[/I]
+[COLOR yellow]--[/COLOR][I] EZTV site seems to return invalid magnets where the hash is less
+    than the required 40 character length.  All scrapers now have a check
+    added for this.  Real-Debrid terminates a request if it receives one of
+    these invalid magnets.  This should improve addons cache check
+    results with RD.[/I]
+
 [B][COLOR red]Update - v1.2.8 - Feb. 10, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] RLSBB works once again.  Few tweaks for query of older titles.[/I]
 [COLOR yellow]--[/COLOR][I] Fixed EXT torrent scraper.  Site was switched to cloudflare v2

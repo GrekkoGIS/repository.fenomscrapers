@@ -106,9 +106,11 @@ class source:
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
+					if len(hash) != 40: continue
 					name = link[2].replace('+MB+', '')
 					name = unquote_plus(name).replace('&amp;', '&')
 					name = source_utils.clean_name(name)
+
 					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 					name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 					if source_utils.remove_lang(name_info): continue
@@ -199,6 +201,7 @@ class source:
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
+					if len(hash) != 40: continue
 					name = link[2].replace('+MB+', '')
 					name = unquote_plus(name).replace('&amp;', '&')
 					name = source_utils.clean_name(name)

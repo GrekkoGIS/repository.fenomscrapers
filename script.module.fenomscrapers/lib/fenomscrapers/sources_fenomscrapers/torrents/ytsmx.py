@@ -70,11 +70,12 @@ class source:
 				quality = torrent.get('quality')
 				type = torrent.get('type')
 				hash = torrent.get('hash')
+				if len(hash) != 40: continue
 				name = '%s.[%s].[%s].[YTS.MX]' % (title_long, quality, type)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr)
-				if source_utils.remove_lang(name_info): return
+				if source_utils.remove_lang(name_info): continue
 
 				try:
 					seeders = torrent.get('seeds')

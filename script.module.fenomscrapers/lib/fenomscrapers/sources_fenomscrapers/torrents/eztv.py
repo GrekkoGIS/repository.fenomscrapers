@@ -96,7 +96,7 @@ class source:
 				try: url = unquote(url).decode('utf8')
 				except: pass
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-
+				if len(hash) != 40: continue
 				name = link[1].split(' [eztv]')[0].split(' Torrent:')[0]
 				name = source_utils.clean_name(name)
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue

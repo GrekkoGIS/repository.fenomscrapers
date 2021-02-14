@@ -99,9 +99,10 @@ class source:
 			if result is None: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
+			if len(hash) != 40: return
+
 			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
 			name = source_utils.clean_name(unquote_plus(name))
-
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info): return
@@ -203,9 +204,10 @@ class source:
 			if not result: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
+			if len(hash) != 40: return
+
 			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
 			name = source_utils.clean_name(unquote_plus(name))
-
 			if not self.search_series:
 				if not self.bypass_filter:
 					if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

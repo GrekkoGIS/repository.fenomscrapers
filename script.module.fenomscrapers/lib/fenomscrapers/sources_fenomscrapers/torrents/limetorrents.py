@@ -116,8 +116,10 @@ class source:
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
 				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
+				if len(hash) != 40: continue
 				name = re.findall(r'title\s*=\s*(.+?)$', data, re.DOTALL | re.I)[0]
 				name = source_utils.clean_name(name)
+
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -206,6 +208,7 @@ class source:
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
 				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
+				if len(hash) != 40: continue
 				name = re.findall(r'title\s*=\s*(.+?)$', data, re.DOTALL | re.I)[0]
 				name = source_utils.clean_name(name)
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)

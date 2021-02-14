@@ -108,6 +108,7 @@ class source:
 					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = item['infohash'].lower()
+					if len(hash) != 40: continue
 					if url in str(self.sources): continue
 
 					name = item['title']
@@ -201,11 +202,11 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = item['infohash'].lower()
+				if len(hash) != 40: continue
 				if url in str(self.sources): continue
 
 				name = item['title']
 				name = source_utils.clean_name(name)
-
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

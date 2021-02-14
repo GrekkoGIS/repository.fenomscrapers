@@ -94,13 +94,12 @@ class source:
 
 			for post in posts:
 				post = post.replace('&nbsp;', ' ')
-
 				links = client.parseDOM(post, 'a', ret='href')
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-
+				if len(hash) != 40: continue
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
 				name = source_utils.clean_name(name)
@@ -199,7 +198,7 @@ class source:
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(self.sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-
+				if len(hash) != 40: continue
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
 				name = source_utils.clean_name(name)

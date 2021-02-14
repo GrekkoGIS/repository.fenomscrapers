@@ -90,9 +90,10 @@ class source:
 				if 'dwn-btn torrent-dwn' not in row: continue
 				link = client.parseDOM(row, 'a', attrs={'class': 'dwn-btn torrent-dwn'}, ret='href')[0]
 				hash = re.search(r'/torrent/(?:.+?/)(.+?).torrent', link, re.I).group(1)
-
+				if len(hash) != 40: continue
 				name = re.search(r'\?title=(?:.+?])(.+?).torrent', link, re.I).group(1)
 				name = source_utils.clean_name(name)
+
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -182,7 +183,7 @@ class source:
 				if 'dwn-btn torrent-dwn' not in row: continue
 				link = client.parseDOM(row, 'a', attrs={'class': 'dwn-btn torrent-dwn'}, ret='href')[0]
 				hash = re.search(r'/torrent/(?:.+?/)(.+?).torrent\?', link).group(1)
-
+				if len(hash) != 40: continue
 				name = re.search(r'\?title=(?:.+?])(.+?).torrent', link).group(1).replace('./.', '.')
 				name = source_utils.clean_name(name)
 

@@ -117,6 +117,8 @@ class source:
 					if url in str(self.sources): continue
 				except: continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				if len(hash) != 40: continue
+
 				try:
 					name = re.findall(r'<a class\s*=\s*["\'].+?>(.+?)</a>', row, re.DOTALL | re.I)[0]
 					name = client.cleanHTML(name)
@@ -226,6 +228,8 @@ class source:
 					if url in str(self.sources): continue
 				except: continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				if len(hash) != 40: continue
+
 				try:
 					name = re.findall(r'<a class\s*=\s*["\'].+?>(.+?)</a>', row, re.DOTALL | re.I)[0]
 					name = client.cleanHTML(name)

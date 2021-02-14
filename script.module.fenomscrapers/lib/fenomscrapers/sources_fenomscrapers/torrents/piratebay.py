@@ -89,8 +89,10 @@ class source:
 		for file in files:
 			try:
 				hash = file['info_hash']
+				if len(hash) != 40: continue
 				name = file['name']
 				name = source_utils.clean_name(name)
+
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -175,6 +177,7 @@ class source:
 		for file in files:
 			try:
 				hash = file['info_hash']
+				if len(hash) != 40: continue
 				name = file['name']
 				name = source_utils.clean_name(name)
 

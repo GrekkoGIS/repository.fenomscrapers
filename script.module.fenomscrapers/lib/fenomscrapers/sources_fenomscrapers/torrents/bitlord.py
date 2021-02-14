@@ -118,6 +118,7 @@ class source:
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				if len(hash) != 40: continue
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
 					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
@@ -220,6 +221,7 @@ class source:
 				url = url.split('&tr=')[0].split('&xl=')[0]
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+				if len(hash) != 40: continue
 
 				if not self.search_series:
 					if not self.bypass_filter:

@@ -97,6 +97,7 @@ class source:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+					if len(hash) != 40: continue
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
@@ -188,10 +189,10 @@ class source:
 					url = unquote_plus(link[0]).split('&tr')[0].replace(' ', '.')
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
+					if len(hash) != 40: continue
 
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
-
 					if not self.search_series:
 						if not self.bypass_filter:
 							if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

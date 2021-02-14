@@ -113,9 +113,10 @@ class source:
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			if url in str(self.sources): return
 			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-
+			if len(hash) != 40: return
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
+
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 			if source_utils.remove_lang(name_info): return
@@ -204,7 +205,7 @@ class source:
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				if url in str(self.sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-
+				if len(hash) != 40: continue
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
 

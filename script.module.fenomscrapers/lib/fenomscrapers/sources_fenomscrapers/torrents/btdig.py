@@ -91,9 +91,10 @@ class source:
 				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', row, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-
+				if len(hash) != 40: continue
 				name = url.split('&dn=')[1]
 				name = source_utils.clean_name(name)
+
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
