@@ -99,7 +99,6 @@ class source:
 			if result is None: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
-			if len(hash) != 40: return
 
 			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
 			name = source_utils.clean_name(unquote_plus(name))
@@ -204,7 +203,6 @@ class source:
 			if not result: return
 			if '<kbd>' not in result: return
 			hash = re.findall(r'<kbd>(.+?)<', result, re.DOTALL | re.I)[0]
-			if len(hash) != 40: return
 
 			name = re.findall(r'<h3\s*class\s*=\s*["\']card-title["\']>(.+?)<', result, re.DOTALL | re.I)[0].replace('Original Name: ', '')
 			name = source_utils.clean_name(unquote_plus(name))

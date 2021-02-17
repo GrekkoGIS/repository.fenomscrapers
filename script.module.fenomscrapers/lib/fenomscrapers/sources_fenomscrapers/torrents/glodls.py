@@ -89,7 +89,6 @@ class source:
 				url = unquote_plus(item[2]).replace('&amp;', '&').replace(' ', '.')
 				url = url.split('&tr')[0]
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0].lower()
-				if len(hash) != 40: continue
 				quality, info = source_utils.get_release_quality(name_info, url)
 
 				if item[3] != '0': info.insert(0, item[3])

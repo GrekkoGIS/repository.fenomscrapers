@@ -89,7 +89,6 @@ class source:
 		for file in files:
 			try:
 				hash = file['info_hash']
-				if len(hash) != 40: continue
 				name = file['name']
 				name = source_utils.clean_name(name)
 
@@ -177,7 +176,6 @@ class source:
 		for file in files:
 			try:
 				hash = file['info_hash']
-				if len(hash) != 40: continue
 				name = file['name']
 				name = source_utils.clean_name(name)
 

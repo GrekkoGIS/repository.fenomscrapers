@@ -97,7 +97,6 @@ class source:
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(sources): continue
 					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-					if len(hash) != 40: continue
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
 
@@ -192,7 +191,6 @@ class source:
 					url = source_utils.strip_non_ascii_and_unprintable(url)
 					if url in str(self.sources): continue
 					hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-					if len(hash) != 40: continue
 					name = url.split('&dn=')[1]
 					name = source_utils.clean_name(name)
 

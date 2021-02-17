@@ -417,10 +417,6 @@ msgstr ""
 
 
 
-
-
-
-
 msgctxt "#32101"
 msgid "$NUMBER[1337]X"
 msgstr "$NUMBER[1337]X"
@@ -551,11 +547,11 @@ msgstr "BT4G (Pack geschikt)"
 
 msgctxt "#32133"
 msgid "BTDIG"
-msgstr ""
+msgstr "BTDIG"
 
 msgctxt "#32134"
-msgid ""
-msgstr ""
+msgid "TORRENTTM (Pack capable)"
+msgstr "TORRENTTM (Pack geschikt)"
 
 msgctxt "#32135"
 msgid ""

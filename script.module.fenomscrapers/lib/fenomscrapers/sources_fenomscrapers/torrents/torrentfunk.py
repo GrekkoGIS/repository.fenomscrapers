@@ -119,7 +119,6 @@ class source:
 			link = client.request(link, timeout='5')
 			if link is None: 	return
 			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
-			if len(hash) != 40: return
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 			if url in str(self.sources): return
 
@@ -240,7 +239,6 @@ class source:
 			link = client.request(items[2], timeout='5')
 			if link is None: 	return
 			hash = re.findall(r'Infohash.*?>(?!<)(.+?)</', link, re.DOTALL | re.I)[0]
-			if len(hash) != 40: return
 			url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, items[0])
 			if url in str(self.sources): return
 

@@ -110,7 +110,6 @@ class source:
 			try:
 				url = file["download"].split('&tr')[0]
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-				if len(hash) != 40: continue
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 
@@ -156,15 +155,13 @@ class source:
 			self.year = data['year']
 			self.season_x = data['season']
 			self.season_xx = self.season_x.zfill(2)
-
 			search_link = self.tvshowsearch.format(self.key, data['imdb'], 'S%s' % self.season_xx)
 			# log_utils.log('search_link = %s' % str(search_link), log_utils.LOGDEBUG)
 
 			time.sleep(2.1)
 			# rjson = client.request(search_link, error=True)
 			rjson = self.scraper.get(search_link).content
-			if not rjson or 'torrent_results' not in str(rjson):
-				return sources
+			if not rjson or 'torrent_results' not in str(rjson): return sources
 			files = jsloads(rjson)['torrent_results']
 		except:
 			source_utils.scraper_error('TORRENTAPI')
@@ -174,7 +171,6 @@ class source:
 			try:
 				url = file["download"].split('&tr')[0]
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-				if len(hash) != 40: continue
 				name = unquote_plus(file["title"])
 				name = source_utils.clean_name(name)
 

@@ -24,6 +24,7 @@ class source:
 		self.domains = ['solidtorrents.net']
 		self.base_link = 'https://solidtorrents.net'
 		self.search_link = '/api/v1/search?q=%s&category=all&sort=size'
+		#self.search_link = '/api/v1/search?q=%s&category=video&sort=seeders'
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -79,9 +80,10 @@ class source:
 			url = urljoin(self.base_link, url)
 			urls.append(url)
 			urls.append(url + '&skip=20')
-			urls.append(url + '&skip=40')
-			urls.append(url + '&skip=60')
-			urls.append(url + '&skip=80')
+			if 'tvshowtitle' not in data:
+				urls.append(url + '&skip=40')
+				urls.append(url + '&skip=60')
+				urls.append(url + '&skip=80')
 			# log_utils.log('urls = %s' % urls, log_utils.LOGDEBUG)
 
 			threads = []
@@ -101,46 +103,43 @@ class source:
 			if not r: return
 			r = jsloads(r)
 			results = r['results']
-
-			for item in results:
-				try:
-					url = unquote_plus(item['magnet']).replace(' ', '.')
-					url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
-					url = source_utils.strip_non_ascii_and_unprintable(url)
-					hash = item['infohash'].lower()
-					if len(hash) != 40: continue
-					if url in str(self.sources): continue
-
-					name = item['title']
-					name = source_utils.clean_name(name)
-					if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
-					name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-					if source_utils.remove_lang(name_info): continue
-
-					if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
-						if any(re.search(item, name.lower()) for item in ep_strings): continue
-
-					try:
-						seeders = int(item['swarm']['seeders'])
-						if self.min_seeders > seeders: continue
-					except:
-						seeders = 0
-
-					quality, info = source_utils.get_release_quality(name_info, url)
-					try:
-						dsize, isize = source_utils.convert_size(item["size"], to='GB')
-						info.insert(0, isize)
-					except:
-						dsize = 0
-					info = ' | '.join(info)
-
-					self.sources.append({'provider': 'solidtorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
-													'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-				except:
-					source_utils.scraper_error('SOLIDTORRENTS')
 		except:
 			source_utils.scraper_error('SOLIDTORRENTS')
+
+		for item in results:
+			try:
+				url = unquote_plus(item['magnet']).replace(' ', '.')
+				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
+				url = source_utils.strip_non_ascii_and_unprintable(url)
+				hash = item['infohash'].lower()
+				if url in str(self.sources): continue
+
+				name = item['title']
+				name = source_utils.clean_name(name)
+				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
+				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
+				if source_utils.remove_lang(name_info): continue
+
+				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
+					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					if any(re.search(item, name.lower()) for item in ep_strings): continue
+
+				try:
+					seeders = int(item['swarm']['seeders'])
+					if self.min_seeders > seeders: continue
+				except: seeders = 0
+
+				quality, info = source_utils.get_release_quality(name_info, url)
+				try:
+					dsize, isize = source_utils.convert_size(item["size"], to='GB')
+					info.insert(0, isize)
+				except: dsize = 0
+				info = ' | '.join(info)
+
+				self.sources.append({'provider': 'solidtorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
+												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
+			except:
+				source_utils.scraper_error('SOLIDTORRENTS')
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -202,7 +201,6 @@ class source:
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on solidtorrents &tr= before &dn=
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = item['infohash'].lower()
-				if len(hash) != 40: continue
 				if url in str(self.sources): continue
 
 				name = item['title']
@@ -227,15 +225,13 @@ class source:
 				try:
 					seeders = int(item['swarm']['seeders'])
 					if self.min_seeders > seeders: continue
-				except:
-					seeders = 0
+				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
 					dsize, isize = source_utils.convert_size(item["size"], to='GB')
 					info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				item = {'provider': 'solidtorrents', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,

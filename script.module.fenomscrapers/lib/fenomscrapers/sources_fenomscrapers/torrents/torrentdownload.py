@@ -106,7 +106,6 @@ class source:
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
-					if len(hash) != 40: continue
 					name = link[2].replace('+MB+', '')
 					name = unquote_plus(name).replace('&amp;', '&')
 					name = source_utils.clean_name(name)
@@ -201,7 +200,6 @@ class source:
 				for items in links:
 					link = items[0].split("/")
 					hash = link[1].lower()
-					if len(hash) != 40: continue
 					name = link[2].replace('+MB+', '')
 					name = unquote_plus(name).replace('&amp;', '&')
 					name = source_utils.clean_name(name)

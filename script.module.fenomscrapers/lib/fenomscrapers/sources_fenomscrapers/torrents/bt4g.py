@@ -96,7 +96,6 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				hash = client.parseDOM(post, 'a', ret='href')[0].split('magnet/')[1]
-				if len(hash) != 40: continue
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
@@ -196,7 +195,6 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				hash = client.parseDOM(post, 'a', ret='href')[0].split('magnet/')[1]
-				if len(hash) != 40: continue
 				url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 				try:

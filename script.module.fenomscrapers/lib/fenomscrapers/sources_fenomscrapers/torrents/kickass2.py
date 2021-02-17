@@ -125,7 +125,6 @@ class source:
 				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				if url in str(self.sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-				if len(hash) != 40: continue
 				name = unquote_plus(url.split('&dn=')[1])
 				name = source_utils.clean_name(name)
 
@@ -210,7 +209,6 @@ class source:
 				link = ref.split('url=')[1]
 				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-				if len(hash) != 40: continue
 				name = unquote_plus(url.split('&dn=')[1])
 				name = source_utils.clean_name(name)
 

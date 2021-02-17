@@ -99,7 +99,6 @@ class source:
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			if url in str(self.sources): return
 			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-			if len(hash) != 40: return
 			name = url.split('&dn=')[1]
 			name = source_utils.clean_name(name)
 			if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): return

@@ -98,7 +98,6 @@ class source:
 				url = url.split('&tr=')[0].replace(' ', '.')
 				url = source_utils.strip_non_ascii_and_unprintable(url)
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-				if len(hash) != 40: continue
 
 				release_name = url.split('&dn=')[1]
 				release_name = source_utils.clean_name(release_name)

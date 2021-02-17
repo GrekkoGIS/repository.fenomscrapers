@@ -99,7 +99,6 @@ class source:
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-				if len(hash) != 40: continue
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
 				name = source_utils.clean_name(name)
@@ -198,7 +197,6 @@ class source:
 				url = unquote_plus(magnet).split('&tr')[0].replace(' ', '.')
 				if url in str(self.sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-				if len(hash) != 40: continue
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
 				name = unquote_plus(name)
 				name = source_utils.clean_name(name)
