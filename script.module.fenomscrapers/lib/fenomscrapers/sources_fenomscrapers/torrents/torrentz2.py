@@ -113,21 +113,17 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
 					# seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Seeds'})[0])
 					seeders = int(client.parseDOM(row, 'td', attrs={'data-title': 'Last Updated'})[0]) #keep an eye on this, looks like they gaffed their col's (seeders and size)
-
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					# size = client.parseDOM(row, 'td', attrs={'data-title': 'Size'})[0]
-					# size = client.parseDOM(row, 'td', attrs={'class': 'description-data'})[0].replace(u'&nbsp;', u' ').replace(u'\xa0', u' ')
-					# size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' '))[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
@@ -140,7 +136,6 @@ class source:
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('TORRENTZ2')
-				return sources
 		return sources
 
 
@@ -165,14 +160,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
-							]
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
 			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
-						self.search_link % quote_plus(query + ' Complete')
-								]
-
+						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
@@ -232,9 +224,6 @@ class source:
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					# size = client.parseDOM(row, 'td', attrs={'data-title': 'Size'})[0]
-					# size = client.parseDOM(row, 'td', attrs={'class': 'description-data'})[0].replace(u'&nbsp;', u' ').replace(u'\xa0', u' ')
-					# size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', size)[0]
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row.replace(u'\xa0', u' ').replace(u'&nbsp;', u' '))[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
@@ -243,8 +232,7 @@ class source:
 
 				item = {'provider': 'torrentz2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
+				if self.search_series: item.update({'last_season': last_season})
 				self.sources.append(item)
 			except:
 				source_utils.scraper_error('TORRENTZ2')

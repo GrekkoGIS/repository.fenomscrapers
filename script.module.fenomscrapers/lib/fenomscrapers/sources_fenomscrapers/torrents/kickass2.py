@@ -117,8 +117,12 @@ class source:
 			r = client.request(url, headers=headers, timeout='5')
 			if not r: return
 			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
+		except:
+			source_utils.scraper_error('KICKASS2')
+			return
 
-			for post in posts:
+		for post in posts:
+			try:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
 				link = ref.split('url=')[1]
 
@@ -133,7 +137,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
@@ -151,8 +155,8 @@ class source:
 
 				self.sources.append({'provider': 'kickass2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-		except:
-			source_utils.scraper_error('KICKASS2')
+			except:
+				source_utils.scraper_error('KICKASS2')
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -176,14 +180,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search2.format(quote_plus(query + ' S%s' % self.season_xx)),
-						self.search2.format(quote_plus(query + ' Season %s' % self.season_x))
-							]
+						self.search2.format(quote_plus(query + ' Season %s' % self.season_x))]
 			if self.search_series:
 				queries = [
 						self.search2.format(quote_plus(query + ' Season')),
-						self.search2.format(quote_plus(query + ' Complete'))
-								]
-
+						self.search2.format(quote_plus(query + ' Complete'))]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
@@ -203,8 +204,12 @@ class source:
 			r = client.request(link, headers=headers, timeout='5')
 			if not r: return
 			posts = client.parseDOM(r, 'tr', attrs={'id': 'torrent_latest_torrents'})
+		except:
+			source_utils.scraper_error('KICKASS2')
+			return
 
-			for post in posts:
+		for post in posts:
+			try:
 				ref = client.parseDOM(post, 'a', attrs={'title': 'Torrent magnet link'}, ret='href')[0]
 				link = ref.split('url=')[1]
 				url = unquote_plus(link).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
@@ -244,11 +249,10 @@ class source:
 
 				item = {'provider': 'kickass2', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
+				if self.search_series: item.update({'last_season': last_season})
 				self.sources.append(item)
-		except:
-			source_utils.scraper_error('KICKASS2')
+			except:
+				source_utils.scraper_error('KICKASS2')
 
 
 	def __get_base_url(self, fallback):

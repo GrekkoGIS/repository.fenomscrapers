@@ -1,3 +1,8 @@
+[B][COLOR red]Update - v1.3.1 - Feb. 20, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Enhancements to EasyNews title check.[/I]
+[COLOR yellow]--[/COLOR][I] Added setting to disable EasyNews title
+    check, see new Help file.[/I]
+
 [B][COLOR red]Update - v1.3.0 - Feb. 17, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] EXT torrent scraper has been removed due to Cloudflare v2 challenge.[/I]
 [COLOR yellow]--[/COLOR][I] New torrent scraper added, TORRENTTM.[/I]

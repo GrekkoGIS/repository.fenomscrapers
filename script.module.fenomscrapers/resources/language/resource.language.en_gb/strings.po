@@ -343,7 +343,7 @@ msgid "RAPIDMOVIEZ"
 msgstr ""
 
 msgctxt "#32083"
-msgid ""
+msgid "-- Title Check Results"
 msgstr ""
 
 msgctxt "#32084"

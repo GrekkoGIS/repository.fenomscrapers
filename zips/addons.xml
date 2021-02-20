@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.3.0" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.3.1" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0" />
 		<import addon="script.module.beautifulsoup4" />
@@ -28,15 +28,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.3.0 - Feb. 17, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] EXT torrent scraper has been removed due to Cloudflare v2 challenge.[/I]
-[COLOR yellow]--[/COLOR][I] New torrent scraper added, TORRENTTM.[/I]
-[COLOR yellow]--[/COLOR][I] Default enabled scrapers updated.[/I]
-[COLOR yellow]--[/COLOR][I] It has been decided that since RD is the only debrid provider that
-    terminates a cache check request upon receiving magnets with
-    BASE32 encoded hashes that the addon should deal with this.
-    RD would require these BASE32 encodes to be converted to
-    HEX while AD and PM do the conversions for you.[/I]
+[B][COLOR red]Update - v1.3.1 - Feb. 20, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Enhancements to EasyNews title check.[/I]
+[COLOR yellow]--[/COLOR][I] Added setting to disable EasyNews title
+    check, see new Help file.[/I]
 		</news>
 	</extension>
 </addon>

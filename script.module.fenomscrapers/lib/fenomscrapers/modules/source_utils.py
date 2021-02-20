@@ -17,8 +17,7 @@ from fenomscrapers.modules import control
 from fenomscrapers.modules import log_utils
 
 
-# RES_4K = ['.4k', 'hd4k', '4khd', 'uhd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, uhd removed
-RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd']
+RES_4K = ['.4k', 'hd4k', '4khd', 'ultrahd', 'ultra.hd', '2160p', '2160i', 'hd2160', '2160hd'] # some idiots use "uhd.1080p" in their uploads, "uhd" now removed
 RES_1080 = ['1080p', '1080i', 'hd1080', '1080hd']
 RES_720 = ['720p', '720i', 'hd720', '720hd']
 RES_SD = ['576p', '576i', 'sd576', '576sd', 'x576', '480p', '480i', 'sd480', '480sd']
@@ -120,9 +119,8 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 			try:
 				alias = item.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and').replace(year, '')
 				# alias = re.sub(r'[^A-Za-z0-9\s\.-]+', '', alias)
-				if years:
-					for i in years:
-						alias = alias.replace(i, '')
+				if years: # for movies only, scraper to pass None for episodes
+					for i in years: alias = alias.replace(i, '')
 				if alias in title_list: continue
 				title_list.append(alias)
 			except:
@@ -135,9 +133,9 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 		release_title = release_title_format(release_title) # converts to .lower()
 		h = hdlr.lower()
 		t = release_title.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
+
 		if years:
-			for i in years:
-				t = t.split(i)[0]
+			for i in years: t = t.split(i)[0]
 		t = t.split('2160p')[0].split('4k')[0].split('1080p')[0].split('720p')[0]
 		if all(cleantitle.get(i) != cleantitle.get(t) for i in title_list): match = False
 		if years: # for movies only, scraper to pass None for episodes
@@ -483,6 +481,7 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 
 
 def info_from_name(release_title, title, year, hdlr=None, episode_title=None, season=None, pack=None):
+	# log_utils.log('release_title = %s' % release_title, __name__, log_utils.LOGDEBUG)
 	try:
 		try: release_title = release_title.encode('utf-8')
 		except: pass
@@ -493,8 +492,8 @@ def info_from_name(release_title, title, year, hdlr=None, episode_title=None, se
 		name_info = release_title.replace(title, '').replace(year, '')
 		if hdlr: name_info = name_info.replace(hdlr.lower(), '')
 		if episode_title:
-			episode_title = episode_title.lower().replace('&', 'and')
-			episode_title = re.sub(r'[^a-z0-9]+', '.', title)
+			episode_title = episode_title.lower().replace('&', 'and').replace("'", "")
+			episode_title = re.sub(r'[^a-z0-9]+', '.', episode_title)
 			name_info = name_info.replace(episode_title, '')
 		if pack:
 			if pack == 'season':

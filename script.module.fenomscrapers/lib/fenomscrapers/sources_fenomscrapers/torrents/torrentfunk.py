@@ -110,7 +110,7 @@ class source:
 			if source_utils.remove_lang(name_info): return
 
 			if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-				ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+				ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 				if any(re.search(item, name.lower()) for item in ep_strings): return
 
 			if not url.startswith('http'): 
@@ -163,14 +163,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
-							]
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
 			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
-						self.search_link % quote_plus(query + ' Complete')
-								]
-
+						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
@@ -196,8 +193,12 @@ class source:
 			if not r: return
 			r = client.parseDOM(r, 'table', attrs={'class': 'tmain'})[0]
 			links = re.findall(r'<a\s*href\s*=\s*["\'](/torrent/.+?)["\']>(.+?)</a>', r, re.DOTALL | re.I)
+		except:
+			source_utils.scraper_error('TORRENTFUNK')
+			return
 
-			for link in links:
+		for link in links:
+			try:
 				try: url = link[0].encode('ascii', errors='ignore').decode('ascii', errors='ignore').replace('&nbsp;', ' ')
 				except: url = link[0].replace('&nbsp;', ' ')
 				if '/torrent/' not in url: continue
@@ -229,9 +230,8 @@ class source:
 				if not url.startswith('http'): url = urljoin(self.base_link, url)
 				if self.search_series: self.items.append((name, name_info, url, package, last_season))
 				else: self.items.append((name, name_info, url, package))
-			return self.items
-		except:
-			source_utils.scraper_error('TORRENTFUNK')
+			except:
+				source_utils.scraper_error('TORRENTFUNK')
 
 
 	def get_pack_sources(self, items):
@@ -257,8 +257,7 @@ class source:
 
 			item = {'provider': 'torrentfunk', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': items[0], 'name_info': items[1], 'quality': quality,
 						'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': items[3]}
-			if self.search_series:
-				item.update({'last_season': items[4]})
+			if self.search_series: item.update({'last_season': items[4]})
 			self.sources.append(item)
 		except:
 			source_utils.scraper_error('TORRENTFUNK')

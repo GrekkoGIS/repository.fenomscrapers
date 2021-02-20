@@ -97,7 +97,12 @@ class source:
 			r = client.request(url, timeout='5')
 			if not r: return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
-			for post in posts:
+		except:
+			source_utils.scraper_error('BTDB')
+			return
+
+		for post in posts:
+			try:
 				if 'magnet:' not in post: continue
 				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
@@ -111,7 +116,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
@@ -129,8 +134,8 @@ class source:
 
 				self.sources.append({'provider': 'btdb', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-		except:
-			source_utils.scraper_error('BTDB')
+			except:
+				source_utils.scraper_error('BTDB')
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -154,14 +159,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx + ' -soundtrack'),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x + ' -soundtrack')
-							]
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x + ' -soundtrack')]
 			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season' + ' -soundtrack'),
-						self.search_link % quote_plus(query + ' Complete' + ' -soundtrack')
-								]
-
+						self.search_link % quote_plus(query + ' Complete' + ' -soundtrack')]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
@@ -180,7 +182,12 @@ class source:
 			r = client.request(link, timeout='5')
 			if not r: return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'media'})
-			for post in posts:
+		except:
+			source_utils.scraper_error('BTDB')
+			return
+
+		for post in posts:
+			try:
 				if 'magnet:' not in post: continue
 				url = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\']', post, re.DOTALL | re.I)[0]
 				url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
@@ -221,11 +228,10 @@ class source:
 
 				item = {'provider': 'btdb', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
+				if self.search_series: item.update({'last_season': last_season})
 				self.sources.append(item)
-		except:
-			source_utils.scraper_error('BTDB')
+			except:
+				source_utils.scraper_error('BTDB')
 
 
 	def resolve(self, url):

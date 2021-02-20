@@ -6,7 +6,7 @@
 
 from json import dumps as jsdumps, loads as jsloads
 import requests
-import sys
+# import sys
 try: #Py2
 	from urlparse import parse_qs
 	from urllib import urlencode

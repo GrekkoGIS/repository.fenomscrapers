@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-28-2021)
+# created by Venom for Fenomscrapers (updated 2-19-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -99,8 +99,12 @@ class source:
 			r = re.sub(r'\t', '', r)
 			posts = re.compile(r'<table\s*class\s*=\s*["\']table2["\']\s*cellspacing\s*=\s*["\']\d+["\']>(.*?)</table>', re.I).findall(r)
 			posts = client.parseDOM(posts, 'tr')
+		except:
+			source_utils.scraper_error('TORRENTDOWNLOAD')
+			return
 
-			for post in posts:
+		for post in posts:
+			try:
 				if '<th' in post: continue
 				links = re.compile(r'<a\s*href\s*=\s*["\'](.+?)["\']>.*?<td class\s*=\s*["\']tdnormal["\']>((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))</td><td class\s*=\s*["\']tdseed["\']>([0-9]+|[0-9]+,[0-9]+)</td>', re.I).findall(post)
 				for items in links:
@@ -117,7 +121,7 @@ class source:
 					url = 'magnet:?xt=urn:btih:%s&dn=%s' % (hash, name)
 
 					if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-						ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+						ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 						if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 					try:
@@ -135,8 +139,8 @@ class source:
 
 					self.sources.append({'provider': 'torrentdownload', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 														'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-		except:
-			source_utils.scraper_error('TORRENTDOWNLOAD')
+			except:
+				source_utils.scraper_error('TORRENTDOWNLOAD')
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -160,14 +164,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
-							]
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
 			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
-						self.search_link % quote_plus(query + ' Complete')
-								]
-
+						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
@@ -238,8 +239,7 @@ class source:
 
 					item = {'provider': 'torrentdownload', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 								'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-					if self.search_series:
-						item.update({'last_season': last_season})
+					if self.search_series: item.update({'last_season': last_season})
 					self.sources.append(item)
 			except:
 				source_utils.scraper_error('TORRENTDOWNLOAD')

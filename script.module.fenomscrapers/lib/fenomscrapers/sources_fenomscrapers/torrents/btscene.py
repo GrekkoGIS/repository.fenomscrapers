@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
+# modified by Venom for Fenomscrapers (updated 2-19-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -115,7 +115,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
@@ -158,14 +158,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link % quote_plus(query + ' S%s' % self.season_xx),
-						self.search_link % quote_plus(query + ' Season %s' % self.season_x)
-							]
+						self.search_link % quote_plus(query + ' Season %s' % self.season_x)]
 			if search_series:
 				queries = [
 						self.search_link % quote_plus(query + ' Season'),
-						self.search_link % quote_plus(query + ' Complete')
-								]
-
+						self.search_link % quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
@@ -187,6 +184,7 @@ class source:
 			rows = client.parseDOM(table, 'tr')
 		except:
 			source_utils.scraper_error('BTSCENE')
+			return
 
 		for row in rows:
 			try:
@@ -230,8 +228,7 @@ class source:
 
 				item = {'provider': 'btscene', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
+				if self.search_series: item.update({'last_season': last_season})
 				self.sources.append(item)
 			except:
 				source_utils.scraper_error('BTSCENE')

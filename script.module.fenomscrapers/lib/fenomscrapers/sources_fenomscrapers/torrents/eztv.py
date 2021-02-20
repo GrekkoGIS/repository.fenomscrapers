@@ -78,7 +78,6 @@ class source:
 			except:
 				source_utils.scraper_error('EZTV')
 				return sources
-
 			rows = re.findall(r'<tr\s*name\s*=\s*["\']hover["\']\s*class\s*=\s*["\']forum_header_border["\']>(.+?)</tr>', table, re.DOTALL | re.I)
 			if not rows: return sources
 		except:
@@ -119,7 +118,6 @@ class source:
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
 			except:
 				source_utils.scraper_error('EZTV')
-				continue
 		return sources
 
 

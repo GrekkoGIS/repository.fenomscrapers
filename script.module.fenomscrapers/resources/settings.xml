@@ -28,6 +28,8 @@
 
 		<setting label="32044" type="lsep" />
 		<setting id="provider.easynews" type="bool" label="32065" default="false" />
+		<setting id="easynews.title.chk" type="bool" label="32083" default="true" visible="eq(-1,true)" />
+		<setting label="32001" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=EasyNews_titleCheck)" visible="eq(-2,true)" />
 		<setting id="provider.filepursuit" type="bool" label="32066" default="false" />
 		<setting id="provider.furk" type="bool" label="32068" default="false" />
 		<setting id="provider.gdrive" type="bool" label="32081" default="false" />

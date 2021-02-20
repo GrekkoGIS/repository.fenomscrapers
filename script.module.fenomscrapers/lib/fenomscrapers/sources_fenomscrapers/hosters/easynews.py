@@ -1,21 +1,18 @@
 # -*- coding: UTF-8 -*-
-# (updated 1-16-2021)
+# (updated 2-19-2021)
 '''
 	Fenomscrapers Project
 '''
 
-import base64
-from json import loads as jsloads
+from base64 import b64encode
 import re
 import requests
-import sys
 try: #Py2
 	from urllib import urlencode, quote
 	from urlparse import parse_qs
 except ImportError: #Py3
 	from urllib.parse import urlencode, quote, parse_qs
 
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import control
 from fenomscrapers.modules import source_utils
 
@@ -74,7 +71,8 @@ class source:
 
 			title = data['tvshowtitle'] if 'tvshowtitle' in data else data['title']
 			title = title.replace('&', 'and').replace('Special Victims Unit', 'SVU')
-			aliases = data['aliases'] # not used
+			aliases = data['aliases']
+
 			episode_title = data['title'] if 'tvshowtitle' in data else None
 			year = data['year']
 			years = [str(year), str(int(year)+1), str(int(year)-1)] if 'tvshowtitle' not in data else None
@@ -83,9 +81,7 @@ class source:
 			query = self._query(data)
 			url, params = self._translate_search(query)
 			headers = {'Authorization': auth}
-			response = requests.get(url, params=params, headers=headers, timeout=10).text
-
-			results = jsloads(response)
+			results = requests.get(url, params=params, headers=headers, timeout=15).json()
 			down_url = results.get('downURL')
 			dl_farm = results.get('dlFarm')
 			dl_port = results.get('dlPort')
@@ -106,10 +102,19 @@ class source:
 				if any(checks): continue
 
 				stream_url = down_url + quote('/%s/%s/%s%s/%s%s' % (dl_farm, dl_port, post_hash, ext, post_title, ext))
-				file_name = post_title
-				name = source_utils.clean_name(file_name)
-				if not source_utils.check_title(title, aliases, name, hdlr, year, years): continue
-				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
+				name = source_utils.clean_name(post_title)
+				# log_utils.log('name = %s' % name, __name__, log_utils.LOGDEBUG)
+				name_chk = name
+				if 'tvshowtitle' in data:
+					name_chk = re.sub(r'S\d+([.-])E\d+', hdlr, name_chk, 1, re.I)
+					name_chk = re.sub(r'^tvp[.-]', '', name_chk, 1, re.I)
+				name_chk = re.sub(r'disney[.-]gallery[.-]star[.-]wars[.-]', '', name_chk, 0, re.I)
+				name_chk = re.sub(r'marvels[.-]', '', name_chk, 0, re.I)
+
+				if control.setting('easynews.title.chk') == 'true':
+					if not source_utils.check_title(title, aliases, name_chk, hdlr, year, years): continue
+
+				name_info = source_utils.info_from_name(name_chk, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
 
 				file_dl = stream_url + '|Authorization=%s' % (quote(auth))
@@ -119,8 +124,7 @@ class source:
 					size = float(int(item['rawSize']))
 					dsize, isize = source_utils.convert_size(size, to='GB')
 					if isize: info.insert(0, isize)
-				except:
-					dsize = 0
+				except: dsize = 0
 				info = ' | '.join(info)
 
 				sources.append({'provider': 'easynews', 'source': 'direct', 'name': name, 'name_info': name_info, 'quality': quality, 'language': "en", 'url': file_dl,
@@ -138,29 +142,25 @@ class source:
 		auth = None
 		username = control.setting('easynews.user')
 		password = control.setting('easynews.password')
-		if username == '' or password == '':
-			return auth
-		try:
-			# Python 2
+		if username == '' or password == '': return auth
+		try: # Python 2
 			user_info = '%s:%s' % (username, password)
-			auth = 'Basic ' + base64.b64encode(user_info)
-		except:
-			# Python 3
+			auth = 'Basic ' + b64encode(user_info)
+		except: # Python 3
 			user_info = '%s:%s' % (username, password)
 			user_info = user_info.encode('utf-8')
-			auth = 'Basic ' + base64.b64encode(user_info).decode('utf-8')
+			auth = 'Basic ' + b64encode(user_info).decode('utf-8')
 		return auth
 
 
 	def _query(self, data):
-		content_type = 'episode' if 'tvshowtitle' in data else 'movie'
-		if content_type == 'movie':
-			title = cleantitle.normalize(data.get('title'))
+		if 'tvshowtitle' not in data:
+			title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', data.get('title'))
 			year = int(data.get('year'))
 			years = '%s,%s,%s' % (str(year - 1), year, str(year + 1))
 			query = '"%s" %s' % (title, years)
 		else:
-			title = cleantitle.normalize(data.get('tvshowtitle'))
+			title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', data.get('tvshowtitle'))
 			season = int(data.get('season'))
 			episode = int(data.get('episode'))
 			query = '%s S%02dE%02d' % (title, season, episode)
@@ -170,7 +170,7 @@ class source:
 	def _translate_search(self, query):
 		params = SEARCH_PARAMS
 		params['pby'] = 100
-		params['safeO'] = 1
+		params['safeO'] = 1 # 1 is the moderation (adult filter) ON, 0 is OFF.
 		params['gps'] = params['sbj'] = query
 		url = self.base_link + self.search_link
 		return url, params

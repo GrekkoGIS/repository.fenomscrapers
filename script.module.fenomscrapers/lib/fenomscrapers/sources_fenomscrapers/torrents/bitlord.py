@@ -120,7 +120,7 @@ class source:
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 
 				if not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
@@ -167,14 +167,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						quote_plus(query + ' S%s' % self.season_xx),
-						quote_plus(query + ' Season %s' % self.season_x)
-							]
+						quote_plus(query + ' Season %s' % self.season_x)]
 			if search_series:
 				queries = [
 						quote_plus(query + ' Season'),
-						quote_plus(query + ' Complete')
-								]
-
+						quote_plus(query + ' Complete')]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, self.search_link % url).replace('+', '-')
@@ -254,8 +251,7 @@ class source:
 
 				item = {'provider': 'bitlord', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
+				if self.search_series: item.update({'last_season': last_season})
 				self.sources.append(item)
 			except:
 				source_utils.scraper_error('BITLORD')
@@ -265,7 +261,6 @@ class source:
 		headers = None
 		try:
 			post = client.request(self.base_link, output='extended', timeout='10')
-			# log_utils.log('post = %s' % post, log_utils.LOGDEBUG)
 			if not post: return headers
 			token_id = re.findall(r'token\: (.*)\n', post[0])[0]
 			token = ''.join(re.findall(token_id + r" ?\+?\= ?'(.*)'", post[0]))

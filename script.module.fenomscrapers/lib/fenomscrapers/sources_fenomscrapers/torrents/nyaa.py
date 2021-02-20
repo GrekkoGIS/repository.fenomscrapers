@@ -73,7 +73,6 @@ class source:
 
 			query = '%s %s' % (title, hdlr)
 			query = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query)
-
 			query2 = '%s %s' % (title, hdlr2)
 			query2 = re.sub(r'(\\\|/| -|:|;|\*|\?|"|\'|<|>|\|)', '', query2)
 

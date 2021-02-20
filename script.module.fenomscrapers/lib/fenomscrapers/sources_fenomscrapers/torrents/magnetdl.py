@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
+# modified by Venom for Fenomscrapers (updated 2-19-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -82,17 +82,21 @@ class source:
 			r = client.parseDOM(r, 'tbody')[0]
 			results = client.parseDOM(r, 'tr')
 			posts = [i for i in results if 'magnet:' in i]
+		except:
+			source_utils.scraper_error('MAGNETDL')
+			return sources
 
+		try:
+			next_page = [i for i in results if 'Next Page' in i]
+			if not next_page: raise Exception()
+			page = client.parseDOM(next_page, 'a', ret='href', attrs={'title': 'Downloads | Page 2'})[0]
+			r2 = client.request(self.base_link+page)
+			results2 = client.parseDOM(r2, 'tr')
+			posts += [i for i in results2 if 'magnet:' in i]
+		except: pass
+
+		for post in posts:
 			try:
-				next_page = [i for i in results if 'Next Page' in i]
-				if not next_page: raise Exception()
-				page = client.parseDOM(next_page, 'a', ret='href', attrs={'title': 'Downloads | Page 2'})[0]
-				r2 = client.request(self.base_link+page)
-				results2 = client.parseDOM(r2, 'tr')
-				posts += [i for i in results2 if 'magnet:' in i]
-			except: pass
-
-			for post in posts:
 				post = post.replace('&nbsp;', ' ')
 				links = client.parseDOM(post, 'a', ret='href')
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
@@ -107,7 +111,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				elif not episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
@@ -125,10 +129,9 @@ class source:
 
 				sources.append({'provider': 'magnetdl', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info,
 											'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize})
-			return sources
-		except:
-			source_utils.scraper_error('MAGNETDL')
-			return sources
+			except:
+				source_utils.scraper_error('MAGNETDL')
+		return sources
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -152,14 +155,11 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
 						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' S%s' % self.season_xx)),
-						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' Season %s' % self.season_x))
-							]
+						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' Season %s' % self.season_x))]
 			if search_series:
 				queries = [
 						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' Season')),
-						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' Complete'))
-								]
-
+						self.search_link.format(query[0].lower(), cleantitle.geturl(query + ' Complete'))]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)
@@ -180,17 +180,21 @@ class source:
 			r = client.parseDOM(r, 'tbody')[0]
 			results = client.parseDOM(r, 'tr')
 			posts = [i for i in results if 'magnet:' in i]
+		except:
+			source_utils.scraper_error('MAGNETDL')
+			return
 
+		try:
+			next_page = [i for i in results if 'Next Page' in i]
+			if not next_page: raise Exception()
+			page = client.parseDOM(next_page, 'a', ret='href', attrs={'title': 'Downloads | Page 2'})[0]
+			r2 = client.request(self.base_link+page)
+			results2 = client.parseDOM(r2, 'tr')
+			posts += [i for i in results2 if 'magnet:' in i]
+		except: pass
+
+		for post in posts:
 			try:
-				next_page = [i for i in results if 'Next Page' in i]
-				if not next_page: raise Exception()
-				page = client.parseDOM(next_page, 'a', ret='href', attrs={'title': 'Downloads | Page 2'})[0]
-				r2 = client.request(self.base_link+page)
-				results2 = client.parseDOM(r2, 'tr')
-				posts += [i for i in results2 if 'magnet:' in i]
-			except: pass
-
-			for post in posts:
 				post = post.replace('&nbsp;', ' ')
 				links = client.parseDOM(post, 'a', ret='href')
 				magnet = [i.replace('&amp;', '&') for i in links if 'magnet:' in i][0]
@@ -233,11 +237,10 @@ class source:
 
 				item = {'provider': 'magnetdl', 'source': 'torrent', 'seeders': seeders, 'hash': hash, 'name': name, 'name_info': name_info, 'quality': quality,
 							'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': dsize, 'package': package}
-				if self.search_series:
-					item.update({'last_season': last_season})
+				if self.search_series: item.update({'last_season': last_season})
 				self.sources.append(item)
-		except:
-			source_utils.scraper_error('MAGNETDL')
+			except:
+				source_utils.scraper_error('MAGNETDL')
 
 
 	def resolve(self, url):

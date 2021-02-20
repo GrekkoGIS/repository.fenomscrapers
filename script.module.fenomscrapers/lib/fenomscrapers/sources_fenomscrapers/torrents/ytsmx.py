@@ -58,7 +58,6 @@ class source:
 			files = jsloads(rjson)
 			if files.get('status') == 'error' or files.get('data').get('movie_count') == 0:
 				return sources
-
 			title_long = files.get('data').get('movies')[0].get('title_long').replace(' ', '.')
 			torrents = files.get('data').get('movies')[0].get('torrents')
 		except:

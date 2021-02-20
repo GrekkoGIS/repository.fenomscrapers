@@ -344,8 +344,8 @@ msgid "RAPIDMOVIEZ"
 msgstr "RAPIDMOVIEZ"
 
 msgctxt "#32083"
-msgid ""
-msgstr ""
+msgid "-- Title Check Results"
+msgstr "-- Titel Controle Resultaten"
 
 msgctxt "#32084"
 msgid ""

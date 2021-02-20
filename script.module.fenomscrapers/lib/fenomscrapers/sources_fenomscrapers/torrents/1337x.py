@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
+# modified by Venom for Fenomscrapers (updated 2-19-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -59,9 +59,9 @@ class source:
 
 
 	def sources(self, url, hostDict):
-		self._sources = []
+		self.sources = []
 		self.items = []
-		if not url: return self._sources
+		if not url: return self.sources
 		try:
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -86,30 +86,34 @@ class source:
 
 			threads = []
 			for url in urls:
-				threads.append(workers.Thread(self._get_items, url))
+				threads.append(workers.Thread(self.get_items, url))
 			[i.start() for i in threads]
 			[i.join() for i in threads]
 
 			threads2 = []
 			for i in self.items:
-				threads2.append(workers.Thread(self._get_sources, i))
+				threads2.append(workers.Thread(self.get_sources, i))
 			[i.start() for i in threads2]
 			[i.join() for i in threads2]
-			return self._sources
+			return self.sources
 		except:
 			source_utils.scraper_error('1337X')
-			return self._sources
+			return self.sources
 
 
-	def _get_items(self, url):
+	def get_items(self, url):
 		try:
 			headers = {'User-Agent': client.agent()}
 			r = client.request(url, headers=headers, timeout='10')
-			if not r or '<tbody' not in r: return self.items
+			if not r or '<tbody' not in r: return
 			posts = client.parseDOM(r, 'tbody')[0]
 			posts = client.parseDOM(posts, 'tr')
+		except:
+			source_utils.scraper_error('1337X')
+			return
 
-			for post in posts:
+		for post in posts:
+			try:
 				data = client.parseDOM(post, 'a', ret='href')[1]
 				link = urljoin(self.base_link, data)
 
@@ -121,7 +125,7 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				if not self.episode_title: #filter for eps returned in movie query (rare but movie and show exists for Run in 2020)
-					ep_strings = [r'(?:\.|\-)s\d{2}e\d{2}(?:\.|\-|$)', r'(?:\.|\-)s\d{2}(?:\.|\-|$)', r'(?:\.|\-)season(?:\.|\-)\d{1,2}(?:\.|\-|$)']
+					ep_strings = [r'[.-]s\d{2}e\d{2}([.-]?)', r'[.-]s\d{2}([.-]?)', r'[.-]season[.-]?\d{1,2}[.-]?']
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
@@ -132,30 +136,26 @@ class source:
 				try:
 					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
 					dsize, isize = source_utils._size(size)
-				except:
-					isize = '0' ; dsize = 0
+				except: isize = '0' ; dsize = 0
 
 				self.items.append((name, name_info, link, isize, dsize, seeders))
-			return self.items
-		except:
-			source_utils.scraper_error('1337X')
-			return self.items
+			except:
+				source_utils.scraper_error('1337X')
 
 
-	def _get_sources(self, item):
+	def get_sources(self, item):
 		try:
 			quality, info = source_utils.get_release_quality(item[1], item[2])
 			if item[3] != '0': info.insert(0, item[3])
 			info = ' | '.join(info)
-
 			data = client.request(item[2], timeout='10')
 			data = client.parseDOM(data, 'a', ret='href')
-
+			if not data: return
 			url = [i for i in data if 'magnet:' in i][0]
 			url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 			url = source_utils.strip_non_ascii_and_unprintable(url)
 			hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
-			self._sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
+			self.sources.append({'provider': '1337x', 'source': 'torrent', 'seeders': item[5], 'hash': hash, 'name': item[0], 'name_info': item[1],
 												'quality': quality, 'language': 'en', 'url': url, 'info': info, 'direct': False, 'debridonly': True, 'size': item[4]})
 		except:
 			source_utils.scraper_error('1337X')
