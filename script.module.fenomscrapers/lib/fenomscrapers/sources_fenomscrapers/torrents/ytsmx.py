@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # created by Venom for Fenomscrapers (1-28-2021)
-'''
+"""
 	Fenomscrapers Project
-'''
+"""
 
 from json import loads as jsloads
 import re

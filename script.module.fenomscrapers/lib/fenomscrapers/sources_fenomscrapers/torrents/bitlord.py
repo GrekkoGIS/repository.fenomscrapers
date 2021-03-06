@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-28-2021)
-'''
+# created by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 from json import loads as jsloads
 import re
@@ -107,8 +107,7 @@ class source:
 
 		for file in files.get('content'):
 			try:
-				name = file.get('name')
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(file.get('name'))
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -142,7 +141,6 @@ class source:
 			except:
 				source_utils.scraper_error('BITLORD')
 		return sources
-
 
 
 	def sources_packs(self, url, hostDict, search_series=False, total_seasons=None, bypass_filter=False):
@@ -209,8 +207,7 @@ class source:
 
 		for file in files.get('content'):
 			try:
-				name = file.get('name')
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(file.get('name'))
 
 				url = unquote_plus(file.get('magnet')).replace('&amp;', '&').replace(' ', '.')
 				url = re.sub(r'(&tr=.+)&dn=', '&dn=', url) # some links on bitlord &tr= before &dn=
@@ -260,12 +257,13 @@ class source:
 	def _get_token_and_cookies(self):
 		headers = None
 		try:
+			# returned from client (result, response_code, response_headers, headers, cookie)
 			post = client.request(self.base_link, output='extended', timeout='10')
 			if not post: return headers
 			token_id = re.findall(r'token\: (.*)\n', post[0])[0]
 			token = ''.join(re.findall(token_id + r" ?\+?\= ?'(.*)'", post[0]))
 			headers = post[3]
-			headers.update({'Cookie': post[2].get('Set-Cookie').replace('SameSite=Lax, ', ''), 'X-Request-Token': token})
+			headers.update({'Cookie': post[4].replace('SameSite=Lax, ', ''), 'X-Request-Token': token})
 			return headers
 		except:
 			source_utils.scraper_error('BITLORD')

@@ -28,12 +28,8 @@ makeFile = xbmcvfs.mkdir
 joinPath = os.path.join
 
 SETTINGS_PATH = xbmc.translatePath(os.path.join(addonInfo('path'), 'resources', 'settings.xml'))
-
-try:
-	dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
-except:
-	dataPath = xbmc.translatePath(addonInfo('profile'))
-
+try: dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+except: dataPath = xbmc.translatePath(addonInfo('profile'))
 cacheFile = os.path.join(dataPath, 'cache.db')
 
 
@@ -83,25 +79,22 @@ def isVersionUpdate():
 			f = open(versionFile, 'w')
 			f.close()
 	except:
-		xbmc.log('FenomScrapers Addon Data Path Does not Exist. Creating Folder....', 2)
+		LOGNOTICE = xbmc.LOGNOTICE if getKodiVersion() < 19 else xbmc.LOGINFO #(2 in 18, deprecated in 19 use LOGINFO(1))
+		xbmc.log('FenomScrapers Addon Data Path Does not Exist. Creating Folder....', LOGNOTICE)
 		addon_folder = xbmc.translatePath('special://profile/addon_data/script.module.fenomscrapers')
 		xbmcvfs.mkdirs(addon_folder)
 	try:
-		with open(versionFile, 'rb') as fh:
-			oldVersion = fh.read()
-	except:
-		oldVersion = '0'
+		with open(versionFile, 'r') as fh: oldVersion = fh.read()
+	except: oldVersion = '0'
 	try:
 		curVersion = addon('script.module.fenomscrapers').getAddonInfo('version')
 		if oldVersion != curVersion:
-			with open(versionFile, 'wb') as fh:
-				fh.write(curVersion)
+			with open(versionFile, 'w') as fh: fh.write(curVersion)
 			return True
-		else:
-			return False
+		else: return False
 	except:
-		import traceback
-		traceback.print_exc()
+		from fenomscrapers.modules import log_utils
+		log_utils.error()
 		return False
 
 
@@ -163,8 +156,8 @@ def clean_settings():
 		sleep(200)
 		notification(title=addon_name, message=lang(32042).format(str(len(removed_settings))))
 	except:
-		import traceback
-		traceback.print_exc()
+		from fenomscrapers.modules import log_utils
+		log_utils.error()
 		notification(title=addon_name, message=32043)
 
 
@@ -221,24 +214,15 @@ def idle():
 
 
 def notification(title=None, message=None, icon=None, time=3000, sound=False):
-	if title == 'default' or title is None:
-		title = addonName()
-	if isinstance(title, (int, long)):
-		heading = lang(title)
-	else:
-		heading = str(title)
-	if isinstance(message, (int, long)):
-		body = lang(message)
-	else:
-		body = str(message)
-	if icon is None or icon == '' or icon == 'default':
-		icon = addonIcon()
-	elif icon == 'INFO':
-		icon = xbmcgui.NOTIFICATION_INFO
-	elif icon == 'WARNING':
-		icon = xbmcgui.NOTIFICATION_WARNING
-	elif icon == 'ERROR':
-		icon = xbmcgui.NOTIFICATION_ERROR
+	if title == 'default' or title is None: title = addonName()
+	if isinstance(title, int): heading = lang(title)
+	else: heading = str(title)
+	if isinstance(message, int): body = lang(message)
+	else: body = str(message)
+	if icon is None or icon == '' or icon == 'default': icon = addonIcon()
+	elif icon == 'INFO': icon = xbmcgui.NOTIFICATION_INFO
+	elif icon == 'WARNING': icon = xbmcgui.NOTIFICATION_WARNING
+	elif icon == 'ERROR': icon = xbmcgui.NOTIFICATION_ERROR
 	dialog.notification(heading, body, icon, time, sound=sound)
 
 

@@ -1,3 +1,6 @@
+[B][COLOR red]Update - v1.3.2 - March 06, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Matrix(py3) compatibility update.[/I]
+
 [B][COLOR red]Update - v1.3.1 - Feb. 20, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Enhancements to EasyNews title check.[/I]
 [COLOR yellow]--[/COLOR][I] Added setting to disable EasyNews title

@@ -5,7 +5,7 @@
 
 from json import loads as jsloads
 import re
-import string
+from string import printable
 try: #Py2
 	from urllib import unquote_plus
 	from urlparse import urlparse
@@ -88,8 +88,8 @@ def get_release_quality(release_info, release_link=None):
 		if not quality:
 			if release_link:
 				release_link = release_link.lower()
-				try: release_link = release_link.encode('utf-8')
-				except: pass
+				# try: release_link = release_link.encode('utf-8')
+				# except: pass
 				quality = get_qual(release_link)
 				if not quality: quality = 'SD'
 			else: quality = 'SD'
@@ -133,7 +133,6 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 		release_title = release_title_format(release_title) # converts to .lower()
 		h = hdlr.lower()
 		t = release_title.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
-
 		if years:
 			for i in years: t = t.split(i)[0]
 		t = t.split('2160p')[0].split('4k')[0].split('1080p')[0].split('720p')[0]
@@ -151,16 +150,15 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 def remove_lang(release_info):
 	if not release_info: return False
 	try:
-		fmt = release_info
-		if any(value in fmt for value in DUBBED): return True
-		if any(value in fmt for value in SUBS): return True
+		if any(value in release_info for value in DUBBED): return True
+		if any(value in release_info for value in SUBS): return True
 		if control.setting('filter.undesirables') == 'true':
-			if any(value in fmt for value in UNDESIREABLES): return True
-			# if any(value in fmt for value in ADDS): return True
+			if any(value in release_info for value in UNDESIREABLES): return True
+			# if any(value in release_info for value in ADDS): return True
 		if control.setting('filter.foreign.single.audio') == 'true':
-			if any(value in fmt for value in LANG) and not any(value in fmt for value in ['.eng.', '.en.', 'english']): return True
-			if any(value in fmt for value in ABV_LANG) and not any(value in fmt for value in ['.eng.', '.en.', 'english']): return True
-		if fmt.endswith('.srt.') and not any(value in fmt for value in ['with.srt', '.avi', '.mkv', '.mp4']): return True
+			if any(value in release_info for value in LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
+			if any(value in release_info for value in ABV_LANG) and not any(value in release_info for value in ['.eng.', '.en.', 'english']): return True
+		if release_info.endswith('.srt.') and not any(value in release_info for value in ['with.srt', '.avi', '.mkv', '.mp4']): return True
 		return False
 	except:
 		log_utils.error()
@@ -483,8 +481,11 @@ def filter_show_pack(show_title, aliases, imdb, year, season, release_title, tot
 def info_from_name(release_title, title, year, hdlr=None, episode_title=None, season=None, pack=None):
 	# log_utils.log('release_title = %s' % release_title, __name__, log_utils.LOGDEBUG)
 	try:
-		try: release_title = release_title.encode('utf-8')
-		except: pass
+		# try: release_title = release_title.encode('utf-8') 
+		# except: pass
+		# try: release_title = str(release_title)
+		# except: pass
+
 		release_title = release_title.lower().replace('&', 'and').replace("'", "")
 		release_title = re.sub(r'[^a-z0-9]+', '.', release_title)
 		title = title.lower().replace('&', 'and').replace("'", "")
@@ -564,8 +565,12 @@ def clean_name(release_title):
 
 
 def strip_non_ascii_and_unprintable(text):
-	result = ''.join(char for char in text if char in string.printable)
-	return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+	try:
+		result = ''.join(char for char in text if char in printable)
+		return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+	except:
+		import traceback
+		traceback.print_exc()
 
 
 def _size(siz):

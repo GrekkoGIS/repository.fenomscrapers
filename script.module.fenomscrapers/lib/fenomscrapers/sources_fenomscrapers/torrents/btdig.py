@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # created by Venom for Fenomscrapers (1-28-2021)
-'''
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -13,6 +13,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cfscrape # client.request causes strange 429 error
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 
 
@@ -23,7 +24,6 @@ class source:
 		self.domains = ['www.digbt.org']
 		self.base_link = 'https://www.btdig.com'
 		self.search_link = '/search?q=%s'
-		self.scraper = cfscrape.create_scraper()
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -62,6 +62,7 @@ class source:
 		sources = []
 		if not url: return sources
 		try:
+			scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -77,8 +78,7 @@ class source:
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			r = self.scraper.get(url).content
-			# r = client.request(url)
+			r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 			if not r: return sources
 			rows = client.parseDOM(r, "div", attrs={"class": "one_result"})
 			if not rows: return sources

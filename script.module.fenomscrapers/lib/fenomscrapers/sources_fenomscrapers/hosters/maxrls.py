@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-05-2020)
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -13,6 +13,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -79,7 +80,9 @@ class source:
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url).replace('%3A+', '+')
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			result = scraper.get(url).content
+			# result = scraper.get(url).content
+			result = py_tools.ensure_str(scraper.get(url).content, errors='replace')
+
 			if not result or "Sorry, but you are looking for something that isn't here" in str(result):
 				return sources
 			posts = client.parseDOM(result, "div", attrs={"class": "post"})

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-19-2021)
-'''
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2

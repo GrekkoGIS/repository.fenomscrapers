@@ -12,6 +12,7 @@ except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 
 
@@ -132,10 +133,7 @@ class source:
 
 				for link in links:
 					try:
-						url = client.replaceHTMLCodes(link)
-						try: url = url.encode('utf-8')
-						except: pass
-
+						url = py_tools.ensure_text(client.replaceHTMLCodes(str(link)), errors='replace')
 						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
 						if url in str(sources): continue
 

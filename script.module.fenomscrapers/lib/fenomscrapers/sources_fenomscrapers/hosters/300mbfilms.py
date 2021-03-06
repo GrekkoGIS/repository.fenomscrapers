@@ -12,6 +12,7 @@ except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 
 
@@ -108,10 +109,7 @@ class source:
 
 			for item in urls:
 				if 'earn-money' in item[0]: continue
-				url = client.replaceHTMLCodes(item[0])
-				try: url = url.encode('utf-8')
-				except: pass
-
+				url = py_tools.ensure_text(client.replaceHTMLCodes(item[0]), errors='replace')
 				valid, host = source_utils.is_host_valid(url, hostDict)
 				if not valid: continue
 				sources.append({'provider': '300mbfilms', 'source': host, 'name': item[1], 'name_info': item[2], 'quality': item[3], 'language': 'en', 'url': url,

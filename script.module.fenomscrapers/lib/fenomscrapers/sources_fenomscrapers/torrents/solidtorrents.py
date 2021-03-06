@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-09-2021)
-'''
+# created by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 from json import loads as jsloads
 import re
@@ -101,8 +101,7 @@ class source:
 		try:
 			r = client.request(url, timeout='5')
 			if not r: return
-			r = jsloads(r)
-			results = r['results']
+			results = jsloads(r)['results']
 		except:
 			source_utils.scraper_error('SOLIDTORRENTS')
 			return
@@ -115,8 +114,7 @@ class source:
 				hash = item['infohash'].lower()
 				if url in str(self.sources): continue
 
-				name = item['title']
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(item['title'])
 				if not source_utils.check_title(self.title, self.aliases, name, self.hdlr, self.year): continue
 				name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -187,8 +185,7 @@ class source:
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
-			r = jsloads(r)
-			results = r['results']
+			results = jsloads(r)['results']
 		except:
 			source_utils.scraper_error('SOLIDTORRENTS')
 			return
@@ -201,8 +198,7 @@ class source:
 				hash = item['infohash'].lower()
 				if url in str(self.sources): continue
 
-				name = item['title']
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(item['title'])
 				if not self.search_series:
 					if not self.bypass_filter:
 						if not source_utils.filter_season_pack(self.title, self.aliases, self.year, self.season_x, name):

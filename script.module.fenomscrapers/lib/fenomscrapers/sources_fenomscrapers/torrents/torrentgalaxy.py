@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (updated 1-28-2021)
-'''
+# created by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -13,6 +13,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -25,7 +26,6 @@ class source:
 		self.base_link = 'https://torrentgalaxy.to'
 		self.search_link = '/torrents.php?search=%s&sort=seeders&order=desc'
 		self.min_seeders = 0
-		self.scraper = cfscrape.create_scraper()
 		self.pack_capable = True
 
 
@@ -63,6 +63,7 @@ class source:
 		sources = []
 		if not url: return sources
 		try:
+			scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -81,8 +82,9 @@ class source:
 				url = self.search_link % data['imdb']
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
-			r = self.scraper.get(url).content
+			r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 			posts = client.parseDOM(r, 'div', attrs={'class': 'tgxtable'})
+			if not posts: return sources
 		except:
 			source_utils.scraper_error('TORRENTGALAXY')
 			return sources
@@ -131,6 +133,7 @@ class source:
 		self.sources = []
 		if not url: return self.sources
 		try:
+			self.scraper = cfscrape.create_scraper()
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
@@ -168,9 +171,10 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
-			r = self.scraper.get(link).content
+			r = py_tools.ensure_str(self.scraper.get(link).content, errors='replace')
 			if not r: return
 			posts = client.parseDOM(r, 'div', attrs={'class': 'tgxtable'})
+			if not posts: return
 		except:
 			source_utils.scraper_error('TORRENTGALAXY')
 			return

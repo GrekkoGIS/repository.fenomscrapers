@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
-'''
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -13,6 +13,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -25,7 +26,6 @@ class source:
 		self.base_link = 'https://www.limetorrents.info'
 		self.tvsearch = '/search/tv/{0}/1/'
 		self.moviesearch = '/search/movies/{0}/1/'
-		self.scraper = cfscrape.create_scraper()
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -64,6 +64,7 @@ class source:
 		self.sources = []
 		if not url: return self.sources
 		try:
+			self.scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -102,10 +103,11 @@ class source:
 		# log_utils.log('link = %s' % link, log_utils.LOGDEBUG)
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = self.scraper.get(link, headers=headers).content
-			if not r: return
+			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
+			if not r or '<table' not in r: return
 			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			posts = client.parseDOM(posts, 'tr')
+			if not posts: return
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return
@@ -152,6 +154,7 @@ class source:
 		self.sources = []
 		if not url: return self.sources
 		try:
+			self.scraper = cfscrape.create_scraper()
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
@@ -190,10 +193,11 @@ class source:
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
 			headers = {'User-Agent': client.agent()}
-			r = self.scraper.get(link,headers=headers).content
-			if not r: return
+			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
+			if not r or '<table' not in r: return
 			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
 			posts = client.parseDOM(posts, 'tr')
+			if not posts: return
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return

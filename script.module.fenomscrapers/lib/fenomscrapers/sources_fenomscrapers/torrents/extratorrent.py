@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 1-28-2021)
-'''
+# created by Venom for Fenomscrapers (added cfscrape 4-20-2020)(updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -13,6 +13,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -26,7 +27,6 @@ class source:
 		self.search_link = '/search/?new=1&search=%s&s_cat=4'
 		self.min_seeders = 1
 		self.pack_capable = True
-		self.scraper = cfscrape.create_scraper()
 
 
 	def movie(self, imdb, title, aliases, year):
@@ -66,6 +66,7 @@ class source:
 		self.sources = []
 		if not url: return self.sources
 		try:
+			scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -88,7 +89,7 @@ class source:
 
 			links = []
 			for x in urls:
-				r = self.scraper.get(x).content
+				r = py_tools.ensure_str(scraper.get(x).content, errors='replace')
 				if not r: continue
 				list = client.parseDOM(r, 'tr', attrs={'class': 'tlr'})
 				list += client.parseDOM(r, 'tr', attrs={'class': 'tlz'})
@@ -147,6 +148,7 @@ class source:
 		self.sources = []
 		if not url: return self.sources
 		try:
+			self.scraper = cfscrape.create_scraper()
 			self.search_series = search_series
 			self.total_seasons = total_seasons
 			self.bypass_filter = bypass_filter
@@ -184,7 +186,7 @@ class source:
 	def get_sources_packs(self, link):
 		# log_utils.log('link = %s' % str(link), log_utils.LOGDEBUG)
 		try:
-			r = self.scraper.get(link).content
+			r = py_tools.ensure_str(self.scraper.get(link).content, errors='replace')
 			if not r: return
 			posts = client.parseDOM(r, 'tr', attrs={'class': 'tlr'})
 			posts += client.parseDOM(r, 'tr', attrs={'class': 'tlz'})

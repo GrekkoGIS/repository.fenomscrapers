@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
-'''
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 from json import loads as jsloads
 import re
@@ -78,7 +78,7 @@ class source:
 			url = urljoin(self.base_link, url)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			rjson = client.request(url, error=True, timeout='5')
+			rjson = client.request(url, timeout='5')
 			if not rjson or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
 				return sources
 			files = jsloads(rjson)
@@ -89,8 +89,7 @@ class source:
 		for file in files:
 			try:
 				hash = file['info_hash']
-				name = file['name']
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(file['name'])
 
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
@@ -162,7 +161,7 @@ class source:
 	def get_sources_packs(self, link):
 		try:
 			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
-			rjson = client.request(link, error=True, timeout='5')
+			rjson = client.request(link, timeout='5')
 			if not rjson or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
 				return
 			files = jsloads(rjson)
@@ -173,8 +172,7 @@ class source:
 		for file in files:
 			try:
 				hash = file['info_hash']
-				name = file['name']
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(file['name'])
 
 				if not self.search_series:
 					if not self.bypass_filter:

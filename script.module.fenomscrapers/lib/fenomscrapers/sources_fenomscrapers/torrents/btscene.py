@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-19-2021)
-'''
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -94,7 +94,7 @@ class source:
 	def get_sources(self, url):
 		try:
 			r = client.request(url, timeout='5')
-			if not r: return
+			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
 			rows = client.parseDOM(table, 'tr')
 		except:
@@ -179,7 +179,7 @@ class source:
 		# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 		try:
 			r = client.request(link, timeout='5')
-			if not r: return
+			if not r or '<table' not in r: return
 			table = client.parseDOM(r, 'table', attrs={'class': 'rtable'})
 			rows = client.parseDOM(table, 'tr')
 		except:

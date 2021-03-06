@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
-'''
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -25,10 +25,8 @@ class source:
 								'kickasshydra.dev', 'kickasshydra.net', 'kathydra.com', 'kickass.onl',
 								'kickasstorrents.id', 'thekat.cc', 'kkat.net', 'kickasstorrents.bz']
 		self._base_link = None
-		# self.search = '/usearch/{0}%20category:movies'
-		self.search = '/usearch/{0}%20category:movies/?field=size&sorder=desc'
-		# self.search2 = '/usearch/{0}%20category:tv'
-		self.search2 = '/usearch/{0}%20category:tv/?field=size&sorder=desc'
+		self.moviesearch = '/usearch/{0}%20category:movies/?field=size&sorder=desc'
+		self.tvsearch = '/usearch/{0}%20category:tv/?field=size&sorder=desc'
 		self.min_seeders = 0
 		self.pack_capable = True
 
@@ -87,8 +85,8 @@ class source:
 			query = '%s %s' % (self.title, self.hdlr)
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			urls = []
-			if 'tvshowtitle' in data: url = self.search2.format(quote_plus(query))
-			else: url = self.search.format(quote_plus(query))
+			if 'tvshowtitle' in data: url = self.tvsearch.format(quote_plus(query))
+			else: url = self.moviesearch.format(quote_plus(query))
 			url = urljoin(self.base_link, url)
 			urls.append(url)
 
@@ -179,12 +177,12 @@ class source:
 
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', self.title)
 			queries = [
-						self.search2.format(quote_plus(query + ' S%s' % self.season_xx)),
-						self.search2.format(quote_plus(query + ' Season %s' % self.season_x))]
+						self.tvsearch.format(quote_plus(query + ' S%s' % self.season_xx)),
+						self.tvsearch.format(quote_plus(query + ' Season %s' % self.season_x))]
 			if self.search_series:
 				queries = [
-						self.search2.format(quote_plus(query + ' Season')),
-						self.search2.format(quote_plus(query + ' Complete'))]
+						self.tvsearch.format(quote_plus(query + ' Season')),
+						self.tvsearch.format(quote_plus(query + ' Complete'))]
 			threads = []
 			for url in queries:
 				link = urljoin(self.base_link, url)

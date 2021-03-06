@@ -13,6 +13,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import control
 from fenomscrapers.modules import cleantitle
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 
 
@@ -65,7 +66,8 @@ class source:
 				title = cleantitle.get_simple(data['title']).lower()
 				ids = [data['imdb']]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovies", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title", "originaltitle", "file"]}, "id": 1}' % years)
-				r = unicode(r, 'utf-8', errors='ignore')
+				r = py_tools.ensure_text(r, errors='replace')
+
 				if 'movies' not in r: return sources
 				r = jsloads(r)['result']['movies']
 				r = [i for i in r if str(i['imdbnumber']) in ids or title in [cleantitle.get_simple(i['title']), cleantitle.get_simple(i['originaltitle'])]]
@@ -74,21 +76,21 @@ class source:
 				if not r: return sources
 				r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"properties": ["streamdetails", "file"], "movieid": %s }, "id": 1}' % str(r['movieid']))
-				r = unicode(r, 'utf-8', errors='ignore')
+				r = py_tools.ensure_text(r, errors='replace')
 				r = jsloads(r)['result']['moviedetails']
 
 			elif content_type == 'episode':
 				title = cleantitle.get_simple(data['tvshowtitle']).lower()
 				season, episode = data['season'], data['episode']
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows", "params": {"filter":{"or": [{"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}, {"field": "year", "operator": "is", "value": "%s"}]}, "properties": ["imdbnumber", "title"]}, "id": 1}' % years)
-				r = unicode(r, 'utf-8', errors='ignore')
+				r = py_tools.ensure_text(r, errors='replace')
 				if 'tvshows' not in r: return sources
 				r = jsloads(r)['result']['tvshows']
 				r = [i for i in r if title in (cleantitle.get_simple(i['title']).lower() if not ' (' in i['title'] else cleantitle.get_simple(i['title']).split(' (')[0])]
 				if not r: return sources
 				else: r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes", "params": {"filter":{"and": [{"field": "season", "operator": "is", "value": "%s"}, {"field": "episode", "operator": "is", "value": "%s"}]}, "properties": ["file"], "tvshowid": %s }, "id": 1}' % (str(season), str(episode), str(r['tvshowid'])))
-				r = unicode(r, 'utf-8', errors='ignore')
+				r = py_tools.ensure_text(r, errors='replace')
 				r = jsloads(r)['result']['episodes']
 				if not r: return sources
 				try: r = [i for i in r if not i['file'].encode('utf-8').endswith('.strm')]
@@ -96,11 +98,10 @@ class source:
 				if not r: return sources
 				r = r[0]
 				r = control.jsonrpc('{"jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodeDetails", "params": {"properties": ["streamdetails", "file"], "episodeid": %s }, "id": 1}' % str(r['episodeid']))
-				r = unicode(r, 'utf-8', errors='ignore')
+				r = py_tools.ensure_text(r, errors='replace')
 				r = jsloads(r)['result']['episodedetails']
 
-			try: url = r['file'].encode('utf-8')
-			except: url = r['file']
+			url = py_tools.ensure_text(r['file'], errors='replace')
 
 			try:
 				quality = int(r['streamdetails']['video'][0]['width'])
@@ -149,8 +150,7 @@ class source:
 				source_utils.scraper_error('LIBRARY')
 
 			info = ' | '.join(info)
-			try: info = info.encode('utf-8')
-			except: pass
+			info = py_tools.ensure_text(info, errors='replace')
 
 			sources.append({'provider': 'library', 'source': 'local', 'quality': quality, 'language': 'en', 'url': url, 'info': info,
 										'local': True, 'direct': True, 'debridonly': False, 'size': dsize})

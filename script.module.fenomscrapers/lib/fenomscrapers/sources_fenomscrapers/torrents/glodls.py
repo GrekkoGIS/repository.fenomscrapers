@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-19-2021)
-'''
+# modified by Venom for Fenomscrapers (updated 3-3-2021)
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -10,7 +10,8 @@ try: #Py2
 	from urllib import urlencode, quote_plus, unquote_plus
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus, unquote_plus
-
+# from fenomscrapers.modules import cfscrape
+# from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 
@@ -19,7 +20,7 @@ class source:
 	def __init__(self):
 		self.priority = 3
 		self.language = ['en']
-		self.domains = ['glodls.to']
+		self.domains = ['glodls.to', 'gtdb.to'] # gtdb.to needs "www." or does not work or different domain loads
 		self.base_link = 'https://glodls.to/'
 		self.tvsearch = 'search_results.php?search={0}&cat=41&incldead=0&inclexternal=0&lang=1&sort=seeders&order=desc'
 		self.moviesearch = 'search_results.php?search={0}&cat=1&incldead=0&inclexternal=0&lang=1&sort=size&order=desc'
@@ -58,6 +59,7 @@ class source:
 		sources = []
 		if not url: return sources
 		try:
+			# scraper = cfscrape.create_scraper()
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -73,10 +75,12 @@ class source:
 			if 'tvshowtitle' in data: url = self.tvsearch.format(quote_plus(query))
 			else: url = self.moviesearch.format(quote_plus(query))
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, level=log_utils.LOGDEBUG)
 
 			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers, timeout='5')
+			r = client.request(url, headers=headers, timeout='5') # 3/3/21 new 403 error cfscrape can not solve
+			# r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
+
 			if not r: return sources
 			rows = client.parseDOM(r, 'tr', attrs={'class': 't-row'})
 			rows = [i for i in rows if not 'racker:' in i]

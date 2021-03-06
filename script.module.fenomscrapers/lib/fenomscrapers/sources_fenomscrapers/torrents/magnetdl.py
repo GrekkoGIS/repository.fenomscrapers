@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # modified by Venom for Fenomscrapers (updated 2-19-2021)
-'''
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -11,8 +11,8 @@ try: #Py2
 except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, unquote_plus
 
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
+from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -104,8 +104,8 @@ class source:
 				if url in str(sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
-				name = unquote_plus(name)
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(unquote_plus(name))
+
 				if not source_utils.check_title(title, aliases, name, hdlr, year): continue
 				name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 				if source_utils.remove_lang(name_info): continue
@@ -202,8 +202,7 @@ class source:
 				if url in str(self.sources): continue
 				hash = re.compile(r'btih:(.*?)&', re.I).findall(url)[0]
 				name = client.parseDOM(post, 'a', ret='title')[1].replace('&ndash;', '-')
-				name = unquote_plus(name)
-				name = source_utils.clean_name(name)
+				name = source_utils.clean_name(unquote_plus(name))
 
 				if not self.search_series:
 					if not self.bypass_filter:

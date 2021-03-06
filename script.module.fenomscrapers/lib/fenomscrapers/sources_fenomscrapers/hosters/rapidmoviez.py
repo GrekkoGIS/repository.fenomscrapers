@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# modified by Venom for Fenomscrapers  (updated 1-04-2020)
+# modified by Venom for Fenomscrapers  (updated 2-26-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -16,6 +16,7 @@ from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import client
 from fenomscrapers.modules import dom_parser  # switch to client.parseDOM() to rid import
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
 
@@ -65,7 +66,8 @@ class source:
 	def search(self, title, year):
 		try:
 			url = urljoin(self.base_link, self.search_link % (quote_plus(title)))
-			r = self.scraper.get(url, headers=self.headers).content
+			# r = self.scraper.get(url, headers=self.headers).content
+			r = py_tools.ensure_str(self.scraper.get(url, headers=self.headers).content, errors='replace')
 				# switch to client.parseDOM() to rid import
 			if not r: return None
 			r = dom_parser.parse_dom(r, 'div', {'class': 'list_items'})[0]
@@ -100,7 +102,8 @@ class source:
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 			if not url: return self.sources
 
-			result = self.scraper.get(url, headers=self.headers).content
+			# result = self.scraper.get(url, headers=self.headers).content
+			result = py_tools.ensure_str(self.scraper.get(url, headers=self.headers).content, errors='replace')
 			if not result: return self.sources
 			r_pack = None
 			if 'tvshowtitle' in data:
@@ -138,14 +141,12 @@ class source:
 
 	def get_sources(self, name, url):
 		try:
-			r = self.scraper.get(url, headers=self.headers).content
+			# r = self.scraper.get(url, headers=self.headers).content
+			r = py_tools.ensure_str(self.scraper.get(url, headers=self.headers).content, errors='replace')
 			name = client.replaceHTMLCodes(name)
 			if name.startswith('['): name = name.split(']')[1]
 			name = name.strip().replace(' ', '.')
 			name_info = source_utils.info_from_name(name, self.title, self.year, self.hdlr, self.episode_title)
-
-			# log_utils.log('name = %s' % name, log_utils.LOGDEBUG)
-			# log_utils.log('name_info = %s' % name_info, log_utils.LOGDEBUG)
 
 			l = dom_parser.parse_dom(r, 'pre', {'class': 'links'})
 			if l == []: return
@@ -156,9 +157,7 @@ class source:
 			urls = re.findall(r'''((?:http|ftp|https)://[\w_-]+(?:(?:\.[\w_-]+)+)[\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])''', i.content, flags=re.M | re.S)
 			urls = [i for i in urls if not i.endswith(('.rar', '.zip', '.iso', '.idx', '.sub', '.srt'))]
 			for link in urls:
-				url = client.replaceHTMLCodes(link)
-				try: url = url.encode('utf-8')
-				except: pass
+				url = py_tools.ensure_text(client.replaceHTMLCodes(str(link)), errors='replace')
 				if url in str(self.sources): continue
 
 				valid, host = source_utils.is_host_valid(url, self.hostDict)

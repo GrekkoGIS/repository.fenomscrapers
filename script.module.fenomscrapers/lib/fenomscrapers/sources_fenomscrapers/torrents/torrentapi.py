@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 1-28-2021)
-'''
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
+"""
 	Fenomscrapers Project
-'''
-
+"""
 
 from json import loads as jsloads
 import re
@@ -29,17 +28,14 @@ class source:
 		self.tvshowsearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&search_string={2}&ranked=0&limit=100&format=json_extended' # imdb_id + string query
 		self.msearch = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&token={0}&mode=search&search_imdb={1}&ranked=0&limit=100&format=json_extended'
 		self.token = 'https://torrentapi.org/pubapi_v2.php?app_id=Torapi&get_token=get_token'
-		self.scraper = cfscrape.create_scraper()
-		self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
 		self.min_seeders = 0
 		self.pack_capable = True
-
 
 
 	def _get_token(self):
 		try:
 			token = self.scraper.get(self.token).content
-			token = jsloads(token)["token"]
+			token = jsloads(token)["token"] # json can handle byte encoded strings
 			return token
 		except:
 			source_utils.scraper_error('TORRENTAPI')
@@ -79,6 +75,9 @@ class source:
 		sources = []
 		if not url: return sources
 		try:
+			self.scraper = cfscrape.create_scraper()
+			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
+
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
 
@@ -95,7 +94,6 @@ class source:
 				search_link = self.tvshowsearch.format(self.key, data['imdb'], hdlr)
 			else:
 				search_link = self.msearch.format(self.key, data['imdb'])
-			# log_utils.log('search_link = %s' % search_link, log_utils.LOGDEBUG)
 
 			time.sleep(2.1)
 			# rjson = client.request(search_link, error=True, timeout='5')
@@ -146,6 +144,9 @@ class source:
 		if search_series: # torrentapi does not have showPacks
 			return sources
 		try:
+			self.scraper = cfscrape.create_scraper()
+			self.key = cache.get(self._get_token, 0.2) # 800 secs token is valid for
+
 			self.bypass_filter = bypass_filter
 			data = parse_qs(url)
 			data = dict([(i, data[i][0]) if data[i] else (i, '') for i in data])
@@ -159,7 +160,7 @@ class source:
 			# log_utils.log('search_link = %s' % str(search_link), log_utils.LOGDEBUG)
 
 			time.sleep(2.1)
-			# rjson = client.request(search_link, error=True)
+			# rjson = client.request(search_link, error=True, timeout='5')
 			rjson = self.scraper.get(search_link).content
 			if not rjson or 'torrent_results' not in str(rjson): return sources
 			files = jsloads(rjson)['torrent_results']

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-9-2021)
+# modified by Venom for Fenomscrapers (updated 2-26-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -13,6 +13,7 @@ except ImportError: #Py3
 
 from fenomscrapers.modules import cfscrape
 from fenomscrapers.modules import client
+from fenomscrapers.modules import py_tools
 from fenomscrapers.modules import source_utils
 
 
@@ -86,7 +87,8 @@ class source:
 			url = urljoin(self.base_link, query)
 			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
 
-			r = scraper.get(url).content
+			# r = scraper.get(url).content
+			r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 			if not r or 'nothing was found' in r:
 				if 'tvshowtitle' in data:
 					season = re.search(r'S(.*?)E', hdlr).group(1)
@@ -96,7 +98,8 @@ class source:
 					query = query + "-S" + season
 					url = urljoin(self.base_link, query)
 					# log_utils.log('Season url = %s' % url, log_utils.LOGDEBUG)
-					r = scraper.get(url).content
+					# r = scraper.get(url).content
+					r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 					isSeasonQuery = True
 				else: return sources 
 			if not r or 'nothing was found' in r: return sources
@@ -154,9 +157,7 @@ class source:
 						# if source_utils.remove_lang(name_info): continue # not seen lang BS yet needing this.
 						name_info = source_utils.info_from_name(name, title, year, hdlr, episode_title)
 
-						url = client.replaceHTMLCodes(str(i))
-						try: url = url.encode('utf-8')
-						except: pass
+						url = py_tools.ensure_text(client.replaceHTMLCodes(str(i)), errors='replace')
 						if url in str(sources): continue
 						if url.endswith(('.rar', '.zip', '.iso', '.part', '.png', '.jpg', '.bmp', '.gif')): continue
 

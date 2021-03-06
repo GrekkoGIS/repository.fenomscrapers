@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # created by Venom for Fenomscrapers (updated url 1-28-2021)
-'''
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
@@ -88,9 +88,8 @@ class source:
 
 			r = client.request(url, timeout='5')
 			if not r: return sources
-			if any(value in str(r) for value in ['something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable']):
+			if any(value in r for value in ['something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable']):
 				return sources
-
 			table = client.parseDOM(r, 'table', attrs={'id': 'table'})
 			table_body = client.parseDOM(table, 'tbody')
 			rows = client.parseDOM(table_body, 'tr')
@@ -182,6 +181,8 @@ class source:
 		try:
 			r = client.request(link, timeout='5')
 			if not r: return
+			if any(value in r for value in ['something went wrong', 'Connection timed out', '521: Web server is down', '503 Service Unavailable']):
+				return sources
 			table = client.parseDOM(r, 'table', attrs={'id': 'table'})
 			table_body = client.parseDOM(table, 'tbody')
 			rows = client.parseDOM(table_body, 'tr')

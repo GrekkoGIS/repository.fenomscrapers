@@ -7,9 +7,23 @@
 import re
 from collections import namedtuple
 from fenomscrapers.modules import log_utils
+from fenomscrapers.modules import py_tools
 
 DomMatch = namedtuple('DOMMatch', ['attrs', 'content'])
-re_type = type(re.compile(''))
+re_type = type(re.compile(r''))
+
+
+		# ----- FUTURE -----
+# def parseDOM(html, name='', attrs=None, ret=False):
+	# try:
+		# if attrs:
+			# attrs = dict((key, re.compile(value + ('$' if value else ''))) for key, value in py_tools.iteritems(attrs))
+		# results = parse_dom(html, name, attrs, ret)
+		# if ret: results = [result.attrs[ret.lower()] for result in results]
+		# else: results = [result.content for result in results]
+		# return results
+	# except:
+		# log_utils.error()
 
 
 def __get_dom_content(html, name, match):
@@ -38,6 +52,7 @@ def __get_dom_content(html, name, match):
 		return result
 	except:
 		log_utils.error()
+		return ''
 
 
 def __get_dom_elements(item, name, attrs):
@@ -47,14 +62,12 @@ def __get_dom_elements(item, name, attrs):
 			this_list = re.findall(pattern, item, re.M | re.S | re.I)
 		else:
 			last_list = None
-			try: iter_items = attrs.iteritems()
-			except: iter_items = attrs.items()
-			for key, value in iter_items:
+
+			for key, value in py_tools.iteritems(attrs):
 				value_is_regex = isinstance(value, re_type)
-				value_is_str = isinstance(value, basestring)
+				value_is_str = isinstance(value, py_tools.string_types)
 				pattern = r'''(<{tag}[^>]*\s{key}=(?P<delim>['"])(.*?)(?P=delim)[^>]*>)'''.format(tag=name, key=key)
 				re_list = re.findall(pattern, item, re.M | re.S | re.I)
-
 				if value_is_regex:
 					this_list = [r[0] for r in re_list if re.match(value, r[2])]
 				else:
@@ -66,8 +79,10 @@ def __get_dom_elements(item, name, attrs):
 					if not has_space:
 						pattern = r'''(<{tag}[^>]*\s{key}=((?:[^\s>]|/>)*)[^>]*>)'''.format(tag=name, key=key)
 						re_list = re.findall(pattern, item, re.M | re.S | re.I)
-						if value_is_regex: this_list = [r[0] for r in re_list if re.match(value, r[1])]
-						else: this_list = [r[0] for r in re_list if value == r[1]]
+						if value_is_regex:
+							this_list = [r[0] for r in re_list if re.match(value, r[1])]
+						else:
+							this_list = [r[0] for r in re_list if value == r[1]]
 
 				if last_list is None: last_list = this_list
 				else: last_list = [item for item in this_list if item in last_list]
@@ -75,13 +90,12 @@ def __get_dom_elements(item, name, attrs):
 		return this_list
 	except:
 		log_utils.error()
-
+		return this_list
 
 def __get_attribs(element):
 	try:
 		attribs = {}
-		for match in re.finditer(
-				'''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element):
+		for match in re.finditer(r'''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element):
 			match = match.groupdict()
 			value1 = match.get('value1')
 			value2 = match.get('value2')
@@ -91,27 +105,29 @@ def __get_attribs(element):
 		return attribs
 	except:
 		log_utils.error()
+		return attribs
 
 
 def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 	try:
 		if attrs is None: attrs = {}
 		name = name.strip()
-		try:
-			if isinstance(html, unicode): html = [html]
-		except: pass
-		if isinstance(html, DomMatch): html = [html]
-		elif isinstance(html, str):
+		if isinstance(html, py_tools.text_type) or isinstance(html, DomMatch):
+			html = [html]
+		elif isinstance(html, py_tools.binary_type) and py_tools.isPY2:
 			try: html = [html.decode("utf-8")]  # Replace with chardet thingy
 			except:
 				try: html = [html.decode("utf-8", "replace")]
 				except: html = [html]
 		elif not isinstance(html, list): return ''
+
 		if not name: return ''
 		if not isinstance(attrs, dict): return ''
+
 		if req:
 			if not isinstance(req, list): req = [req]
 			req = set([key.lower() for key in req])
+
 		all_results = []
 		for item in html:
 			if isinstance(item, DomMatch): item = item.content
@@ -127,3 +143,4 @@ def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
 		return all_results
 	except:
 		log_utils.error()
+		return ''

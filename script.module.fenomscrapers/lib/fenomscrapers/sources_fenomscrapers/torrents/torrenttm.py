@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # created by Venom for Fenomscrapers (2-19-2021)
-'''
+"""
 	Fenomscrapers Project
-'''
+"""
 
 import re
 try: #Py2
 	from urlparse import parse_qs, urljoin
 	from urllib import urlencode, quote_plus
-except: #Py3
+except ImportError: #Py3
 	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 
 from fenomscrapers.modules import client

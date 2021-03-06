@@ -55,7 +55,7 @@
 		<setting id="provider.1337x" type="bool" label="32101" default="false" />
 		<setting id="provider.bitlord" type="bool" label="32103" default="true" />
 		<setting id="provider.bt4g" type="bool" label="32132" default="false" />
-		<setting id="provider.btdb" type="bool" label="32129" default="false" />
+		<setting id="provider.btdb" type="bool" label="32129" default="true" />
 		<setting id="provider.btdig" type="bool" label="32133" default="false" />
 		<setting id="provider.btscene" type="bool" label="32104" default="true" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
