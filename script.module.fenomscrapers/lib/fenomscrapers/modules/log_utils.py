@@ -30,14 +30,15 @@ def log(msg, caller=None, level=LOGNOTICE):
 	if not debug_enabled: return
 	debug_log = control.setting('debug.location')
 	try:
-		if caller is not None and level != LOGERROR:
+		if caller == 'scraper_error': pass
+		elif caller is not None and level != LOGERROR:
 			func = inspect.currentframe().f_back.f_code
 			line_number = inspect.currentframe().f_back.f_lineno
 			caller = "%s.%s()" % (caller, func.co_name)
 			msg = 'From func name: %s Line # :%s\n                       msg : %s' % (caller, line_number, msg)
-
-		if caller is not None and level == LOGERROR:
+		elif caller is not None and level == LOGERROR:
 			msg = 'From func name: %s.%s() Line # :%s\n                       msg : %s' % (caller[0], caller[1], caller[2], msg)
+
 		try:
 			if isinstance(msg, py_tools.text_type):
 				# msg = msg.encode('ascii', errors='ignore').decode('ascii', errors='ignore') moved this to `ensure_str(), check if it's correct.
@@ -83,4 +84,4 @@ def error(message=None, exception=True):
 		log(msg=message, caller=caller, level=LOGERROR)
 		del(type, value, traceback) # So we don't leave our local labels/objects dangling
 	except Exception as e:
-		xbmc.log('log.error() Logging Failure: %s' % (e), LOGERROR)
+		xbmc.log('[ script.module.fenomonscrapers ] log_utils.error() Logging Failure: %s' % (e), LOGERROR)

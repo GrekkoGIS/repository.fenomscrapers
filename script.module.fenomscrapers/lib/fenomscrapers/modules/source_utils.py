@@ -608,7 +608,7 @@ def convert_size(size_bytes, to='GB'):
 def scraper_error(provider):
 	import traceback
 	failure = traceback.format_exc()
-	log_utils.log(provider.upper() + ' - Exception: \n' + str(failure), log_utils.LOGDEBUG)
+	log_utils.log(provider.upper() + ' - Exception: \n' + str(failure), caller='scraper_error', level=log_utils.LOGERROR)
 
 
 def is_host_valid(url, domains):

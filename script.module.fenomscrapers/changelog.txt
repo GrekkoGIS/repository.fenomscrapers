@@ -1,3 +1,9 @@
+[B][COLOR red]Update - v1.3.3 - March 12, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] btscene is now off by default.  Site appears to be dead and gone.
+    Will leave for a week and if not returned it will be removed.[/I]
+[COLOR yellow]--[/COLOR][I] Added new torrent scraper, torrentparadise.  Scraper is on by default
+    since it is an api and extremely fast.[/I]
+
 [B][COLOR red]Update - v1.3.2 - March 06, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Matrix(py3) compatibility update.[/I]
 

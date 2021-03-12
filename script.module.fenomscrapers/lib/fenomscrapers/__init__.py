@@ -60,8 +60,8 @@ def enabledCheck(module_name):
 
 def pack_sources():
 	return ['bitlord', 'bt4g', 'btdb', 'btscene', 'extratorrent', 'idope', 'kickass2', 'limetorrents', 'magnetdl', 'piratebay',
-				'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrenttm', 'torrentz2',
-				'yourbittorrent', 'zooqle']
+				'skytorrents', 'solidtorrents', 'torrentapi', 'torrentdownload', 'torrentfunk', 'torrentgalaxy', 'torrentparadise',
+				'torrenttm', 'torrentz2', 'yourbittorrent', 'zooqle']
 
 
 def getScraperFolder(scraper_source):

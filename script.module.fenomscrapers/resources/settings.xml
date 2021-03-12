@@ -57,7 +57,7 @@
 		<setting id="provider.bt4g" type="bool" label="32132" default="false" />
 		<setting id="provider.btdb" type="bool" label="32129" default="true" />
 		<setting id="provider.btdig" type="bool" label="32133" default="false" />
-		<setting id="provider.btscene" type="bool" label="32104" default="true" />
+		<setting id="provider.btscene" type="bool" label="32104" default="false" /> <!-- seems gone 3-12-21 -->
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.extratorrent" type="bool" label="32106" default="false" />
 		<setting id="provider.eztv" type="bool" label="32107" default="true" />
@@ -78,6 +78,7 @@
 		<setting id="provider.torrentdownload" type="bool" label="32123" default="true" />
 		<setting id="provider.torrentfunk" type="bool" label="32124" default="false" />
 		<setting id="provider.torrentgalaxy" type="bool" label="32125" default="false" />
+		<setting id="provider.torrentparadise" type="bool" label="32135" default="true" />
 		<setting id="provider.torrenttm" type="bool" label="32134" default="true" />
 		<setting id="provider.torrentz2" type="bool" label="32130" default="false" />
 		<setting id="provider.yourbittorrent" type="bool" label="32126" default="false" />

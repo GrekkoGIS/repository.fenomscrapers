@@ -553,7 +553,7 @@ msgid "TORRENTTM (Pack capable)"
 msgstr ""
 
 msgctxt "#32135"
-msgid ""
+msgid "TORRENTPARADISE (Pack capable)"
 msgstr ""
 
 msgctxt "#32136"

@@ -554,8 +554,8 @@ msgid "TORRENTTM (Pack capable)"
 msgstr "TORRENTTM (Pack geschikt)"
 
 msgctxt "#32135"
-msgid ""
-msgstr ""
+msgid "TORRENTPARADISE (Pack capable)"
+msgstr "TORRENTPARADISE (Pack geschikt)"
 
 msgctxt "#32136"
 msgid ""

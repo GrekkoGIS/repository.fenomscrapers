@@ -7,6 +7,7 @@ bitlord (priority=1)
 piratebay (priority=2)
 solidtorrents(priority=1)
 torrentapi (priority=1, uses imdb_id query, uses cfscrape as of 1-28-21, RARBG's api)
+torrentparadise (priority=1)
 ytsmx (priority=2, uses imdb_id query, movies only site)
 
 single request html parsed sites(medium speed, priority=3-5):
