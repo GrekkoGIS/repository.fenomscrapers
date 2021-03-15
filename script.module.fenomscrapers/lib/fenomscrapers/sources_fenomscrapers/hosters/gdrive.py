@@ -7,13 +7,13 @@
 import re
 import requests
 try: #Py2
-	from urllib import unquote
+	from urllib import unquote, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import unquote
+	from urllib.parse import unquote, quote_plus, unquote_plus
 
 from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import control
-from fenomscrapers.modules import source_utils
+from fenomscrapers.modules import source_utils, log_utils
 
 cloudflare_worker_url = control.setting('gdrive.cloudflare_url').strip()
 
@@ -21,25 +21,41 @@ cloudflare_worker_url = control.setting('gdrive.cloudflare_url').strip()
 def getResults(searchTerm):
 	url = '{}/searchjson/{}'.format(cloudflare_worker_url, searchTerm)
 	if not url.startswith("https://"): url = "https://" + url
+	log_utils.log('url line 24= %s' % url)
 	results = requests.get(url).json()
 	return results
 
 
 def get_simple(title):
-	title = title.lower()
+	log_utils.log('title1 line 30= %s' % title)
+	# title = title.lower()
 	if "/" in title:
-		title = title.split("/")[-1].replace("'", "").replace("%20", " ")
-	title = re.sub(r"[^a-zA-Z0-9]", " ", title)
+		# title = title.split("/")[-1].replace("'", "").replace("%20", " ")
+		title = title.split("/")[-1]
+
+	title = unquote_plus(title)
+	# log_utils.log('title2 line 37= %s' % title)
+	title = title.replace('&', 'and').replace("'", '').replace('.', ' ')
+	# log_utils.log('title2 line 39 = %s' % title)
+	# title = re.sub(r"[^a-zA-Z0-9]", " ", title)
+	title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
+	# log_utils.log('title2 line 42 = %s' % title)
+
 	while "  " in title:
 		title = title.replace("  ", " ")
 	title = title.strip()
+	log_utils.log('title2 line 47= %s' % title)
 	return title
 
 
 def filteredResults(results, simpleQuery):
 	filtered = []
 	for result in results:
-		if get_simple(result["link"]).startswith(simpleQuery):
+		# if get_simple(result["link"]).startswith(simpleQuery):
+		link = get_simple(result["link"])
+		if link.startswith(simpleQuery):
+			filtered.append(result)
+		elif simpleQuery in link:
 			filtered.append(result)
 	return filtered
 
@@ -71,21 +87,30 @@ class source:
 
 	def movie(self, imdb, title, aliases, year):
 		try:
-			search_id = title + " " + str(year)
-			return search_id
+			# search_id = title + " " + str(year)
+			title = title.replace('&', 'and')
+			query = '%s %s' % (title, str(year))
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
+			query = quote_plus(query)
+			# return search_id
+			return query
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return
 
 
 	def sources(self, url, hostDict):
+		log_utils.log('url line 103 = %s' % url)
 		sources = []
 		if not url: return sources
 		try:
 			if cloudflare_worker_url == '': return sources
 			simpleQuery = get_simple(url)
+			log_utils.log('simpleQuery line 109 = %s' % simpleQuery)
 			results = getResults(url)
+
 			results = filteredResults(results, simpleQuery)
+
 			if not results: return sources
 		except:
 			source_utils.scraper_error('GDRIVE')
