@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.3.3a" provider-name="Mr-Kodi">
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.3.4" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
@@ -25,11 +25,15 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.3.3 - March 12, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] btscene is now off by default.  Site appears to be dead and gone.
-    Will leave for a week and if not returned it will be removed.[/I]
-[COLOR yellow]--[/COLOR][I] Added new torrent scraper, torrentparadise.  Scraper is on by default
-    since it is an api and extremely fast.[/I]
+[B][COLOR red]Update - v1.3.4 - March 16, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Matrix fix for xbmc.translatePath.[/I]
+[COLOR yellow]--[/COLOR][I] Fixed bogus log error from torrentparadise scraper.[/I]
+[COLOR yellow]--[/COLOR][I] Note btscene has returned so will not be removing.[/I]
+[COLOR yellow]--[/COLOR][I] skytorrents appears to have gone Cloudflare v2 challenge.  Will
+    remove in future update.  Suggest to turn off.[/I]
+[COLOR yellow]--[/COLOR][I] gdrive scraper title checking has been improved.  There is also a
+    new setting option to disable the title checking if you feel a
+    title is in your gdrive but is not being pulled in.[/I]
 		</news>
 	</extension>
 </addon>
