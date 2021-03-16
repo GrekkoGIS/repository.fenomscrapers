@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# modified by Venom for Fenomscrapers (updated 2-19-2021)
+# modified by Venom for Fenomscrapers (updated 3-15-2021)
 """
 	Fenomscrapers Project
 """
@@ -77,21 +77,21 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url)
 
 			r = client.request(url, timeout='5')
 			if not r or '<tbody' not in r: return sources
-			posts = client.parseDOM(r, 'tbody')[0]
-			posts = client.parseDOM(posts, 'tr')
+			table = client.parseDOM(r, 'tbody')[0]
+			rows = client.parseDOM(table, 'tr')
 		except:
 			source_utils.scraper_error('SKYTORRENTS')
 			return sources
 
-		for post in posts:
+		for row in rows:
 			try:
-				post = re.sub(r'\n', '', post)
-				post = re.sub(r'\t', '', post)
-				link = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\'].+<td\s*style\s*=\s*["\']text-align:\s*center;color:green;["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL | re.I)
+				row = re.sub(r'\n', '', row)
+				row = re.sub(r'\t', '', row)
+				link = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\'].+<td\s*style\s*=\s*["\']text-align:\s*center;color:green;["\']>([0-9]+|[0-9]+,[0-9]+)</td>', row, re.DOTALL | re.I)
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
@@ -115,7 +115,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
-						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except: dsize = 0
@@ -171,17 +171,17 @@ class source:
 		try:
 			r = client.request(link, timeout='5')
 			if not r or '<tbody' not in r: return
-			posts = client.parseDOM(r, 'tbody')[0]
-			posts = client.parseDOM(posts, 'tr')
+			table = client.parseDOM(r, 'tbody')[0]
+			rows = client.parseDOM(table, 'tr')
 		except:
 			source_utils.scraper_error('SKYTORRENTS')
 			return
 
-		for post in posts:
+		for row in rows:
 			try:
-				post = re.sub(r'\n', '', post)
-				post = re.sub(r'\t', '', post)
-				link = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\'].+<td\s*style\s*=\s*["\']text-align:\s*center;color:green;["\']>([0-9]+|[0-9]+,[0-9]+)</td>', post, re.DOTALL | re.I)
+				row = re.sub(r'\n', '', row)
+				row = re.sub(r'\t', '', row)
+				link = re.findall(r'href\s*=\s*["\'](magnet:[^"\']+)["\'].+<td\s*style\s*=\s*["\']text-align:\s*center;color:green;["\']>([0-9]+|[0-9]+,[0-9]+)</td>', row, re.DOTALL | re.I)
 				for url, seeders, in link:
 					url = unquote_plus(url).replace('&amp;', '&').replace(' ', '.').split('&tr')[0]
 					url = source_utils.strip_non_ascii_and_unprintable(url)
@@ -214,7 +214,7 @@ class source:
 
 					quality, info = source_utils.get_release_quality(name_info, url)
 					try:
-						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+						size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 						dsize, isize = source_utils._size(size)
 						info.insert(0, isize)
 					except: dsize = 0

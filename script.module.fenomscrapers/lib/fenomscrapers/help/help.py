@@ -3,17 +3,15 @@
 	Fenomscrapers Module
 """
 
-import os.path
-import xbmc
-import xbmcaddon
-import xbmcgui
+from fenomscrapers.modules import control
+
+fenomscrapers_path = control.addonPath()
+fenomscrapers_version = control.addonVersion()
 
 
 def get(file):
-	addonInfo = xbmcaddon.Addon().getAddonInfo
-	addonPath = xbmc.translatePath(addonInfo('path'))
-	helpFile = os.path.join(addonPath, 'lib', 'fenomscrapers', 'help', file + '.txt')
+	helpFile = control.joinPath(fenomscrapers_path, 'lib', 'fenomscrapers', 'help', file + '.txt')
 	r = open(helpFile)
 	text = r.read()
 	r.close()
-	xbmcgui.Dialog().textviewer('[COLOR red]Fenomscrapers[/COLOR] -  v%s - %s' % (xbmcaddon.Addon().getAddonInfo('version'), file), text)
+	control.dialog.textviewer('[COLOR red]Fenomscrapers[/COLOR] -  v%s - %s' % (fenomscrapers_version, file), text)

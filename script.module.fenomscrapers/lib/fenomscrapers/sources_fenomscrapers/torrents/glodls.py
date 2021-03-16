@@ -78,7 +78,7 @@ class source:
 			# log_utils.log('url = %s' % url, level=log_utils.LOGDEBUG)
 
 			headers = {'User-Agent': client.agent()}
-			r = client.request(url, headers=headers, timeout='5') # 3/3/21 new 403 error cfscrape can not solve
+			r = client.request(url, headers=headers, timeout='5')
 			# r = py_tools.ensure_str(scraper.get(url).content, errors='replace')
 
 			if not r: return sources

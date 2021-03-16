@@ -1,5 +1,5 @@
-# -*- coding: UTF-8 -*-
-# (updated 12-23-2020)
+# -*- coding: utf-8 -*-
+# (updated 03-16-2021)
 '''
 	Fenomscrapers Project
 '''
@@ -7,11 +7,10 @@
 import re
 import requests
 try: #Py2
-	from urllib import unquote
+	from urllib import unquote, quote_plus, unquote_plus
 except ImportError: #Py3
-	from urllib.parse import unquote
+	from urllib.parse import unquote, quote_plus, unquote_plus
 
-from fenomscrapers.modules import cleantitle
 from fenomscrapers.modules import control
 from fenomscrapers.modules import source_utils
 
@@ -21,6 +20,7 @@ cloudflare_worker_url = control.setting('gdrive.cloudflare_url').strip()
 def getResults(searchTerm):
 	url = '{}/searchjson/{}'.format(cloudflare_worker_url, searchTerm)
 	if not url.startswith("https://"): url = "https://" + url
+	# log_utils.log('query url = %s' % url)
 	results = requests.get(url).json()
 	return results
 
@@ -28,11 +28,16 @@ def getResults(searchTerm):
 def get_simple(title):
 	title = title.lower()
 	if "/" in title:
-		title = title.split("/")[-1].replace("'", "").replace("%20", " ")
-	title = re.sub(r"[^a-zA-Z0-9]", " ", title)
+		title = title.split("/")[-1]
+
+	title = unquote_plus(title)
+	title = title.replace('&', 'and').replace("'", '').replace('.', ' ')
+	title = re.sub(r'[^a-z0-9\s\.]+', '', title) # query keeps dashes if they exist in actual title. dash is removed in title check and links returned for comp
+
 	while "  " in title:
 		title = title.replace("  ", " ")
 	title = title.strip()
+	# log_utils.log('title = %s' % title)
 	return title
 
 
@@ -52,8 +57,9 @@ class source:
 
 	def tvshow(self, imdb, tvdb, tvshowtitle, aliases, year):
 		try:
-			url = cleantitle.geturl(tvshowtitle)
-			return url
+			query = tvshowtitle.replace('&', 'and')
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
+			return query
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return
@@ -61,9 +67,9 @@ class source:
 
 	def episode(self, url, imdb, tvdb, title, premiered, season, episode):
 		try:
-			# search_id = url + " S" + str(season.zfill(2)) + "E" + str(episode.zfill(2))
-			search_id = url + " S" + season.zfill(2) + "E" + episode.zfill(2)
-			return search_id
+			query = url + " S" + str(season).zfill(2) + "E" + str(episode).zfill(2)
+			query = quote_plus(query)
+			return query
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return
@@ -71,8 +77,11 @@ class source:
 
 	def movie(self, imdb, title, aliases, year):
 		try:
-			search_id = title + " " + str(year)
-			return search_id
+			title = title.replace('&', 'and')
+			query = '%s %s' % (title, str(year))
+			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
+			query = quote_plus(query)
+			return query
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return
@@ -83,10 +92,11 @@ class source:
 		if not url: return sources
 		try:
 			if cloudflare_worker_url == '': return sources
-			simpleQuery = get_simple(url)
 			results = getResults(url)
-			results = filteredResults(results, simpleQuery)
 			if not results: return sources
+			if control.setting('gdrive.title.chk') == 'true':
+				simpleQuery = get_simple(url)
+				results = filteredResults(results, simpleQuery)
 		except:
 			source_utils.scraper_error('GDRIVE')
 			return sources

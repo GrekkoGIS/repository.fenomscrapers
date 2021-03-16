@@ -8,11 +8,9 @@ from json import loads as jsloads
 import re
 try: #Py2
 	from urlparse import parse_qs, urljoin
-	from urllib import urlencode, quote_plus, unquote_plus
+	from urllib import urlencode, quote_plus
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin
-	from urllib.parse import urlencode, quote_plus, unquote_plus
-
+	from urllib.parse import parse_qs, urljoin, urlencode, quote_plus
 from fenomscrapers.modules import client
 from fenomscrapers.modules import source_utils
 from fenomscrapers.modules import workers
@@ -80,7 +78,7 @@ class source:
 			# log_utils.log('url = %s' % url)
 
 			rjson = client.request(url, timeout='5')
-			if not rjson or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
+			if not rjson or rjson == 'null' or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
 				return sources
 			files = jsloads(rjson)
 		except:
@@ -163,8 +161,8 @@ class source:
 		try:
 			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 			rjson = client.request(link, timeout='5')
-			if not rjson or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
-				return
+			if not rjson or rjson == 'null' or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
+				return sources
 			files = jsloads(rjson)
 		except:
 			source_utils.scraper_error('TORRENTPARADISE')

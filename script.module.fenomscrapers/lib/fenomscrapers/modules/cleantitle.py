@@ -44,15 +44,16 @@ def get_simple(title):
 
 
 def geturl(title):
+	if not title: return
 	try:
-		if not title: return
 		try: title = py_tools.ensure_str(title)
 		except: pass
 		title = title.lower().rstrip()
 		try: title = title.translate(None, ':*?"\'\.<>|&!,')
 		except:
-			for c in ':*?"\'\.<>|&!,':
-				title = title.replace(c, '')
+			try: title = title.translate(title.maketrans('', '', ':*?"\'\.<>|&!,'))
+			except:
+				for c in ':*?"\'\.<>|&!,': title = title.replace(c, '')
 		title = title.replace('/', '-').replace(' ', '-').replace('--', '-').replace('–', '-').replace('!', '')
 		return title
 	except:

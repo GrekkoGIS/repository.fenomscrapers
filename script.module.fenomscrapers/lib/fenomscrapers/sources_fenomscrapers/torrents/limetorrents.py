@@ -105,16 +105,16 @@ class source:
 			headers = {'User-Agent': client.agent()}
 			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
 			if not r or '<table' not in r: return
-			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
-			posts = client.parseDOM(posts, 'tr')
-			if not posts: return
+			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
+			rows = client.parseDOM(table, 'tr')
+			if not rows: return
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return
 
-		for post in posts:
+		for row in rows:
 			try:
-				data = client.parseDOM(post, 'a', ret='href')[0]
+				data = client.parseDOM(row, 'a', ret='href')[0]
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
 				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
@@ -132,13 +132,13 @@ class source:
 					if any(re.search(item, name.lower()) for item in ep_strings): continue
 
 				try:
-					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
+					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0
@@ -195,16 +195,16 @@ class source:
 			headers = {'User-Agent': client.agent()}
 			r = py_tools.ensure_str(self.scraper.get(link, headers=headers).content, errors='replace')
 			if not r or '<table' not in r: return
-			posts = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
-			posts = client.parseDOM(posts, 'tr')
-			if not posts: return
+			table = client.parseDOM(r, 'table', attrs={'class': 'table2'})[0]
+			rows = client.parseDOM(table, 'tr')
+			if not rows: return
 		except:
 			source_utils.scraper_error('LIMETORRENTS')
 			return
 
-		for post in posts:
+		for row in rows:
 			try:
-				data = client.parseDOM(post, 'a', ret='href')[0]
+				data = client.parseDOM(row, 'a', ret='href')[0]
 				if '/search/' in data: continue
 				data = re.sub(r'\s', '', data).strip()
 				hash = re.compile(r'/torrent/(.+?).torrent', re.I).findall(data)[0]
@@ -230,13 +230,13 @@ class source:
 				if source_utils.remove_lang(name_info): continue
 
 				try:
-					seeders = int(client.parseDOM(post, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
+					seeders = int(client.parseDOM(row, 'td', attrs={'class': 'tdseed'})[0].replace(',', ''))
 					if self.min_seeders > seeders: continue
 				except: seeders = 0
 
 				quality, info = source_utils.get_release_quality(name_info, url)
 				try:
-					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', post)[0]
+					size = re.findall(r'((?:\d+\,\d+\.\d+|\d+\.\d+|\d+\,\d+|\d+)\s*(?:GB|GiB|Gb|MB|MiB|Mb))', row)[0]
 					dsize, isize = source_utils._size(size)
 					info.insert(0, isize)
 				except: dsize = 0

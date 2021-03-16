@@ -33,6 +33,8 @@
 		<setting id="provider.filepursuit" type="bool" label="32066" default="false" />
 		<setting id="provider.furk" type="bool" label="32068" default="false" />
 		<setting id="provider.gdrive" type="bool" label="32081" default="false" />
+		<setting id="gdrive.title.chk" type="bool" label="32083" default="true" visible="eq(-1,true)" />
+		<setting label="32001" type="action" action="RunPlugin(plugin://script.module.fenomscrapers/?action=ShowHelp&amp;name=gdrive_titleCheck)" visible="eq(-2,true)" />
 		<setting id="provider.ororo" type="bool" label="32074" default="false" />
 
 		<setting label="32045" type="lsep" />
@@ -57,7 +59,7 @@
 		<setting id="provider.bt4g" type="bool" label="32132" default="false" />
 		<setting id="provider.btdb" type="bool" label="32129" default="true" />
 		<setting id="provider.btdig" type="bool" label="32133" default="false" />
-		<setting id="provider.btscene" type="bool" label="32104" default="false" /> <!-- seems gone 3-12-21 -->
+		<setting id="provider.btscene" type="bool" label="32104" default="false" />
 		<setting id="provider.ettv" type="bool" label="32105" default="false" />
 		<setting id="provider.extratorrent" type="bool" label="32106" default="false" />
 		<setting id="provider.eztv" type="bool" label="32107" default="true" />

@@ -10,6 +10,9 @@ import xbmcgui
 import xbmcvfs
 import xml.etree.ElementTree as ET
 
+def getKodiVersion():
+	return int(xbmc.getInfoLabel("System.BuildVersion")[:2])
+
 addon = xbmcaddon.Addon
 addonObject = addon('script.module.fenomscrapers')
 addonInfo = addonObject.getAddonInfo
@@ -18,6 +21,8 @@ condVisibility = xbmc.getCondVisibility
 execute = xbmc.executebuiltin
 jsonrpc = xbmc.executeJSONRPC
 monitor = xbmc.Monitor()
+transPath = xbmc.translatePath if getKodiVersion() < 19 else xbmcvfs.translatePath
+joinPath = os.path.join
 
 dialog = xbmcgui.Dialog()
 window = xbmcgui.Window(10000)
@@ -25,12 +30,11 @@ window = xbmcgui.Window(10000)
 existsPath = xbmcvfs.exists
 openFile = xbmcvfs.File
 makeFile = xbmcvfs.mkdir
-joinPath = os.path.join
 
-SETTINGS_PATH = xbmc.translatePath(os.path.join(addonInfo('path'), 'resources', 'settings.xml'))
-try: dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
-except: dataPath = xbmc.translatePath(addonInfo('profile'))
-cacheFile = os.path.join(dataPath, 'cache.db')
+SETTINGS_PATH = transPath(joinPath(addonInfo('path'), 'resources', 'settings.xml'))
+try: dataPath = transPath(addonInfo('profile')).decode('utf-8')
+except: dataPath = transPath(addonInfo('profile'))
+cacheFile = joinPath(dataPath, 'cache.db')
 
 
 def setting(id):
@@ -41,21 +45,17 @@ def setSetting(id, value):
 	return xbmcaddon.Addon('script.module.fenomscrapers').setSetting(id, value)
 
 
-def sleep(time):  # Modified `sleep` command that honors a user exit request
-	while time > 0 and not monitor.abortRequested():
-		xbmc.sleep(min(100, time))
-		time = time - 100
-
-
-def getKodiVersion():
-	return int(xbmc.getInfoLabel("System.BuildVersion")[:2])
-
-
 def lang(language_id):
 	text = getLangString(language_id)
 	if getKodiVersion() < 19:
 		text = text.encode('utf-8', 'replace')
 	return text
+
+
+def sleep(time):  # Modified `sleep` command that honors a user exit request
+	while time > 0 and not monitor.abortRequested():
+		xbmc.sleep(min(100, time))
+		time = time - 100
 
 
 def check_version_numbers(current, new):
@@ -81,7 +81,7 @@ def isVersionUpdate():
 	except:
 		LOGNOTICE = xbmc.LOGNOTICE if getKodiVersion() < 19 else xbmc.LOGINFO #(2 in 18, deprecated in 19 use LOGINFO(1))
 		xbmc.log('FenomScrapers Addon Data Path Does not Exist. Creating Folder....', LOGNOTICE)
-		addon_folder = xbmc.translatePath('special://profile/addon_data/script.module.fenomscrapers')
+		addon_folder = transPath('special://profile/addon_data/script.module.fenomscrapers')
 		xbmcvfs.mkdirs(addon_folder)
 	try:
 		with open(versionFile, 'r') as fh: oldVersion = fh.read()
@@ -126,8 +126,8 @@ def clean_settings():
 		current_user_settings = []
 		addon = xbmcaddon.Addon(id=addon_id)
 		addon_name = addon.getAddonInfo('name')
-		addon_dir = xbmc.translatePath(addon.getAddonInfo('path'))
-		profile_dir = xbmc.translatePath(addon.getAddonInfo('profile'))
+		addon_dir = transPath(addon.getAddonInfo('path'))
+		profile_dir = transPath(addon.getAddonInfo('profile'))
 		active_settings_xml = os.path.join(addon_dir, 'resources', 'settings.xml')
 		root = ET.parse(active_settings_xml).getroot()
 		for item in root.findall(r'./category/setting'):
@@ -175,6 +175,11 @@ def addonVersion():
 
 def addonIcon():
 	return addonInfo('icon')
+
+
+def addonPath():
+	try: return transPath(addonInfo('path').decode('utf-8'))
+	except: return transPath(addonInfo('path'))
 
 
 def openSettings(query=None, id=addonInfo('id')):

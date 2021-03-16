@@ -8,9 +8,9 @@ from json import loads as jsloads
 import re
 try: #Py2
 	from urlparse import parse_qs, urljoin
-	from urllib import urlencode, quote, unquote_plus
+	from urllib import urlencode, quote
 except ImportError: #Py3
-	from urllib.parse import parse_qs, urljoin, urlencode, quote, unquote_plus
+	from urllib.parse import parse_qs, urljoin, urlencode, quote
 
 from fenomscrapers.modules import cache
 from fenomscrapers.modules import client
@@ -22,6 +22,7 @@ class source:
 	def __init__(self):
 		self.priority = 2
 		self.language = ['en']
+		self.domain = ['apibay.org']
 		self.base_link = 'https://apibay.org'
 		self.search_link = '/q.php?q=%s&cat=0'
 		self.min_seeders = 0
