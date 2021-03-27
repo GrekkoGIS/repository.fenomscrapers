@@ -1,3 +1,7 @@
+[B][COLOR red]Update - v1.3.5 - March 26, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Fixed title check failures on "vs." and "v." in meta titles.  This
+    caused no sources returned[/I]
+
 [B][COLOR red]Update - v1.3.4 - March 16, 2021[/COLOR][/B]
 [COLOR yellow]--[/COLOR][I] Matrix fix for xbmc.translatePath.[/I]
 [COLOR yellow]--[/COLOR][I] Fixed bogus log error from torrentparadise scraper.[/I]

@@ -17,8 +17,8 @@ def get(title):
 		title = re.sub(r'&#(\d+);', '', title).lower()
 		title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
 		title = title.replace('&quot;', '\"').replace('&amp;', '&')
-		# title = re.sub(r'\n|([[].+?[]])|([(].+?[)])|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\~|\s', '', title).lower()
-		title = re.sub(r'\n|([\[({].+?[})\]])|\s(vs[.]?|v[.])\s|([:;–\-"\',!_\.\?~])|\s', '', title) # removes bracketed content
+		# title = re.sub(r'\n|([\[({].+?[})\]])|\s(vs[.]?|v[.])\s|([:;–\-"\',!_\.\?~])|\s', '', title) # removes bracketed content
+		title = re.sub(r'\n|([\[({].+?[})\]])|([:;–\-"\',!_.?~$@])|\s', '', title) # stop trying to remove alpha characters "vs" or "v", they're part of a title
 		return title
 	except:
 		log_utils.error()
@@ -34,8 +34,8 @@ def get_simple(title):
 		title = re.sub(r'&#(\d+);', '', title)
 		title = re.sub(r'(&#[0-9]+)([^;^0-9]+)', '\\1;\\2', title)
 		title = title.replace('&quot;', '\"').replace('&amp;', '&')
-		# title = re.sub(r'\n|\(|\)|\[|\]|\{|\}|\s(vs|v[.])\s|(:|;|-|–|"|,|\'|\_|\.|\?)|\~|\s', '', title).lower()
-		title = re.sub(r'\n|[()[\]{}]|\s(vs[.]?|v[.])\s|[:;–\-",\'!_.?~]|\s', '', title) # keeps bracketed content unlike .get()
+		# title = re.sub(r'\n|[()[\]{}]|\s(vs[.]?|v[.])\s|[:;–\-",\'!_.?~]|\s', '', title) # keeps bracketed content unlike .get()
+		title = re.sub(r'\n|[()[\]{}]|[:;–\-",\'!_.?~$@]|\s', '', title) # stop trying to remove alpha characters "vs" or "v", they're part of a title
 		title = re.sub(r'<.*?>', '', title) # removes tags?
 		return title
 	except:
@@ -63,11 +63,8 @@ def geturl(title):
 
 def normalize(title):
 	try:
-		if py_tools.isPY2:
-			try: return py_tools.ensure_str(py_tools.ensure_text(title, encoding='ascii'))
-			except: pass
-		# return str(''.join(c for c in unicodedata.normalize('NFKD', unicode(title.decode('utf-8'))) if unicodedata.category(c) != 'Mn'))
-		return ''.join(c for c in unicodedata.normalize('NFKD', py_tools.ensure_text(py_tools.ensure_str(title))) if unicodedata.category(c) != 'Mn')
+		title = ''.join(c for c in unicodedata.normalize('NFKD', py_tools.ensure_text(py_tools.ensure_str(title))) if unicodedata.category(c) != 'Mn')
+		return str(title)
 	except:
 		log_utils.error()
 		return title

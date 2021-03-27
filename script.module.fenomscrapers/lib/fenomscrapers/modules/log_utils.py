@@ -5,6 +5,8 @@
 
 from datetime import datetime
 import inspect
+from string import printable
+import unicodedata
 import xbmc
 from fenomscrapers.modules import control
 from fenomscrapers.modules import py_tools
@@ -19,17 +21,32 @@ LOGFATAL = xbmc.LOGFATAL #(6 in 18, 4 in 19)
 LOGNONE = xbmc.LOGNONE #(7 in 18, 5 in 19)
 if py_tools.isPY2:
 	debug_list = ['DEBUG', 'INFO', 'NOTICE', 'WARNING', 'ERROR', 'SEVERE', 'FATAL']
+	from io import open #py2 open() does not support encoding param
 else:
 	debug_list = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL']
 DEBUGPREFIX = '[COLOR red][ FENOMSCRAPERS %s ][/COLOR]'
 LOGPATH = control.transPath('special://logpath/')
+
 
 def log(msg, caller=None, level=LOGNOTICE):
 	debug_enabled = control.setting('debug.enabled') == 'true'
 	if not debug_enabled: return
 	debug_location = control.setting('debug.location')
 
+	if isinstance(msg, int): msg = control.lang(msg) # for strings.po translations
+
 	try:
+		if py_tools.isPY3:
+			if not msg.isprintable(): # ex. "\n" is not a printable character so returns False on those sort of cases
+				msg = '%s (NORMALIZED by log_utils.log())' % normalize(msg)
+			if isinstance(msg, py_tools.binary_type):
+				msg = '%s (ENCODED by log_utils.log())' % (py_tools.ensure_str(msg, errors='replace'))
+		else:
+			if not isprintable(msg): # if not all(c in printable for c in msg): # isprintable() not available in py2
+				msg = normalize(msg)
+			if isinstance(msg, py_tools.binary_type):
+				msg = '%s (ENCODED by log_utils.log())' % (py_tools.ensure_text(msg))
+
 		if caller == 'scraper_error': pass
 		elif caller is not None and level != LOGERROR:
 			func = inspect.currentframe().f_back.f_code
@@ -39,22 +56,15 @@ def log(msg, caller=None, level=LOGNOTICE):
 		elif caller is not None and level == LOGERROR:
 			msg = 'From func name: %s.%s() Line # :%s\n                       msg : %s' % (caller[0], caller[1], caller[2], msg)
 
-		try: msg = msg.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
-		except: pass
-
-		try:
-			if isinstance(msg, py_tools.text_type):
-				msg = '%s (ENCODED)' % (py_tools.ensure_str(msg, errors='replace'))
-		except: pass
-
 		if debug_location == '1':
 			log_file = control.joinPath(LOGPATH, 'fenomscrapers.log')
 			if not control.existsPath(log_file):
 				f = open(log_file, 'w')
 				f.close()
-			with open(log_file, 'a') as f:
+			with open(log_file, 'a', encoding='utf-8') as f: #with auto cleans up and closes
 				line = '[%s %s] %s: %s' % (datetime.now().date(), str(datetime.now().time())[:8], DEBUGPREFIX % debug_list[level], msg)
 				f.write(line.rstrip('\r\n') + '\n')
+				# f.writelines([line1, line2]) ## maybe an option for the 2 lines without using "\n"
 		else:
 			xbmc.log('%s: %s' % (DEBUGPREFIX % debug_list[level], msg, level))
 	except Exception as e:
@@ -87,3 +97,26 @@ def error(message=None, exception=True):
 		del(type, value, traceback) # So we don't leave our local labels/objects dangling
 	except Exception as e:
 		xbmc.log('[ script.module.fenomonscrapers ] log_utils.error() Logging Failure: %s' % (e), LOGERROR)
+
+
+def isprintable(s, codec='utf8'):
+	try: s.decode(codec)
+	except UnicodeDecodeError: return False
+	else: return True
+
+
+def normalize(title):
+	try:
+		return ''.join(c for c in unicodedata.normalize('NFKD', py_tools.ensure_text(py_tools.ensure_str(title))) if unicodedata.category(c) != 'Mn')
+	except:
+		error()
+		return title
+
+
+def strip_non_ascii_and_unprintable(text):
+	try:
+		result = ''.join(char for char in text if char in printable)
+		return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
+	except:
+		error()
+		return text

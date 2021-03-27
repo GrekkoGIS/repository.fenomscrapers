@@ -130,6 +130,7 @@ def check_title(title, aliases, release_title, hdlr, year, years=None):
 		title = title.replace('!', '').replace('(', '').replace(')', '').replace('&', 'and')
 		# title = re.sub(r'[^A-Za-z0-9\s\.-]+', '', title)
 		title_list.append(title)
+
 		release_title = release_title_format(release_title) # converts to .lower()
 		h = hdlr.lower()
 		t = release_title.split(h)[0].replace(year, '').replace('(', '').replace(')', '').replace('&', 'and')
@@ -569,9 +570,8 @@ def strip_non_ascii_and_unprintable(text):
 		result = ''.join(char for char in text if char in printable)
 		return result.encode('ascii', errors='ignore').decode('ascii', errors='ignore')
 	except:
-		import traceback
-		traceback.print_exc()
-
+		log_utils.error()
+		return text
 
 def _size(siz):
 	try:

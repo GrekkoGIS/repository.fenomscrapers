@@ -78,7 +78,7 @@ class source:
 			query = re.sub(r'[^A-Za-z0-9\s\.-]+', '', query)
 			url = self.search_link % quote_plus(query)
 			url = urljoin(self.base_link, url)
-			# log_utils.log('url = %s' % url, log_utils.LOGDEBUG)
+			# log_utils.log('url = %s' % url, __name__, log_utils.LOGDEBUG)
 			api_url = urljoin(self.base_link, self.api_search_link)
 
 			headers = cache.get(self._get_token_and_cookies, 1)
