@@ -72,7 +72,7 @@
 		<setting id="provider.magnetdl" type="bool" label="32114" default="true" />
 		<setting id="provider.nyaa" type="bool" label="32116" default="false" />
 		<setting id="provider.piratebay" type="bool" label="32117" default="true" />
-		<setting id="provider.skytorrents" type="bool" label="32118" default="false" /> <!-- .org v2 challenge uses .net now -->
+<!-- 		<setting id="provider.skytorrents" type="bool" label="32118" default="false" /> --> <!-- .org .net v2 challenge now -->
 		<setting id="provider.solidtorrents" type="bool" label="32119" default="true" />
 		<setting id="provider.topnow" type="bool" label="32120" default="false" />
 		<setting id="provider.torlock" type="bool" label="32121" default="false" />

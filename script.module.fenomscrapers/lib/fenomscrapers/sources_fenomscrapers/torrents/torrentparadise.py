@@ -162,7 +162,7 @@ class source:
 			# log_utils.log('link = %s' % str(link), __name__, log_utils.LOGDEBUG)
 			rjson = client.request(link, timeout='5')
 			if not rjson or rjson == 'null' or any(value in rjson for value in ['521 Origin Down', 'No results returned', 'Connection Time-out', 'Database maintenance']):
-				return sources
+				return
 			files = jsloads(rjson)
 		except:
 			source_utils.scraper_error('TORRENTPARADISE')
