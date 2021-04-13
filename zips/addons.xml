@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<addons>
-<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.3.6" provider-name="Mr-Kodi">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.module.fenomscrapers" name="FenomScrapers Module" version="1.3.7" provider-name="Mr-Kodi">
 	<requires>
 		<import addon="script.module.requests" />
 		<import addon="script.module.myaccounts" version="1.0.0" />
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="lib/default.py">
 		<provides>executable</provides>
-	</extension>
+	</extension> 
 	<extension point="xbmc.service" library="lib/service.py" start="startup" />
 	<extension point="xbmc.python.module" library="lib" /> <!-- Must be placed after xbmc.python.pluginsource, otherwise the addon does not show in the repository. -->
 	<extension point="xbmc.addon.metadata">
-		<reuselanguageinvoker>false</reuselanguageinvoker>
+		<reuselanguageinvoker>false</reuselanguageinvoker> 
 		<summary lang="en">FenomScrapers Module</summary>
 		<description>Scrape common video host for URL's to be playable in Kodi, simplifying addon development of video plugins requiring multi video hosts.</description>
 		<platform>all</platform>
@@ -26,14 +25,10 @@
 			<screenshot></screenshot>
 		</assets>
 		<news>
-[B][COLOR red]Update - v1.3.6 - April 05, 2021[/COLOR][/B]
-[COLOR yellow]--[/COLOR][I] Removed skytorrent scraper, Cloudflare v2 challenge.[/I]
-[COLOR yellow]--[/COLOR][I] Removed Cloudflare logging entry left behind and was spamming
-    the FenomScrapers log.[/I]
-[COLOR yellow]--[/COLOR][I] Fixed issue with show pack filtering missing removal of some
-    obscure named pack files that did not apply to
-    current episode of a season.[/I]
+[B][COLOR red]Update - v1.3.7 - April 13, 2021[/COLOR][/B]
+[COLOR yellow]--[/COLOR][I] Updated cfscrape(aka cloudscraper) to v1.2.58.  Note Venomous
+    removed py2 support so this is a modified version to keep
+    py2 support.[/I]
 		</news>
 	</extension>
 </addon>
-</addons>
