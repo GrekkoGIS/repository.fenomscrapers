@@ -62,7 +62,7 @@ from .user_agent import User_Agent
 
 # ------------------------------------------------------------------------------- #
 
-__version__ = '1.2.56'
+__version__ = '1.2.58'
 
 # ------------------------------------------------------------------------------- #
 
@@ -359,7 +359,7 @@ class CloudScraper(Session):
                 resp.headers.get('Server', '').startswith('cloudflare')
                 and resp.status_code in [429, 503]
                 and re.search(
-                    r'cpo.src\s*=\s*"/cdn-cgi/challenge-platform/\S+orchestrate/jsch/v1"',
+                    r'cpo.src\s*=\s*"/cdn-cgi/challenge-platform/\S+orchestrate/jsch/v1',
                     resp.text,
                     re.M | re.S
                 )
@@ -380,7 +380,7 @@ class CloudScraper(Session):
             return (
                 CloudScraper.is_Captcha_Challenge(resp)
                 and re.search(
-                    r'cpo.src\s*=\s*"/cdn-cgi/challenge-platform/\S+orchestrate/captcha/v1"',
+                    r'cpo.src\s*=\s*"/cdn-cgi/challenge-platform/\S+orchestrate/captcha/v1',
                     resp.text,
                     re.M | re.S
                 )
@@ -510,11 +510,7 @@ class CloudScraper(Session):
             )
 
         return {
-            'url': '{}://{}{}'.format(
-                hostParsed.scheme,
-                hostParsed.netloc,
-                self.unescape(formPayload['challengeUUID'])
-            ),
+            'url': '{}://{}{}'.format(hostParsed.scheme, hostParsed.netloc, self.unescape(formPayload['challengeUUID'])),
             'data': payload
         }
 
@@ -595,11 +591,7 @@ class CloudScraper(Session):
         hostParsed = urlparse(url)
 
         return {
-            'url': '{}://{}{}'.format(
-                hostParsed.scheme,
-                hostParsed.netloc,
-                self.unescape(formPayload['challengeUUID'])
-            ),
+            'url': '{}://{}{}'.format(hostParsed.scheme, hostParsed.netloc, self.unescape(formPayload['challengeUUID'])),
             'data': dataPayload
         }
 
@@ -850,9 +842,7 @@ if ssl.OPENSSL_VERSION_INFO < (1, 1, 1):
     print(
         "DEPRECATION: The OpenSSL being used by this python install ({}) does not meet the minimum supported "
         "version (>= OpenSSL 1.1.1) in order to support TLS 1.3 required by Cloudflare, "
-        "You may encounter an unexpected Captcha or cloudflare 1020 blocks.".format(
-            ssl.OPENSSL_VERSION
-        )
+        "You may encounter an unexpected Captcha or cloudflare 1020 blocks.".format(ssl.OPENSSL_VERSION)
     )
 
 # ------------------------------------------------------------------------------- #

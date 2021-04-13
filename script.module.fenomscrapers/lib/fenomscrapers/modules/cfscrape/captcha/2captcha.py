@@ -84,10 +84,7 @@ class captchaSolver(Captcha):
         rPayload = response.json()
         if rPayload.get('status') == 0 and rPayload.get('request') in errors.get(request_type):
             raise CaptchaAPIError(
-                '{} {}'.format(
-                    rPayload['request'],
-                    errors.get(request_type).get(rPayload['request'])
-                )
+                '{} {}'.format(rPayload['request'], errors.get(request_type).get(rPayload['request']))
             )
 
     # ------------------------------------------------------------------------------- #
@@ -119,6 +116,13 @@ class captchaSolver(Captcha):
             step=5,
             timeout=180
         )
+
+        if response:
+            return True
+        else:
+            raise CaptchaReportError(
+                "2Captcha: Error - Failed to report bad Captcha solve."
+            )
 
     # ------------------------------------------------------------------------------- #
 

@@ -19,10 +19,10 @@ from ..exceptions import (
     reCaptchaBadJobID
 )
 
-from . import reCaptcha
+from . import Captcha
 
 
-class captchaSolver(reCaptcha):
+class captchaSolver(Captcha):
 
     def __init__(self):
         super(captchaSolver, self).__init__('9kw')

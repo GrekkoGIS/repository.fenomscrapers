@@ -36,9 +36,7 @@ class captchaSolver(Captcha):
     def checkErrorStatus(response):
         if response.status_code in [500, 502]:
             raise CaptchaServiceUnavailable(
-                'CapMonster: Server Side Error {}'.format(
-                    response.status_code
-                )
+                'CapMonster: Server Side Error {}'.format(response.status_code)
             )
 
         payload = response.json()
